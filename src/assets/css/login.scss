@@ -1,0 +1,101 @@
+input, .input-placeholder {
+  font-size: 1.1rem;
+  font-family: "Rubik", "Helvetica Neue", "Helvetica", "Arial", "Font Awesome 5 Brands", "Font Awesome 5", sans-serif;
+  padding: 10px;
+  border: none;
+  border-radius: 6px;
+  background: var(--dark);
+  color: var(--white);
+}
+
+.input-placeholder{
+  cursor:no-drop;
+}
+
+.message {
+    background: var(--accent-3);
+    padding: 5px;
+    font-size: .8rem;
+    border-radius: 6px;
+    margin: auto;
+}
+.form {
+  margin: 40px auto;
+  width: 400px;
+  max-width: 90vw;
+  // background: var(--shadow-20);
+  padding: 20px 20px 20px 20px;
+  border-radius: 10px;
+  box-shadow: 0 30px 60px var(--dark), 0 0 0 1px var(--dark);
+  display: grid;
+  gap: 10px;
+  h1{
+    margin:0;
+  }
+  .help-text{
+    margin-top: -8px;
+    font-size: 12px;
+    line-height: 12px;
+    opacity: .6;
+    position: relative;
+    &::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      width: calc(100% + 40px);
+      left: -20px;
+      height: 2px;
+      background: var(--dark);
+      top: calc(100% + 12px);
+    }
+  }
+  .form-section {
+    display: grid;
+    gap: 10px;
+    label{
+      text-transform:uppercase;
+      font-size: 13px;
+transform: translate(10px,5px);
+font-weight: 700;
+opacity: .5;
+    }
+    .flex{
+      margin-top:10px;
+    }
+  }
+
+  &.working {
+    position: relative;
+    overflow: hidden;
+    z-index: 2;
+
+    &::before {
+      content: "";
+      display: block;
+      position: absolute;
+      height: 4px;
+      width: 100%;
+      left: 0;
+      transition: .2s ease;
+      background: linear-gradient(90deg, var(--primary), var(--accent));
+      animation: shootingBar 1s ease forwards infinite;
+    }
+  }
+}
+
+@keyframes shootingBar {
+  from {
+    transform: translateX(-100%);
+
+  }
+
+  to {
+    transform: translateX(100%);
+  }
+}
+
+.invisible {
+  visibility: hidden;
+  pointer-events: none;
+  position: absolute;
+}
