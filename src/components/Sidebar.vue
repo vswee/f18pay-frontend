@@ -9,7 +9,7 @@
         <i :style="'background: #' + store.store_colour"></i>
         <i :style="'background: #' + store.store_accent_colour"></i>
       </span>
-      <span class="collapsible">{{store.store_name}}</span>
+      <span class="collapsible">{{decodedString(store.store_name)}}</span>
     </div>
   </div>
   <div></div>
@@ -58,9 +58,16 @@ export default {
       this.$store.commit("setStores", false);
     }
   },
+  mounted(){
+    if(document.getElementById("main")){document.documentElement.style.setProperty('--main', document.getElementById("main").getBoundingClientRect().width + "px")}
+  },
   methods: {
+    decodedString(string){
+      return decodeURIComponent(decodeURI(string));
+    },
     toggleCollapse() {
       this.$store.commit("setSidebarCollapse", !this.sidebarCollapse);
+      if(document.getElementById("main")){document.documentElement.style.setProperty('--main', document.getElementById("main").getBoundingClientRect().width + "px")}
     },
     openStore(id) {
       this.$store.commit("setActiveStore", id);
@@ -71,6 +78,9 @@ export default {
     },
     settingsView() {
       this.$store.commit("setStoreView", 'settings');
+    },
+    assetsView() {
+      this.$store.commit("setStoreView", 'buttons');
     },
     newStore(){
       this.$store.commit("setStoreModalView", 'new');

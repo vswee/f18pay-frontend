@@ -55,7 +55,7 @@ let actions = {
 
   async verifySession({ commit, getters, dispatch }) {
     let session = false;
-    console.log("verifying session...")
+    // console.log("verifying session...")
     const user = getters.user
     const fingerprint = getters.fingerprint
     const keyivId = getters.keyivId
@@ -66,7 +66,7 @@ let actions = {
       console.warn("No session. Missing parameters.");
       return session
     }
-    console.log("trying session", user, fingerprint, keyivId);
+    // console.log("trying session", user, fingerprint, keyivId);
 
     const username = await dispatch('encrypt', { string: user, keyiv: keyiv });
     await fetch("https://money-api.flat18.co.uk/validate-fingerprint-check-username", {
@@ -85,7 +85,7 @@ let actions = {
           session = false;
         }
         let route = router.currentRoute.name;
-        console.log(session, route)
+        // console.log(session, route)
         if (!session) {
           switch (route) {
             case 'home':
@@ -93,10 +93,10 @@ let actions = {
             case 'signup':
             case 'verify-email':
             case 'reset-password':
-              console.log("Not interrupting")
+              // console.log("Not interrupting")
               break;
             default:
-              console.log("Returning Home")
+              // console.log("Returning Home")
               router.push({
                 name: 'home'
               });
@@ -110,13 +110,13 @@ let actions = {
             case 'signup':
             case 'verify-email':
             case 'reset-password':
-              console.log("Session: Returning Dashboard")
+              // console.log("Session: Returning Dashboard")
               router.push({
                 name: 'dashboard'
               });
               break;
             default:
-              console.log("Session: Not interrupting")
+            // console.log("Session: Not interrupting")
           }
         }
 
@@ -125,9 +125,45 @@ let actions = {
         console.error("Error:", error);
         session = false;
       });
-    console.log("session:", session)
+    // console.log("session:", session)
     return session
   },
+
+  async getStores({ commit, getters, dispatch }) {
+    const username = await dispatch('encrypt', {
+      string: getters.user,
+      keyiv: getters.keyiv
+    });
+    await fetch("https://money-api.flat18.co.uk/stores", {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      },
+      body: JSON.stringify({
+        username: username,
+        fingerprint: getters.fingerprint,
+        keyivId: getters.keyivId
+      }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        // this.message = data.debug ? data.debug : false
+        if (data.proceed == true) {
+          //HANDLE STORES DATA
+          commit("setStores", data.stores);
+          // if (!this.storeView) {
+          //   commit("setStoreView", 'overview');
+          // }
+        }
+        // else {
+        // this.message = "Failed to fetch stores"
+        // }
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
+  },
+
 
   test(payload) {
     console.log(payload)

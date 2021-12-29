@@ -4,7 +4,7 @@
     <div v-for="store in stores" :key="store.store_id" :class="store.deleted==1?'store-tile disabled':'store-tile active'" @click="openStore(store.store_id)">
       <h2>
         <img class="store-icon" v-if="store.store_logo" :src="store.store_logo">
-        <span class="store-name-title-text">{{store.store_name}}</span>
+        <span class="store-name-title-text">{{decodeURIComponent(decodeURI(store.store_name))}} <i class="fab fa-bitcoin" v-if="store.network==='btc'"></i> <i class="fab fa-ethereum" v-if="store.network==='eth'"></i></span>
         <span class="store-flag">
           <i :style="'background: #' + store.store_colour"></i>
           <i :style="'background: #' + store.store_accent_colour"></i>
@@ -16,9 +16,9 @@
       </span>
     </div>
   </div>
-
   <StoreSummary v-if="activeStore && storeView=='overview'"></StoreSummary>
-  <NewStoreModal v-if="storeModalView=='new'"></NewStoreModal>
+  <StoreSettings v-if="activeStore && storeView=='settings'"></StoreSettings>
+  <StoreAssets v-if="activeStore && storeView=='buttons'"></StoreAssets>
 </div>
 </template>
 
@@ -27,14 +27,14 @@ import {
   mapGetters
 } from 'vuex';
 import StoreSummary from '@/components/StoreSummary'
-import NewStoreModal from '@/components/NewStoreModal'
-
+import StoreSettings from '@/components/StoreSettings'
+import StoreAssets from '@/components/StoreAssets'
 export default {
   name: "Dashboard",
-  components:{
+  components: {
     StoreSummary,
-    NewStoreModal,
-
+    StoreSettings,
+    StoreAssets,
   },
   data() {
     return {
@@ -93,7 +93,9 @@ export default {
             //HANDLE STORES DATA
             this.stores = data.stores
             this.$store.commit("setStores", data.stores);
-            if(!this.storeView){this.$store.commit("setStoreView", 'overview');}
+            if (!this.storeView) {
+              this.$store.commit("setStoreView", 'overview');
+            }
           } else {
             this.message = "Failed to fetch stores"
           }

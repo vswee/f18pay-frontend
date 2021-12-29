@@ -10,8 +10,9 @@ import {
       chart: 'chart',
     })
   },
-    mounted() {
-      this.renderChart(this.chart.chartData, this.chart.options)
+    async mounted() {
+      let chartData = {copiedData: this.chart.chartData};
+      this.renderChart(chartData.copiedData, this.chart.options)
     }
   }
 </script>

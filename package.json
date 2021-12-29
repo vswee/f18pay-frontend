@@ -15,6 +15,7 @@
     "vue": "^2.6.11",
     "vue-chartjs": "^3.5.1",
     "vue-cryptojs": "^2.1.6",
+    "vue-native-color-picker": "^1.2.0",
     "webpack": "^4.46.0"
   },
   "devDependencies": {

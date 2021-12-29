@@ -1,16 +1,75 @@
 <template lang="">
-<div class="modal-input">
-  <div :class="working?'form working':'form'" v-if="type==='login'">
-    <h1>Create New Store</h1>
-    <div class="message" v-if="message"><i class="fas fa-exclamation-circle"></i> {{message}}</div>
-    <div class="form-section" v-if="storeNameConfirmed">
-      <label for="username">Store Name</label>
-      <input v-model="name" type="text" placeholder="Store Name" />
-      <label for="password">password</label>
-      <input v-model="password" type="password" placeholder="" v-on:keyup.enter="checkPassword()" />
-      <div class="flex">
-        <a class="btn sec" @click="usernameConfirmed=false"><i class="fas fa-arrow-left"></i>Back</a>
-        <a class="btn" @click="checkPassword()">Login<i class="fas fa-arrow-right"></i></a></div>
+<div class="modal" @click="closeModal()">
+  <div class="modal-input">
+    <div :class="working?'form working':'form'" @click.stop="false">
+      <h1>Create New Store</h1>
+      <div class="message" v-if="message"><i class="fas fa-exclamation-circle"></i> {{message}}</div>
+      <div class="form-section" v-if="!storeNameConfirmed">
+        <div class="sub-sect">
+          <label for="storeName">Store Name</label>
+          <input v-model="storeName" type="text" placeholder="E.g. Donations" />
+          <span class="help-text">This name will appear on invoices, financial reports and on the F18 Pay Dashboard.</span>
+        </div>
+        <div class="sub-sect">
+          <label for="storeName">Store Type: {{storeType}}</label>
+          <div class="switch">
+            <a :class="storeType=='btc'?'btn active':'btn'" @click.stop="storeType='btc'"><i class="fab fa-bitcoin"></i> Bitcoin</a>
+            <a :class="storeType=='eth'?'btn active':'btn'" @click.stop="storeType='eth'"><i class="fab fa-ethereum"></i> Ethereum</a>
+          </div>
+          <span class="help-text">A F18 Pay Store can collect either Bitcoin or Ethereum only. To enable your payees to choose between BTC and ETH (including ERC-20 Tokens) you should create multiple stores and setup currency-switching in the store settings.</span>
+        </div>
+        <div class="flex">
+          <a class="btn sec" @click.stop="closeModal()"><i class="fas fa-arrow-left"></i>Cancel</a>
+          <a class="btn" @click.stop="!working && (checkStoreName())">Next<i class="fas fa-arrow-right"></i></a>
+        </div>
+      </div>
+
+      <div class="form-section" v-if="storeNameConfirmed && zpubOptions && !collectZpub && !confirmAddresses">
+        <div class="sub-sect">
+          <label for="storeName">Address Derivation</label>
+          <div class="switch">
+            <a :class="addressDerivationType=='external'?'btn active':'btn'" @click.stop="addressDerivationType='external'">External</a>
+            <a :class="addressDerivationType=='internal'?'btn active':'btn'" @click.stop="addressDerivationType='internal'">Internal</a>
+          </div>
+          <span class="help-text">You can use your own (external) wallet with F18 Pay as long as the addresses are Native SegWit.<br>If you'd like to use randomly generated addresses for your store invoices choose 'Internal' and we'll generate key pairs which you can sweep at any time.</span>
+        </div>
+        <div class="flex">
+          <a class="btn sec" @click.stop="backToStart()"><i class="fas fa-arrow-left"></i>Back</a>
+          <a class="btn" @click.stop="!working && (setAddressDerivationType())">Next<i class="fas fa-arrow-right"></i></a></div>
+      </div>
+
+      <div class="form-section" v-if="storeNameConfirmed && zpubOptions && collectZpub && !confirmAddresses">
+        <div class="sub-sect">
+          <label for="storeName">Native SegWit zpub</label>
+          <input v-model="zpub" type="text" placeholder="E.g. zpub6nALs1VXMgnQF7eU35PHhB..." />
+          <span class="help-text">For Electrum wallets; Menu > Wallet > Information > Master Public Key.</span>
+        </div>
+        <div class="sub-sect">
+          <span class="help-text">F18 Pay will <b>only</b> be able to generate addresses and check balances for your wallet.<br>We recommend that you use a dedicated wallet for F18 Pay to avoid untracked transactions on your addresses.</span>
+        </div>
+        <div class="flex">
+          <a class="btn sec" @click.stop="collectZpub=false"><i class="fas fa-arrow-left"></i>Back</a>
+          <a class="btn" @click.stop="!working && (submitZpub())">Next<i class="fas fa-arrow-right"></i></a>
+        </div>
+      </div>
+
+      <div class="form-section" v-if="storeNameConfirmed && zpubOptions && collectZpub && confirmAddresses">
+        <div class="sub-sect">
+          <label for="storeName">Wallet Addresses</label>
+          <ol>
+            <li v-for="(address, key) in confirmAddresses" :key="key">{{address}}</li>
+          </ol>
+          <span class="help-text"></span>
+        </div>
+        <div class="sub-sect">
+          <span class="help-text">Confirm that the addresses above match the <b>first 10</b> addresses on your wallet.<br>For Wasabi wallet, you may need to generate 10 addresses manually (under the 'receive' tab).</span>
+        </div>
+        <div class="flex">
+          <a class="btn sec" @click.stop="confirmAddresses=false"><i class="fas fa-arrow-left"></i></a>
+          <a class="btn" @click.stop="!working && (confirmAddressesMatchWallet())">Confirm Addresses<i class="fas fa-arrow-right"></i></a>
+        </div>
+      </div>
+
     </div>
   </div>
 </div>
@@ -24,9 +83,15 @@ export default {
   name: "NewStoreModal",
   data() {
     return {
-      storeNameConfirmed:false,
-      name: '',
+      working: false,
+      message: false,
+      storeNameConfirmed: false,
+      storeName: '',
+      storeType: 'btc',
       zpub: '',
+      collectZpub: false,
+      addressDerivationType: 'external',
+      confirmAddresses: false,
     }
   },
   computed: {
@@ -39,30 +104,31 @@ export default {
     })
   },
   methods: {
-    async createNewStore() {
+    async checkStoreName() {
+      this.working = true;
       const username = await this.$store.dispatch('encrypt', {
         string: this.user,
         keyiv: this.keyiv
       });
       const storeName = await this.$store.dispatch('encrypt', {
-        string: this.name,
+        string: encodeURI(this.storeName),
         keyiv: this.keyiv
       });
-      const zpub = await this.$store.dispatch('encrypt', {
-        string: this.zpub,
-        keyiv: this.keyiv
-      });
-      await fetch("https://money-api.flat18.co.uk/new-store", {
+      // const zpub = await this.$store.dispatch('encrypt', {
+      //   string: this.zpub,
+      //   keyiv: this.keyiv
+      // });
+      await fetch("https://money-api.flat18.co.uk/new-store-type-name-check", {
           method: 'POST',
           headers: {
             'Content-Type': 'multipart/form-data'
           },
           body: JSON.stringify({
             username: username,
+            storeName: storeName,
+            storeType: this.storeType,
             fingerprint: this.fingerprint,
             keyivId: this.keyivId,
-            storeName: storeName,
-            zpub: zpub,
           }),
         })
         .then((response) => response.json())
@@ -70,10 +136,17 @@ export default {
           this.message = data.debug ? data.debug : false
           if (data.proceed == true) {
             //HANDLE STORES DATA
-
+            if (!data.extra && data.currentStore) {
+              this.$store.commit("setActiveStore", data.currentStore);
+              this.$router.go()
+            } else if (data.extra == 'zpub') {
+              this.zpubOptions = true;
+            }
+            this.storeNameConfirmed = true;
           } else {
-            this.message = "Failed to save store"
+            this.message = data.debug ? data.debug : "There was a problem with the information provided."
           }
+          this.working = false;
         })
         .catch((error) => {
           console.error("Error:", error);
@@ -89,6 +162,168 @@ export default {
         temp.push(tempObject)
       }
       this.$store.commit("setStores", temp);
+    },
+    closeModal() {
+      this.$store.commit("setStoreModalView", false);
+
+    },
+    async setAddressDerivationType() {
+      if (this.addressDerivationType === 'external') {
+        this.collectZpub = true;
+      }
+      if (this.addressDerivationType === 'internal') {
+        //COMPLETE
+        this.working = true;
+        const username = await this.$store.dispatch('encrypt', {
+          string: this.user,
+          keyiv: this.keyiv
+        });
+        const storeName = await this.$store.dispatch('encrypt', {
+          string: this.storeName,
+          keyiv: this.keyiv
+        });
+        // const zpub = await this.$store.dispatch('encrypt', {
+        //   string: this.zpub,
+        //   keyiv: this.keyiv
+        // });
+        await fetch("https://money-api.flat18.co.uk/new-store-bitcoin-internal", {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'multipart/form-data'
+            },
+            body: JSON.stringify({
+              username: username,
+              storeName: storeName,
+              storeType: this.storeType,
+              fingerprint: this.fingerprint,
+              keyivId: this.keyivId,
+              addressDerivationType: this.addressDerivationType,
+            }),
+          })
+          .then((response) => response.json())
+          .then((data) => {
+            this.message = data.debug ? data.debug : false
+            if (data.proceed == true) {
+              //HANDLE STORES DATA
+              if (data.currentStore) {
+                this.$store.commit("setActiveStore", data.currentStore);
+                // this.storeNameConfirmed = true;
+                this.$router.go()
+              } else {
+                this.message = data.debug ? data.debug : "There was a problem with the information provided."
+              }
+            }
+            this.working = false;
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+          });
+
+      }
+    },
+    async submitZpub() {
+      this.working = true;
+      let regExp = /^[A-Za-z0-9]+$/;
+      if(!this.zpub.match(regExp)){
+      this.working = false;
+      this.message = "zpub does not appear to be valid";
+      return false;
+      }else{
+      this.message = "Checking zpub...";
+      }
+      const username = await this.$store.dispatch('encrypt', {
+        string: this.user,
+        keyiv: this.keyiv
+      });
+      const storeName = await this.$store.dispatch('encrypt', {
+        string: this.storeName,
+        keyiv: this.keyiv
+      });
+      const zpub = await this.$store.dispatch('encrypt', {
+        string: this.zpub,
+        keyiv: this.keyiv
+      });
+      await fetch("https://money-api.flat18.co.uk/new-store-query-bitcoin-zpub", {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          },
+          body: JSON.stringify({
+            username: username,
+            storeName: storeName,
+            storeType: this.storeType,
+            fingerprint: this.fingerprint,
+            keyivId: this.keyivId,
+            zpub: zpub,
+          }),
+        })
+        .then((response) => response.json())
+        .then((data) => {
+          this.message = data.debug ? data.debug : false
+          if (data.proceed == true) {
+            if (data.extra == 'confirm-addresses' && data.confirmAddresses) {
+              this.confirmAddresses = data.confirmAddresses;
+            }
+            // this.storeNameConfirmed = true;
+          } else {
+            this.message = data.debug ? data.debug : "There was a problem with the information provided."
+          }
+          this.working = false;
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+        });
+    },
+    async confirmAddressesMatchWallet() {
+      this.working = true;
+      const username = await this.$store.dispatch('encrypt', {
+        string: this.user,
+        keyiv: this.keyiv
+      });
+      const storeName = await this.$store.dispatch('encrypt', {
+        string: encodeURIComponent(encodeURI(this.storeName)),
+        keyiv: this.keyiv
+      });
+      const zpub = await this.$store.dispatch('encrypt', {
+        string: this.zpub,
+        keyiv: this.keyiv
+      });
+      await fetch("https://money-api.flat18.co.uk/new-store-confirm-bitcoin-zpub-addresses-match", {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          },
+          body: JSON.stringify({
+            username: username,
+            storeName: storeName,
+            storeType: this.storeType,
+            fingerprint: this.fingerprint,
+            keyivId: this.keyivId,
+            zpub: zpub,
+          }),
+        })
+        .then((response) => response.json())
+        .then((data) => {
+          this.message = data.debug ? data.debug : false
+          if (data.proceed == true) {
+            if (!data.extra && data.currentStore) {
+              this.$store.commit("setActiveStore", data.currentStore);
+              this.$router.go()
+            }
+          } else {
+            this.message = data.debug ? data.debug : "There was a problem with the information provided."
+          }
+          this.working = false;
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+        });
+    },
+    backToStart() {
+      this.zpubOptions = false;
+      this.collectZpub = false;
+      this.storeNameConfirmed = false;
+          this.working = false;
     }
   }
 }

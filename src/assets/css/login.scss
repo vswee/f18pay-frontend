@@ -1,4 +1,5 @@
-input, .input-placeholder {
+input,
+.input-placeholder {
   font-size: 1.1rem;
   font-family: "Rubik", "Helvetica Neue", "Helvetica", "Arial", "Font Awesome 5 Brands", "Font Awesome 5", sans-serif;
   padding: 10px;
@@ -8,35 +9,49 @@ input, .input-placeholder {
   color: var(--white);
 }
 
-.input-placeholder{
-  cursor:no-drop;
+.input-placeholder {
+  cursor: no-drop;
 }
 
 .message {
-    background: var(--accent-3);
-    padding: 5px;
-    font-size: .8rem;
-    border-radius: 6px;
-    margin: auto;
+  background: var(--accent-3);
+  padding: 5px;
+  font-size: 0.8rem;
+  border-radius: 6px;
+  margin: auto;
 }
 .form {
-  margin: 40px auto;
-  width: 400px;
+  &.page {
+    // width: 100%;
+    min-width: max-content;
+    &.working {
+      &::before {
+        position: fixed;
+        width: calc(var(--main, 100vw) / 2);
+        top: 0;
+        z-index: 999;
+      }
+    }
+  }
+  &:not(.page) {
+    width: 400px;
+    padding: 20px 20px 20px 20px;
+    border-radius: 10px;
+    box-shadow: 0 30px 60px var(--dark), 0 0 0 1px var(--dark);
+    margin: 40px auto;
+  }
   max-width: 90vw;
   // background: var(--shadow-20);
-  padding: 20px 20px 20px 20px;
-  border-radius: 10px;
-  box-shadow: 0 30px 60px var(--dark), 0 0 0 1px var(--dark);
   display: grid;
   gap: 10px;
-  h1{
-    margin:0;
+  h1 {
+    margin: 0;
   }
-  .help-text{
+  .help-text {
     margin-top: -8px;
     font-size: 12px;
     line-height: 12px;
-    opacity: .6;
+    opacity: 0.6;
     position: relative;
     &::after {
       content: "";
@@ -51,24 +66,80 @@ input, .input-placeholder {
   }
   .form-section {
     display: grid;
-    gap: 10px;
-    label{
-      text-transform:uppercase;
-      font-size: 13px;
-transform: translate(10px,5px);
-font-weight: 700;
-opacity: .5;
+    gap: 15px;
+    h2 {
+      margin-bottom: 0;
+      cursor: pointer;
     }
-    .flex{
-      margin-top:10px;
+    label {
+      text-transform: uppercase;
+      font-size: 13px;
+      transform: translate(10px, 5px);
+      font-weight: 700;
+      opacity: 0.5;
+      margin-top: 1rem;
+    }
+    .flex {
+      margin-top: 10px;
+    }
+    .sub-sect {
+      display: grid;
+      gap: 10px;
+      margin-top: 10px;
+      margin-bottom: 10px;
+      .help-text {
+        margin-top: 2px;
+        padding: 0 10px;
+        line-height: 1.25;
+      }
+      ol {
+        padding: 0;
+        font-size: 0.8rem;
+        margin: 1rem auto;
+        li {
+          padding: 0.4rem;
+        }
+      }
+      figure {
+        /* max-width: 300px; */
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 1rem;
+        /* column-gap: 10px; */
+        .figure-image-holder {
+          background-size: cover;
+          height: 120px;
+          width: 120px;
+          background-position: center;
+          display: block;
+          border-radius: 10px;
+          border: none;
+          box-shadow: none;
+          background-color: var(--dark);
+        }
+      }
+      .colour-pickers {
+        gap: 2rem;
+        input {
+          height: 2rem;
+          border: 0px none;
+          border-radius: 100px;
+          width: 3rem;
+          &:first-of-type {
+            box-shadow: var(--dark) 0px 0px 0px 3px, -2rem 0px 0px 3px, -1rem 0px 0px 3px;
+          }
+        }
+      }
     }
   }
 
   &.working {
-    position: relative;
-    overflow: hidden;
-    z-index: 2;
-
+    &:not(.page) {
+      z-index: 2;
+      position: relative;
+      overflow: hidden;
+    }
     &::before {
       content: "";
       display: block;
@@ -76,7 +147,7 @@ opacity: .5;
       height: 4px;
       width: 100%;
       left: 0;
-      transition: .2s ease;
+      transition: 0.2s ease;
       background: linear-gradient(90deg, var(--primary), var(--accent));
       animation: shootingBar 1s ease forwards infinite;
     }
@@ -86,7 +157,6 @@ opacity: .5;
 @keyframes shootingBar {
   from {
     transform: translateX(-100%);
-
   }
 
   to {
@@ -94,8 +164,18 @@ opacity: .5;
   }
 }
 
-.invisible {
-  visibility: hidden;
-  pointer-events: none;
-  position: absolute;
+
+
+.accordian-sect {
+  animation: sectBin 0.2s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards 1;
+  @keyframes sectBin {
+    from {
+      opacity: 0;
+      transform: scale(0.9);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
 }

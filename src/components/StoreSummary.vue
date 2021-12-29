@@ -1,7 +1,7 @@
 <template lang="">
 <div class="store-management">
-  <h1><img class="store-icon" v-if="storeLogo()" :src="storeLogo()">{{storeName()}}</h1>
-  <h2>{{storeBalance() || '0.00'}} BTC</h2>
+  <h1><img class="store-icon" v-if="storeLogo()" :src="storeLogo()">{{storeName()}} <i class="fab fa-bitcoin" v-if="storeNetwork()==='btc'"></i> <i class="fab fa-ethereum" v-if="storeNetwork()==='eth'"></i> </h1>
+  <h2>{{storeBalance() || '0.00'}} {{storeNetwork().toUpperCase()}}</h2>
   <small :class="storeStatus()==1?'status bad':'status good'">{{storeStatus()==1?'Disabled':'Active'}}</small>
   <p class="help-text"><i class="fas fa-info-circle"></i> We never monitor wallet addresses outside of the scope of 'incoming transactions for associated invoices'.<br>This means that your Balance won't reflect withdrawals or transactions on addresses not associated with invoices on this platform.</p>
   <div class="subsect">
@@ -146,7 +146,7 @@ export default {
     storeName() {
       for (const store of this.stores) {
         if (store.store_id == this.activeStore) {
-          return store.store_name;
+          return decodeURIComponent(decodeURI(store.store_name));
         }
       }
     },
@@ -169,6 +169,13 @@ export default {
       for (const store of this.stores) {
         if (store.store_id == this.activeStore) {
           return store.deleted;
+        }
+      }
+    },
+    storeNetwork() {
+      for (const store of this.stores) {
+        if (store.store_id == this.activeStore) {
+          return store.network;
         }
       }
     }

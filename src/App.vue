@@ -3,9 +3,11 @@
     <Header/>
     <Sidebar/>
     <div id="main">
+
       <router-view></router-view>
     </div>
     <Footer/>
+  <NewStoreModal v-if="session && storeModalView=='new'"></NewStoreModal>
   </div>
 </template>
 
@@ -13,18 +15,21 @@
 import Footer from './components/Footer.vue'
 import Header from './components/Header.vue'
 import Sidebar from './components/Sidebar.vue'
+import NewStoreModal from '@/components/NewStoreModal'
 import { mapGetters } from 'vuex';
 export default {
   name: 'App',
   components: {
     Header,
     Footer,
-    Sidebar
+    Sidebar,
+    NewStoreModal,
   },
     computed: {
     ...mapGetters({
       theme: 'theme',
       session: 'session',
+      storeModalView: 'storeModalView',
     })
     },  
   watch: {
