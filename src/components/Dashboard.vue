@@ -1,6 +1,6 @@
 <template lang="">
 <div>
-  <div class="stores" v-if="!activeStore">
+  <div class="stores" v-if="!activeStore || activeStore==='false'">
     <div v-for="store in stores" :key="store.store_id" :class="store.deleted==1?'store-tile disabled':'store-tile active'" @click="openStore(store.store_id)">
       <h2>
         <img class="store-icon" v-if="store.store_logo" :src="store.store_logo">
@@ -10,15 +10,16 @@
           <i :style="'background: #' + store.store_accent_colour"></i>
         </span>
       </h2>
-      <span class="store-value"><span class="mono">{{store.sum?store.sum:"0.00"}}</span><small>BTC</small></span>
-      <span class="tooltip">
-        {{store.deleted==1?'disabled':'active'}}
-      </span>
+      <span class="store-value"><span class="mono">{{store.sum?store.sum:"0.00"}}</span><small>{{store.network.toUpperCase()}}</small></span>
+      <span>{{store.zpub?'External':'Internal'}} wallet</span>
+      <span>{{store.deleted==1?'Disabled':'Active'}}</span>
     </div>
   </div>
   <StoreSummary v-if="activeStore && storeView=='overview'"></StoreSummary>
   <StoreSettings v-if="activeStore && storeView=='settings'"></StoreSettings>
   <StoreAssets v-if="activeStore && storeView=='buttons'"></StoreAssets>
+  <Invoices v-if="activeStore && storeView=='invoices'"></Invoices>
+  <PaymentRequest v-if="activeStore && storeView=='requests'"></PaymentRequest>
 </div>
 </template>
 
@@ -29,12 +30,16 @@ import {
 import StoreSummary from '@/components/StoreSummary'
 import StoreSettings from '@/components/StoreSettings'
 import StoreAssets from '@/components/StoreAssets'
+import Invoices from '@/components/Invoices'
+import PaymentRequest from '@/components/PaymentRequest'
 export default {
   name: "Dashboard",
   components: {
     StoreSummary,
     StoreSettings,
     StoreAssets,
+    Invoices,
+    PaymentRequest,
   },
   data() {
     return {
@@ -114,4 +119,7 @@ export default {
 
 <style lang="scss">
 @import "../assets/css/dashboard.scss";
+</style>
+<style lang="css">
+@import "../assets/css/fonts-mono.css";
 </style>

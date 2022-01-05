@@ -1,8 +1,8 @@
 <template lang="">
 <div class="store-management">
-  <h1><img class="store-icon" v-if="storeLogo()" :src="storeLogo()">{{storeName()}} <i class="fab fa-bitcoin" v-if="storeNetwork()==='btc'"></i> <i class="fab fa-ethereum" v-if="storeNetwork()==='eth'"></i> </h1>
-  <h2>{{storeBalance() || '0.00'}} {{storeNetwork().toUpperCase()}}</h2>
-  <small :class="storeStatus()==1?'status bad':'status good'">{{storeStatus()==1?'Disabled':'Active'}}</small>
+  <h1><img class="store-icon" v-if="currentStore.store_logo" :src="currentStore.store_logo"><span>{{_decode(currentStore.store_name)}} <i class="fab fa-bitcoin" v-if="currentStore.network==='btc'"></i> <i class="fab fa-ethereum" v-if="currentStore.network==='eth'"></i> </span></h1>
+  <h2>{{currentStore.sum || '0.00'}} {{currentStore.network.toUpperCase()}}</h2>
+  <small :class="currentStore.deleted==1?'status bad':'status good'">{{currentStore.deleted==1?'Disabled':'Active'}}</small>
   <p class="help-text"><i class="fas fa-info-circle"></i> We never monitor wallet addresses outside of the scope of 'incoming transactions for associated invoices'.<br>This means that your Balance won't reflect withdrawals or transactions on addresses not associated with invoices on this platform.</p>
   <div class="subsect">
     <h3>Invoice Statistics</h3>
@@ -40,7 +40,16 @@ export default {
       activeStore: 'activeStore',
       chart: 'chart',
       stores: 'stores',
-    })
+    }),
+    currentStore() {
+      let current = false
+      for (const store of this.stores) {
+        if (store.store_id == this.activeStore) {
+          current = store;
+        }
+      }
+      return current;
+    },
   },
   watch: {
     activeStore: function (val) {
@@ -51,6 +60,10 @@ export default {
     this.fetchInvoiceValues(this.activeStore)
   },
   methods: {
+    _decode(string) {
+      let decoded = decodeURIComponent(decodeURI(string));
+      return decoded
+    },
     async fetchInvoiceValues(id) {
       this.chartDestroy = true;
       this.$store.commit("setChart", {
@@ -143,42 +156,6 @@ export default {
           console.error("Error:", error);
         });
     },
-    storeName() {
-      for (const store of this.stores) {
-        if (store.store_id == this.activeStore) {
-          return decodeURIComponent(decodeURI(store.store_name));
-        }
-      }
-    },
-    storeBalance() {
-      for (const store of this.stores) {
-        if (store.store_id == this.activeStore) {
-          return store.sum;
-        }
-      }
-    },
-    storeLogo() {
-      for (const store of this.stores) {
-        if (store.store_id == this.activeStore) {
-          return store.store_logo;
-        }
-      }
-      return false
-    },
-    storeStatus() {
-      for (const store of this.stores) {
-        if (store.store_id == this.activeStore) {
-          return store.deleted;
-        }
-      }
-    },
-    storeNetwork() {
-      for (const store of this.stores) {
-        if (store.store_id == this.activeStore) {
-          return store.network;
-        }
-      }
-    }
   }
 }
 </script>

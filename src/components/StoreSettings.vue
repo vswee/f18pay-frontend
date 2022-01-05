@@ -28,7 +28,9 @@
   </div>
   <!-- MODAL -->
   <div :class="working?'form page working':'form page'" @click.stop="_null()">
-    <h1>Settings <br>{{_decode(currentStore.store_name)}} <a class="btn" @click="saveSettings()">Save</a></h1>
+    
+    <h1><span>Settings</span><span>{{_decode(currentStore.store_name)}}</span><a class="btn" @click="saveSettings()">Save</a></h1>
+    
 
     <div class="message" v-if="message"><i class="fas fa-exclamation-circle"></i> {{message}}</div>
     <div class="form-section">
@@ -268,7 +270,6 @@ export default {
             if (!data.extra && data.currentStore) {
               this.$store.dispatch('getStores')
               this.$store.commit("setActiveStore", data.currentStore);
-              // this.$router.go()
             } else if (data.extra == 'confirm-addresses') {
               this.confirmAddresses = true;
               this.addressesForConfirmation = data.confirmAddresses
@@ -323,7 +324,6 @@ export default {
             if (!data.extra && data.currentStore) {
               this.$store.dispatch('getStores')
               this.$store.commit("setActiveStore", data.currentStore);
-              // this.$router.go()
             } else if (data.extra == 'confirm-addresses') {
               this.confirmAddresses = true;
               this.addressesForConfirmation = data.confirmAddresses

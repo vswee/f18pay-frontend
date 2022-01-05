@@ -13,7 +13,7 @@
     </div>
   </div>
   <div></div>
-  <div class="sidebar-shortcuts">
+  <div class="sidebar-shortcuts" v-if="activeStore && activeStore!=='false'">
     <a :class="storeView=='overview'?'sidebar-shortcut active-bar':'sidebar-shortcut'" @click="summaryView()"><i class="fas fa-chart-area"></i><span class="collapsible">Store Overview</span></a>
 
     <a :class="storeView=='settings'?'sidebar-shortcut active-bar':'sidebar-shortcut'" @click="settingsView()"><i class="fas fa-sliders-h"></i><span class="collapsible">Store Settings</span></a>
@@ -60,6 +60,10 @@ export default {
   },
   mounted(){
     if(document.getElementById("main")){document.documentElement.style.setProperty('--main', document.getElementById("main").getBoundingClientRect().width + "px")}
+    if(!this.activeStore && this.activeStore!=='false'){
+        this.$store.commit('setActiveStore', false)
+      this.$store.commit("setStoreView", false);
+    }
   },
   methods: {
     decodedString(string){
@@ -81,6 +85,12 @@ export default {
     },
     assetsView() {
       this.$store.commit("setStoreView", 'buttons');
+    },
+    invoicesView() {
+      this.$store.commit("setStoreView", 'invoices');
+    },
+    requestsView(){
+      this.$store.commit("setStoreView", 'requests');
     },
     newStore(){
       this.$store.commit("setStoreModalView", 'new');

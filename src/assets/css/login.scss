@@ -7,10 +7,9 @@ input,
   border-radius: 6px;
   background: var(--dark);
   color: var(--white);
-}
-
-.input-placeholder {
   cursor: no-drop;
+  line-break: anywhere;
+  max-width: 500px;
 }
 
 .message {
@@ -22,7 +21,6 @@ input,
 }
 .form {
   &.page {
-    // width: 100%;
     min-width: max-content;
     &.working {
       &::before {
@@ -41,7 +39,6 @@ input,
     margin: 40px auto;
   }
   max-width: 90vw;
-  // background: var(--shadow-20);
   display: grid;
   gap: 10px;
   h1 {
@@ -101,12 +98,10 @@ input,
         }
       }
       figure {
-        /* max-width: 300px; */
         display: flex;
         flex-direction: row;
         flex-wrap: wrap;
         gap: 1rem;
-        /* column-gap: 10px; */
         .figure-image-holder {
           background-size: cover;
           height: 120px;
@@ -163,8 +158,6 @@ input,
     transform: translateX(100%);
   }
 }
-
-
 
 .accordian-sect {
   animation: sectBin 0.2s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards 1;

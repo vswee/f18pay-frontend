@@ -1,6 +1,6 @@
 <template lang="">
 <div class="header" id="header">
-  <router-link :to="{name: session?'dashboard':'home'}" title="home" class="logo"><svg clip-rule="evenodd" fill-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="2" viewBox="0 0 158 201" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <a @click="clearToHome()" title="home" class="logo"><svg clip-rule="evenodd" fill-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="2" viewBox="0 0 158 201" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
       <clipPath id="a">
         <path clip-rule="evenodd" d="m100 10.547c49.37 0 89.453 40.083 89.453 89.453 0 93.284-109.752 139.496-157.332 155.146-5.028 1.597-10.516.699-14.774-2.416s-6.774-8.074-6.774-13.35c-.026-44.211-.026-139.38-.026-139.38 0-49.37 40.083-89.453 89.453-89.453z" />
       </clipPath>
@@ -15,7 +15,7 @@
           <path d="m100 10.547c49.37 0 89.453 40.083 89.453 89.453 0 93.284-109.752 139.496-157.332 155.146-5.028 1.597-10.516.699-14.774-2.416s-6.774-8.074-6.774-13.35c-.026-44.211-.026-139.38-.026-139.38 0-49.37 40.083-89.453 89.453-89.453z" stroke="var(--accent)" stroke-width="23.02" />
         </g>
       </g>
-    </svg><b>F18 Pay</b></router-link>
+    </svg><b>F18 Pay</b></a>
   <div></div>
 
   <div class="links">
@@ -56,6 +56,16 @@ export default {
     }
   },
   methods: {
+    clearToHome(){
+        console.log("hi")
+      if(this.session){
+        this.$router.push({ name: 'dashboard'});
+        this.$store.commit('setActiveStore', false)
+      this.$store.commit("setStoreView", false);
+      }else{
+        this.$router.push({ name: 'home'});
+      }
+    },
     logout() {
       this.$store.commit("setFingerprint", false);
       this.$store.commit("setSession", false);

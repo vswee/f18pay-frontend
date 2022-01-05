@@ -18,6 +18,19 @@ let actions = {
     return encrypted;
   },
 
+  async decrypt(context, payload) {
+    let string = payload.string, keyiv = payload.keyiv;
+    let key = keyiv.substr(0, 32);
+    key = Vue.CryptoJS.SHA256(key).toString(Vue.CryptoJS.enc.Hex).substr(0, 32);
+    let iv = keyiv.substr(33);
+    iv = Vue.CryptoJS.SHA256(iv).toString(Vue.CryptoJS.enc.Hex).substr(0, 16);
+    const decrypted = Vue.CryptoJS.enc.Utf8.stringify(Vue.CryptoJS.AES.decrypt(string, Vue.CryptoJS.enc.Utf8.parse(key), {
+      iv: Vue.CryptoJS.enc.Utf8.parse(iv),
+      mode: Vue.CryptoJS.mode.CBC
+    })).toString();
+    return decrypted;
+  },
+
   async init(context) {
     if (localStorage.getItem("fingerprint")) {
       context.commit("setFingerprint", localStorage.getItem("fingerprint"));
@@ -55,7 +68,6 @@ let actions = {
 
   async verifySession({ commit, getters, dispatch }) {
     let session = false;
-    // console.log("verifying session...")
     const user = getters.user
     const fingerprint = getters.fingerprint
     const keyivId = getters.keyivId
@@ -66,7 +78,6 @@ let actions = {
       console.warn("No session. Missing parameters.");
       return session
     }
-    // console.log("trying session", user, fingerprint, keyivId);
 
     const username = await dispatch('encrypt', { string: user, keyiv: keyiv });
     await fetch("https://money-api.flat18.co.uk/validate-fingerprint-check-username", {
@@ -85,7 +96,6 @@ let actions = {
           session = false;
         }
         let route = router.currentRoute.name;
-        // console.log(session, route)
         if (!session) {
           switch (route) {
             case 'home':
@@ -93,10 +103,8 @@ let actions = {
             case 'signup':
             case 'verify-email':
             case 'reset-password':
-              // console.log("Not interrupting")
               break;
             default:
-              // console.log("Returning Home")
               router.push({
                 name: 'home'
               });
@@ -110,13 +118,11 @@ let actions = {
             case 'signup':
             case 'verify-email':
             case 'reset-password':
-              // console.log("Session: Returning Dashboard")
               router.push({
                 name: 'dashboard'
               });
               break;
             default:
-            // console.log("Session: Not interrupting")
           }
         }
 
@@ -125,7 +131,6 @@ let actions = {
         console.error("Error:", error);
         session = false;
       });
-    // console.log("session:", session)
     return session
   },
 
@@ -147,17 +152,10 @@ let actions = {
     })
       .then((response) => response.json())
       .then((data) => {
-        // this.message = data.debug ? data.debug : false
         if (data.proceed == true) {
           //HANDLE STORES DATA
           commit("setStores", data.stores);
-          // if (!this.storeView) {
-          //   commit("setStoreView", 'overview');
-          // }
         }
-        // else {
-        // this.message = "Failed to fetch stores"
-        // }
       })
       .catch((error) => {
         console.error("Error:", error);

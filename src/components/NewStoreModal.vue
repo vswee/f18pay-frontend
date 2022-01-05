@@ -114,10 +114,6 @@ export default {
         string: encodeURI(this.storeName),
         keyiv: this.keyiv
       });
-      // const zpub = await this.$store.dispatch('encrypt', {
-      //   string: this.zpub,
-      //   keyiv: this.keyiv
-      // });
       await fetch("https://money-api.flat18.co.uk/new-store-type-name-check", {
           method: 'POST',
           headers: {
@@ -182,10 +178,6 @@ export default {
           string: this.storeName,
           keyiv: this.keyiv
         });
-        // const zpub = await this.$store.dispatch('encrypt', {
-        //   string: this.zpub,
-        //   keyiv: this.keyiv
-        // });
         await fetch("https://money-api.flat18.co.uk/new-store-bitcoin-internal", {
             method: 'POST',
             headers: {
@@ -207,7 +199,6 @@ export default {
               //HANDLE STORES DATA
               if (data.currentStore) {
                 this.$store.commit("setActiveStore", data.currentStore);
-                // this.storeNameConfirmed = true;
                 this.$router.go()
               } else {
                 this.message = data.debug ? data.debug : "There was a problem with the information provided."
@@ -264,7 +255,6 @@ export default {
             if (data.extra == 'confirm-addresses' && data.confirmAddresses) {
               this.confirmAddresses = data.confirmAddresses;
             }
-            // this.storeNameConfirmed = true;
           } else {
             this.message = data.debug ? data.debug : "There was a problem with the information provided."
           }

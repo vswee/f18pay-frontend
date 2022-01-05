@@ -19,13 +19,21 @@
   </div>
   <!-- MODAL -->
   <div :class="working?'form page working':'form page'" @click.stop="_null()">
-    <h1>Payment Assets <br>{{_decode(currentStore.store_name)}}</h1>
+    <h1><span>Payment Assets</span><span>{{_decode(currentStore.store_name)}}</span></h1>
 
     <div class="message" v-if="message"><i class="fas fa-exclamation-circle"></i> {{message}}</div>
     <div class="form-section">
       <h2 @click="accordianIndexSet(0)">Payment Buttons <i :class="accordianIndex==0?'fas fa-caret-down':'fas fa-caret-right'"></i></h2>
       <div class="accordian-sect" v-if="accordianIndex==0">
-
+        <div class="sub-sect">
+          <label for="storeName">Assets Currency</label>
+          <div class="">
+            <select v-model="currency">
+              <option disabled value="">Button currency</option>
+              <option v-for="cur of supportedCurrencies" :key="cur" v-bind:value="cur">{{cur}}</option>
+            </select>
+          </div>
+        </div>
         <div class="sub-sect">
           <label for="storeName">Basic Button</label>
           <div class="button-preview" :random="random" id="basicButton">
@@ -82,41 +90,51 @@
 
       <h2 @click="accordianIndexSet(1)">Payment Page <i :class="accordianIndex==1?'fas fa-caret-down':'fas fa-caret-right'"></i></h2>
       <div class="accordian-sect" v-if="accordianIndex==1">
+      <div class="sub-sect" v-if="accordianIndex==1">
+        <div class="switch">
+          <a :target="'_blank_'+random" :class="currentStore.payment_page==='1'?'btn active':'btn'" @click.stop="setPaymentPage(1)">{{currentStore.payment_page==='1'?'Page Enabled':'Enable Page'}}</a>
+          <a :class="currentStore.payment_page==='1'?'btn':'btn severe active'" @click.stop="setPaymentPage(0)">{{currentStore.payment_page==='1'?'Disable Page':'Page Disabled'}}</a>
+        </div>
+        <span class="help-text">A Payment page allows anyone with the link to generate invoices for this store. This may be useful as a backup POS terminal or for receiving donations.</span>
+      </div>
         <div class="sub-sect">
           <label for="storeName">Payment Pgae URL <i v-if="settingPaymentPage" class="fas fa-asterisk spin"></i></label>
           <div class="input-placeholder">
             https://pay.flat18.co.uk/store/{{storeCode}} <i class="fas fa-check-circle"></i>
           </div>
           <a :href="'https://pay.flat18.co.uk/store/'+storeCode"><i class="fas fa-external-link-square-alt"></i></a>
-          <div class="switch">
-            <a :target="'_blank_'+random" :class="currentStore.payment_page==='1'?'btn active':'btn'" @click.stop="setPaymentPage(1)">{{currentStore.payment_page==='1'?'Page Enabled':'Enable Page'}}</a>
-            <a :class="currentStore.payment_page==='1'?'btn':'btn severe active'" @click.stop="setPaymentPage(0)">{{currentStore.payment_page==='1'?'Disable Page':'Page Disabled'}}</a>
-          </div>
-          <span class="help-text">A Payment page allows anyone with the link to generate invoices for this store. This may be useful as a backup POS terminal or for receiving donations.</span>
         </div>
-      </div>
 
-      <h2 @click="accordianIndexSet(2)">Invoice Behaviour <i :class="accordianIndex==2?'fas fa-caret-down':'fas fa-caret-right'"></i></h2>
-      <div class="accordian-sect" v-if="accordianIndex==2">
         <div class="sub-sect">
-          <label for="storeName">Payee must provide email on invoice <i v-if="settingEmailRequired" class="fas fa-asterisk spin"></i></label>
-          <div class="switch">
-            <a :target="'_blank_'+random" :class="currentStore.require_email==='1'?'btn active':'btn'" @click.stop="setPRequireEmail(1)">{{currentStore.require_email==='1'?'Email Required':'Require Payee Email'}}</a>
-            <a :class="currentStore.require_email==='1'?'btn':'btn severe active'" @click.stop="setPRequireEmail(0)">{{currentStore.require_email==='1'?'Allow Anonymous':'Not Required'}}</a>
+          <label for="storeName">Payment Pgae API <i v-if="settingPaymentPage" class="fas fa-asterisk spin"></i></label>
+          <div class="input-placeholder">
+            https://pay.flat18.co.uk/store/{{storeCode}}/<b>{{currency}}</b>/<i>Item name or code</i> <i class="fas fa-check-circle"></i>
           </div>
-          <span class="help-text">Choose whether a payee should identify themselves on an invoice by entering their email before proceeding to pay, or if invoices can be paid anonymously.</span>
+          <a :href="'https://pay.flat18.co.uk/store/'+storeCode+'/'+currency+'/Item name or code'"><i class="fas fa-external-link-square-alt"></i></a>
+          <span class="help-text">Store Payment Page API is programmable by setting the currency and item name as text strings in the URL.</span>
         </div>
       </div>
 
+
+    <h2 @click="accordianIndexSet(2)">Invoice Behaviour <i :class="accordianIndex==2?'fas fa-caret-down':'fas fa-caret-right'"></i></h2>
+    <div class="accordian-sect" v-if="accordianIndex==2">
+      <div class="sub-sect">
+        <label for="storeName">Payee must provide email on invoice <i v-if="settingEmailRequired" class="fas fa-asterisk spin"></i></label>
+        <div class="switch">
+          <a :target="'_blank_'+random" :class="currentStore.require_email==='1'?'btn active':'btn'" @click.stop="setPRequireEmail(1)">{{currentStore.require_email==='1'?'Email Required':'Require Payee Email'}}</a>
+          <a :class="currentStore.require_email==='1'?'btn':'btn severe active'" @click.stop="setPRequireEmail(0)">{{currentStore.require_email==='1'?'Allow Anonymous':'Not Required'}}</a>
+        </div>
+        <span class="help-text">Choose whether a payee should identify themselves on an invoice by entering their email before proceeding to pay, or if invoices can be paid anonymously.</span>
+      </div>
     </div>
-    <input id="copy_to_clipboard_workspace" class="transparent">
+
   </div>
+  <input id="copy_to_clipboard_workspace" class="transparent">
+</div>
 
 </div>
 </template>
 
-  
-  
 <script>
 import {
   mapGetters
@@ -137,6 +155,7 @@ export default {
       working: false,
       accordianIndex: 0,
       currency: 'USD',
+      supportedCurrencies: ['USD', 'GBP', 'EUR', 'TTD'],
       fixedPrice: 10,
       primryColour: false,
       accentColour: false,
@@ -208,7 +227,9 @@ export default {
       return !this.text2 ? "#" + this.currentStore.text_accent : "#" + this.text2;
     },
   },
-  mounted() {},
+  mounted() {
+    this.supportedCurrencies.push(this.currentStore.network.toUpperCase())
+  },
   methods: {
     async setPaymentPage(onOff) {
       await this.settingsAsync('payment_page', onOff, 'settingPaymentPage');
@@ -318,8 +339,7 @@ export default {
   },
 }
 </script>
-  
-  
+
 <style lang="scss">
 .code-block {
   max-width: 500px;

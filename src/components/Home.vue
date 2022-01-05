@@ -95,7 +95,6 @@
       <p>Your use of this service is never monitored or recorded and we do not ask for any personally-identifiable details.<sup>2</sup></p>
     </div>
 
-    <!-- <img src="/img/use-03.png"> -->
   </div>
 </div>
 </template>
