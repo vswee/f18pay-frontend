@@ -9,15 +9,15 @@
         <div class="form-section">
           <label for="storeName">Payment Pgae API <i v-if="settingPaymentPage" class="fas fa-asterisk spin"></i></label>
           <div class="input-placeholder">
-            https://money.flat18.co.uk/api/v1/payment-requests/{{confirmedCreatedAddress}} <i class="fas fa-check-circle"></i>
-          </div><a :href="'https://money.flat18.co.uk/api/v1/payment-requests/'+confirmedCreatedAddress">Payment Link <i class="fas fa-external-link-square-alt"></i></a>
+            https://pay.flat18.co.uk/api/v1/payment-requests/{{confirmedCreatedAddress}} <i class="fas fa-check-circle"></i>
+          </div><a :href="'https://pay.flat18.co.uk/api/v1/payment-requests/'+confirmedCreatedAddress">Payment Link <i class="fas fa-external-link-square-alt"></i></a>
           <div class="flex">
-          
-<a class="btn" @click="copyCode('https://money.flat18.co.uk/api/v1/payment-requests/'+confirmedCreatedAddress)">Copy link to clipboard <i v-if="copied" class="fas fa-check"></i></a>
-        </div>
+
+            <a class="btn" @click="copyCode('https://pay.flat18.co.uk/api/v1/payment-requests/'+confirmedCreatedAddress)">Copy link to clipboard <i v-if="copied" class="fas fa-check"></i></a>
+          </div>
           <span class="help-text">{{sendEmail?'Request has been emailed to the recipient.':''}}<br>You can copy the payment link to share it on any platform.</span>
         </div>
-  <input id="copy_to_clipboard_workspace" class="transparent">
+        <input id="copy_to_clipboard_workspace" class="transparent">
 
       </template>
       <template v-if="!confirmedCreatedAddress">
@@ -114,7 +114,6 @@
         </date-range-picker>
       </div>
 
-
     </div>
     <table class="request-list">
       <tr>
@@ -157,6 +156,8 @@
         <tr v-if="active==key" class="list-item active" :key="key+'ex'">
           <td colSpan="5" class="border-bottom-right border-bottom-left">
             <div class="inline-table-notes">
+            
+              <label v-if="request.token">Link:</label><span v-if="request.token"><a :href="'https://pay.flat18.co.uk/api/v1/payment-requests/'+request.token" target="_blank">Payment Link {{request.token.substr(0,6)}} <i class="fas fa-external-link-square-alt"></i></a></span>
               <label v-if="request.description">Description:</label><span v-if="request.description">{{_decode(request.description)}}</span>
               <label v-if="request.payee_email">Payee:</label><span v-if="request.payee_email">{{request.payee_email}}</span>
               <label>Received:</label><span>{{request.assocReceived}} {{request.crypto}} </span>
@@ -222,7 +223,7 @@ export default {
         options: ['USD', 'GBP', 'EUR', 'TTD'],
       }],
       confirmedCreatedAddress: false,
-      copied:true,
+      copied: true,
     }
   },
   computed: {
@@ -355,8 +356,8 @@ export default {
     this.dateRange.startDate = this.currentStore.created;
   },
   methods: {
-        copyCode(copied) {
- 
+    copyCode(copied) {
+
       let workspace = document.getElementById("copy_to_clipboard_workspace");
       (workspace.value = copied),
       workspace.focus(),
@@ -415,7 +416,7 @@ export default {
               email: email,
               value: value,
               currency: currency,
-              notify:this.sendEmail,
+              notify: this.sendEmail,
             }),
           })
           .then((response) => response.json())
@@ -446,9 +447,10 @@ export default {
       this.select[index].open = false;
     },
     newRequest() {
+      window.scrollTo({top: 0, behavior: 'smooth'});
       this.modal = true;
       this.confirmedCreatedAddress = false;
-      this.copied=false;
+      this.copied = false;
     },
     dateTime() {
       let currentdate = new Date();
@@ -504,14 +506,14 @@ export default {
           console.error("Error:", error);
         });
     },
-    async unique(array){
+    async unique(array) {
       let temp = Array();
-      for(const item of array){
-        if(temp.indexOf(item)<0){
+      for (const item of array) {
+        if (temp.indexOf(item) < 0) {
           temp.push(item)
         }
       }
-  return temp;
+      return temp;
     },
     async getPaymentRequests() {
       this.working = true;
@@ -672,9 +674,14 @@ export default {
   border-collapse: collapse;
 
   .list-item {
-    &:not(.active){&:hover{box-shadow: -2px 0px 0px 0px;}}
+    &:not(.active) {
+      &:hover {
+        box-shadow: -2px 0px 0px 0px;
+      }
+    }
 
-cursor:pointer;
+    cursor:pointer;
+
     &.active {
       td {
         background: var(--accent-3);
@@ -715,6 +722,7 @@ cursor:pointer;
         display: grid;
         grid-template-columns: auto 1fr !important;
         text-align: left !important;
+
         label {
           font-weight: 700;
         }

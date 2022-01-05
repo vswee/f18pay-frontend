@@ -4,7 +4,7 @@
   <h2>{{currentStore.sum || '0.00'}} {{currentStore.network.toUpperCase()}}</h2>
   <small :class="currentStore.deleted==1?'status bad':'status good'">{{currentStore.deleted==1?'Disabled':'Active'}}</small>
   <p class="help-text"><i class="fas fa-info-circle"></i> We never monitor wallet addresses outside of the scope of 'incoming transactions for associated invoices'.<br>This means that your Balance won't reflect withdrawals or transactions on addresses not associated with invoices on this platform.</p>
-  <div class="subsect">
+  <div v-if="chart.chartData" class="subsect">
     <h3>Invoice Statistics</h3>
     <p class="help-text">Displays paid v total invoices generated over the last 6 months.</p>
     <bar-chart v-if="chart.chartData && !chartDestroy" class="graph"></bar-chart>

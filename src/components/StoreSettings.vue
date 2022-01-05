@@ -26,11 +26,41 @@
       </div>
     </div>
   </div>
+  <div class="modal" @click="confirmCode=false" v-if="confirmCode">
+    <div class="modal-input">
+      <div :class="working?'form page working':'form page'" @click.stop="false">
+        <h1>Confirm Code</h1>
+        <div class="message" v-if="message"><i class="fas fa-exclamation-circle"></i> {{message}}</div>
+        <div class="form-section" v-if="!downloadFile">
+          <div class="sub-sect">
+            <label for="storeName">Enter code</label>
+            <input v-model="code" type="text" placeholder="123456" v-on:keyup.enter="verifyCode()" />
+            <span class="help-text">We've sent a code to the email address for this F18 Pay account owner. Enter it above to download all the internal keys associated with this Store.</span>
+          </div>
+          <div class="flex">
+            <a class="btn sec" @click.stop="confirmCode=false"><i class="fas fa-arrow-left"></i></a>
+            <a class="btn" @click.stop="!working && (verifyCode())">Verify Code<i class="fas fa-arrow-right"></i></a>
+          </div>
+        </div>
+        <div class="form-section" v-if="downloadFile">
+          <div class="sub-sect">
+            <label for="storeName">Download File</label>
+            <a class="btn severe" style="margin-right: auto;" :href="downloadFile" @click.stop="downloaded()" download="keys.csv"><i class="fas fa-download"></i> Download Keys as .CSV</a>
+            <span class="help-text"><i class="fas fa-exclamation-triangle"></i> Keep these keys safe. Anyone with access to these downloaded, decrypted keys can spend any existing and future balances.</span>
+          </div>
+          <div class="flex">
+            <a class="btn sec" @click.stop="confirmCode=false"><i class="fas fa-arrow-left"></i></a>
+            <a class="btn" @click.stop="!working && (verifyCode())">Verify Code<i class="fas fa-arrow-right"></i></a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
   <!-- MODAL -->
   <div :class="working?'form page working':'form page'" @click.stop="_null()">
-    
-    <h1><span>Settings</span><span>{{_decode(currentStore.store_name)}}</span><a class="btn" @click="saveSettings()">Save</a></h1>
-    
+
+    <h1><span>Manage Store</span><span>{{_decode(currentStore.store_name)}}</span><a class="btn" @click="saveSettings()">Save</a></h1>
 
     <div class="message" v-if="message"><i class="fas fa-exclamation-circle"></i> {{message}}</div>
     <div class="form-section">
@@ -78,6 +108,11 @@
             <a :class="addressDerivationType=='internal'?'btn active':'btn'" @click.stop="addressDerivationType='internal'">Internal</a>
           </div>
           <span class="help-text">You can use your own (external) wallet with F18 Pay as long as the addresses are Native SegWit.<br>If you'd like to use randomly generated addresses for your store invoices choose 'Internal' and we'll generate key pairs which you can sweep at any time.</span>
+        </div>
+        <div class="sub-sect" v-if="addressDerivationType=='internal'">
+          <label for="">Internal wallet keys</label>
+          <a class="btn severe" style="margin-right: auto;" @click="startRequestForKeys()"><i class="fas fa-download"></i> Request Keys Download</a>
+          <span class="help-text">Download the keys for your Store Invoices so you can manage funds in an external wallet.</span>
         </div>
         <div class="sub-sect" v-if="addressDerivationType=='external'">
           <label for="storeName">Native SegWit zpub</label>
@@ -139,6 +174,9 @@ export default {
       addressesForConfirmation: false,
       email: false,
       url: false,
+      confirmCode: false,
+      code: '',
+      downloadFile: false,
     }
   },
   computed: {
@@ -206,6 +244,110 @@ export default {
     this.deleted = !this.currentStore.deleted ? 0 : this.currentStore.deleted;
   },
   methods: {
+    downloaded() {
+      let t = this
+      setTimeout(function () {
+        t.confirmCode = false
+        t.code = ''
+        t.downloadFile = false
+      }, 3000)
+    },
+    async startRequestForKeys() {
+      //COMPLETE
+      this.working = true;
+      this.code = '';
+      const username = await this.$store.dispatch('encrypt', {
+        string: this.user,
+        keyiv: this.keyiv
+      });
+      const storeName = await this.$store.dispatch('encrypt', {
+        string: this.currentStore.store_id,
+        keyiv: this.keyiv
+      });
+      await fetch("https://money-api.flat18.co.uk/store-management-request-keys", {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          },
+          body: JSON.stringify({
+            username: username,
+            store_id: storeName,
+            fingerprint: this.fingerprint,
+            keyivId: this.keyivId,
+          }),
+        })
+        .then((response) => response.json())
+        .then((data) => {
+          this.message = data.debug ? data.debug : false
+          if (data.proceed == true) {
+            if (data.extra == 'confirmCode') {
+              window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+              });
+              this.confirmCode = true;
+            }
+          } else {
+            this.message = data.debug ? data.debug : "There was a problem with the information provided."
+          }
+          this.working = false;
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+        });
+    },
+    async verifyCode() {
+      //COMPLETE
+      this.working = true;
+      const username = await this.$store.dispatch('encrypt', {
+        string: this.user,
+        keyiv: this.keyiv
+      });
+      const storeName = await this.$store.dispatch('encrypt', {
+        string: this.currentStore.store_id,
+        keyiv: this.keyiv
+      });
+      const code = await this.$store.dispatch('encrypt', {
+        string: this.code,
+        keyiv: this.keyiv
+      });
+      await fetch("https://money-api.flat18.co.uk/store-management-request-keys-verify-code", {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          },
+          body: JSON.stringify({
+            username: username,
+            store_id: storeName,
+            fingerprint: this.fingerprint,
+            keyivId: this.keyivId,
+            code: code,
+          }),
+        })
+        .then((response) => response.json())
+        .then(async (data) => {
+          this.message = data.debug ? data.debug : false
+          if (data.proceed == true) {
+            if (data.extra == 'downloadFile') {
+              let decrypted = JSON.parse(await this.$store.dispatch('decrypt', {
+                string: data.keys,
+                keyiv: this.keyiv
+              }))
+              let csvContent = 'data:text/csv;charset=utf-8,'
+              for (const key of decrypted) {
+                csvContent += key.private_key + ',\r\n'
+              }
+              this.downloadFile = encodeURI(csvContent);
+            }
+          } else {
+            this.message = data.debug ? data.debug : "There was a problem with the information provided."
+          }
+          this.working = false;
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+        });
+    },
     _decode(string) {
       let decoded = decodeURIComponent(decodeURI(string));
       return decoded
@@ -271,6 +413,10 @@ export default {
               this.$store.dispatch('getStores')
               this.$store.commit("setActiveStore", data.currentStore);
             } else if (data.extra == 'confirm-addresses') {
+              window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+              });
               this.confirmAddresses = true;
               this.addressesForConfirmation = data.confirmAddresses
             }

@@ -103,6 +103,7 @@ export default {
       stores: 'stores',
     })
   },
+  created(){window.scrollTo({top: 0, behavior: 'smooth'});},
   methods: {
     async checkStoreName() {
       this.working = true;

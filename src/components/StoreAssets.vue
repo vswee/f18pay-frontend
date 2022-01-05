@@ -301,6 +301,7 @@ export default {
       }
     },
     async showCode(id) {
+      window.scrollTo({top: 0, behavior: 'smooth'});
       this.modal.payload = await document.getElementById(id).innerHTML
         .replace(/</g, "\n\n<")
         .replace(/&quot;/g, '\'')
