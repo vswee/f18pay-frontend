@@ -46,6 +46,12 @@ let mutations = {
   setStoreView(state, payload) {
     state.storeView = payload
   },
+  setViewTitle(state, payload) {
+    state.viewTitle = payload
+  },
+  setShowTitle(state, payload) {
+    state.showTitle = payload
+  },
   setStoreModalView(state, payload) {
     state.storeModalView = payload
   },

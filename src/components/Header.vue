@@ -15,7 +15,7 @@
           <path d="m100 10.547c49.37 0 89.453 40.083 89.453 89.453 0 93.284-109.752 139.496-157.332 155.146-5.028 1.597-10.516.699-14.774-2.416s-6.774-8.074-6.774-13.35c-.026-44.211-.026-139.38-.026-139.38 0-49.37 40.083-89.453 89.453-89.453z" stroke="var(--accent)" stroke-width="23.02" />
         </g>
       </g>
-    </svg><b>F18 Pay</b></a>
+    </svg><b v-if="!showTitle || (!showTitle || !viewTitle)">F18 Pay</b><b v-if="session && (showTitle && viewTitle)">{{viewTitle}}</b></a>
   <div></div>
 
   <div class="links">
@@ -30,6 +30,8 @@
       <i v-if="theme==='dark'" class="fas fa-sun"></i>
       <i v-if="theme==='light'" class="fas fa-moon"></i>
     </a>
+    <a class="link" href="https://github.com/vswee/f18pay-frontend" target="_blank" title="F18 Pay Github"><i class="fab fa-github"></i></a>
+    <a class="link" href="https://twitter.com/f18micro" target="_blank" title="Flat18 Twitter"><i class="fab fa-twitter"></i></a>
   </div>
 </div>
 </template>
@@ -49,6 +51,8 @@ export default {
     ...mapGetters({
       fingerprint: 'fingerprint',
       session: 'session',
+      showTitle: 'showTitle',
+      viewTitle: 'viewTitle',
       theme: 'theme',
     }),
     currentRouteName() {
@@ -56,14 +60,21 @@ export default {
     }
   },
   methods: {
-    clearToHome(){
-        console.log("hi")
-      if(this.session){
-        this.$router.push({ name: 'dashboard'});
+    clearToHome() {
+      console.log("hi")
+      if (this.session) {
+        this.$router.push({
+          name: 'dashboard'
+        });
         this.$store.commit('setActiveStore', false)
-      this.$store.commit("setStoreView", false);
-      }else{
-        this.$router.push({ name: 'home'});
+        this.$store.commit('setStoreView', false);
+        this.$store.commit('setViewTitle', false);
+        this.$store.commit('setShowTitle', false);
+
+      } else {
+        this.$router.push({
+          name: 'home'
+        });
       }
     },
     logout() {
@@ -114,6 +125,22 @@ export default {
 
   svg {
     height: 40px;
+  }
+
+  b {
+    animation: slideUp .1s linear forwards 1;
+
+    @keyframes slideUp {
+      from {
+        opacity:0;
+        transform: translateY(-2rem);
+      }
+
+      to {
+        opacity:1;
+        transform: translateY(0);
+      }
+    }
   }
 }
 

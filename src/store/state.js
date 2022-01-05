@@ -11,5 +11,7 @@ let state = {
   chart: { chartData: false, options: false },
   storeView: false,
   storeModalView: false,
+  viewTitle: false,
+  showTitle: false,
 }
 export default state

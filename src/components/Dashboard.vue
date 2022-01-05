@@ -72,9 +72,20 @@ export default {
     } else {
       this.fetchStores()
     }
+    window.addEventListener('scroll', this.scrollUITriggers);
   },
-
+  mounted(){
+      
+    if(!this.activeStore){this.$store.commit("setViewTitle", 'Dashboard');}
+  },
   methods: {
+    scrollUITriggers() {
+      if (window.scrollY>80) {
+        this.$store.commit('setShowTitle', true);
+      } else {
+        this.$store.commit('setShowTitle', false);
+      }
+    },
     async fetchStores() {
       const username = await this.$store.dispatch('encrypt', {
         string: this.user,

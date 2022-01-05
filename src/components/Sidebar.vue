@@ -9,14 +9,14 @@
         <i :style="'background: #' + store.store_colour"></i>
         <i :style="'background: #' + store.store_accent_colour"></i>
       </span>
-      <span class="collapsible">{{decodedString(store.store_name)}}</span>
+      <span class="collapsible">{{decodedString(store.store_name)}} | <i class="fab fa-btc" v-if="store.network==='btc'"></i> <i class="fab fa-ethereum" v-if="store.network==='eth'"></i></span>
     </div>
   </div>
   <div></div>
   <div class="sidebar-shortcuts" v-if="activeStore && activeStore!=='false'">
     <a :class="storeView=='overview'?'sidebar-shortcut active-bar':'sidebar-shortcut'" @click="summaryView()"><i class="fas fa-chart-area"></i><span class="collapsible">Store Overview</span></a>
 
-    <a :class="storeView=='settings'?'sidebar-shortcut active-bar':'sidebar-shortcut'" @click="settingsView()"><i class="fas fa-sliders-h"></i><span class="collapsible">Store Settings</span></a>
+    <a :class="storeView=='settings'?'sidebar-shortcut active-bar':'sidebar-shortcut'" @click="settingsView()"><i class="fas fa-sliders-h"></i><span class="collapsible">Manage Store</span></a>
 
     <a :class="storeView=='buttons'?'sidebar-shortcut active-bar':'sidebar-shortcut'" @click="assetsView()"><i class="fas fa-code"></i><span class="collapsible">Payment Assets</span></a>
 
@@ -62,7 +62,8 @@ export default {
     if(document.getElementById("main")){document.documentElement.style.setProperty('--main', document.getElementById("main").getBoundingClientRect().width + "px")}
     if(!this.activeStore && this.activeStore!=='false'){
         this.$store.commit('setActiveStore', false)
-      this.$store.commit("setStoreView", false);
+      this.$store.commit('setStoreView', false);
+      this.$store.commit('setViewTitle', false);
     }
   },
   methods: {
@@ -76,21 +77,27 @@ export default {
     openStore(id) {
       this.$store.commit("setActiveStore", id);
       this.$store.commit("setStoreView", 'overview');
+      this.$store.commit("setViewTitle", 'Store Overview');
     },
     summaryView(){
       this.$store.commit("setStoreView", 'overview');
+      this.$store.commit("setViewTitle", 'Store Overview');
     },
     settingsView() {
       this.$store.commit("setStoreView", 'settings');
+      this.$store.commit("setViewTitle", 'Manage Store');
     },
     assetsView() {
       this.$store.commit("setStoreView", 'buttons');
+      this.$store.commit("setViewTitle", 'Payment Assets');
     },
     invoicesView() {
       this.$store.commit("setStoreView", 'invoices');
+      this.$store.commit("setViewTitle", 'Invoices');
     },
     requestsView(){
       this.$store.commit("setStoreView", 'requests');
+      this.$store.commit("setViewTitle", 'Payment Requests');
     },
     newStore(){
       this.$store.commit("setStoreModalView", 'new');

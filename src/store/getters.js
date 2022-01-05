@@ -34,6 +34,12 @@ let getters = {
   },
   storeModalView: state => {
     return state.storeModalView
-  }
+  },
+  showTitle: state => {
+    return state.showTitle
+  },
+  viewTitle: state => {
+    return state.viewTitle
+  },
 }
 export default getters
