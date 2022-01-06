@@ -7,9 +7,12 @@ input,
   border-radius: 6px;
   background: var(--dark);
   color: var(--white);
-  cursor: no-drop;
   line-break: anywhere;
   max-width: 500px;
+}
+
+.input-placeholder {
+  cursor: no-drop;
 }
 
 .message {
