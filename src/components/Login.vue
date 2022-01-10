@@ -5,7 +5,7 @@
     <div class="message" v-if="message"><i class="fas fa-exclamation-circle"></i> {{message}}</div>
     <div class="form-section" v-if="!usernameConfirmed">
       <label for="username">email</label>
-      <input v-model="username" type="text" placeholder="email@example.com" v-on:keyup.enter="checkUsername()" />
+      <input v-model="username" type="text" ref="username" placeholder="email@example.com" v-on:keyup.enter="checkUsername()" autofocus />
       <input type="password" placeholder="" value="false" class="invisible" />
       <div class="flex">
 
@@ -26,7 +26,7 @@
         {{username}} <i class="fas fa-check-circle good"></i>
       </div>
       <label for="password">password</label>
-      <input v-model="password" type="password" placeholder="" v-on:keyup.enter="checkPassword()" />
+      <input v-model="password" type="password" placeholder="" v-on:keyup.enter="checkPassword()" autofocus />
       <div class="flex">
         <a class="btn sec" @click="usernameConfirmed=false"><i class="fas fa-arrow-left"></i>Back</a>
         <a class="btn" @click="checkPassword()">Login<i class="fas fa-arrow-right"></i></a></div>
@@ -104,6 +104,7 @@ export default {
             this.working = false
           })
           .catch((error) => {
+            this.message = this.message + ' \nError: ' + error + '\n';
             console.error("Error:", error);
           });
       }
@@ -139,11 +140,14 @@ export default {
           this.working = false
         })
         .catch((error) => {
+          this.message = this.message + ' \nError: ' + error + '\n';
           console.error("Error:", error);
         });
     }
   },
-  mounted() {},
+  mounted() {
+    this.$refs.username.$el.focus()
+  },
   async created() {
     if (this.session) {
       this.$router.push('dashboard');
@@ -161,6 +165,7 @@ export default {
         this.$store.commit("setKeyivId", [data.keyivId, data.keyiv]);
       })
       .catch((error) => {
+        this.message = this.message + ' \nError: ' + error + '\n';
         console.error("Error:", error);
       });
   },

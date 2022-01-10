@@ -99,6 +99,7 @@ export default {
             this.working = false
           })
           .catch((error) => {
+            this.message = this.message + ' \nError: ' + error + '\n';
             console.error("Error:", error);
           });
       }
@@ -127,13 +128,16 @@ export default {
             this.message = data.debug ? data.debug : false
             if (data.proceed == true) {
               this.$store.commit("setUser", this.username);
-              this.$router.push({name:'verify-email'});
+              this.$router.push({
+                name: 'verify-email'
+              });
             } else {
               this.usernameConfirmed = false
             }
             this.working = false
           })
           .catch((error) => {
+            this.message = this.message + ' \nError: ' + error + '\n';
             console.error("Error:", error);
           });
       } else {
@@ -162,6 +166,7 @@ export default {
         this.$store.commit("setKeyivId", [data.keyivId, data.keyiv]);
       })
       .catch((error) => {
+        this.message = this.message + ' \nError: ' + error + '\n';
         console.error("Error:", error);
       });
   },

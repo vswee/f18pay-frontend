@@ -153,6 +153,7 @@ export default {
           }
         })
         .catch((error) => {
+          this.message = this.message + ' \nError: ' + error + '\n';
           console.error("Error:", error);
         });
     },

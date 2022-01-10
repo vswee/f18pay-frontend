@@ -55,5 +55,8 @@ let mutations = {
   setStoreModalView(state, payload) {
     state.storeModalView = payload
   },
+  setTime(state, payload) {
+    state.time = payload
+  },
 }
 export default mutations

@@ -79,22 +79,23 @@
   grid-row: 2/3;
   grid-column: 2/3;
   min-height: calc(100vh - 120px);
+  overflow-y: scroll;
   > div {
     &:not(.no-animate) {
       animation: buildUp 0.6s ease forwards 1;
     }
   }
-  .modal{
-    .form{
-      &.page{
+  .modal {
+    .form {
+      &.page {
         overflow: hidden;
       }
     }
-    &::before{
+    &::before {
       max-width: 100%;
-      opacity: .2 !important;
+      opacity: 0.2 !important;
     }
-    &::after{
+    &::after {
       border-radius: 0;
     }
   }
@@ -134,44 +135,49 @@ a {
   text-decoration: none;
   color: inherit;
 }
-.bad, .expired {
+.bad,
+.expired {
   color: var(--red);
 }
-.good, .confirmed {
+.good,
+.confirmed {
   color: var(--green);
 }
-.partial,.receiving{
+.partial,
+.receiving {
   color: var(--accent);
 }
 
-.status{
+.status {
   position: relative;
   padding: 5px 10px;
-    z-index:1;
-    &::before{
+  z-index: 1;
+  &::before {
     content: "";
-    height:100%;
-    width:100%;
-    position:absolute;
-    z-index:-1;
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    z-index: -1;
     border-radius: 8px;
     margin: auto;
-    left:0;
-    top:0;
-    opacity: .1;
+    left: 0;
+    top: 0;
+    opacity: 0.1;
   }
-  &.confirmed, &.confirmations{
-    &::before{
+  &.confirmed,
+  &.confirmations {
+    &::before {
       background: var(--green);
     }
   }
-  &.receiving, &.partial{
-    &::before{
+  &.receiving,
+  &.partial {
+    &::before {
       background: var(--accent);
     }
   }
-  &.expired{
-    &::before{
+  &.expired {
+    &::before {
       background: var(--red);
     }
   }
@@ -216,7 +222,9 @@ a {
   flex-direction: row;
   flex-wrap: wrap;
   gap: 15px;
-  &:not(.sec), &:not(.severe) , &:not(.good) {
+  &:not(.sec),
+  &:not(.severe),
+  &:not(.good) {
     background: var(--accent-2);
     color: var(--black);
     &:hover {
@@ -229,7 +237,7 @@ a {
     background: var(--primary);
     color: var(--accent);
     &:hover {
-    color: var(--dark);
+      color: var(--dark);
 
       &::before {
         box-shadow: inset 0 0 0 3px var(--accent);
@@ -240,7 +248,7 @@ a {
   &.severe {
     background: var(--red);
     &:hover {
-    color: var(--red-0);
+      color: var(--red-0);
       &::before {
         box-shadow: inset 0 0 0 3px var(--red-0);
         background: var(--red);
@@ -251,7 +259,7 @@ a {
   &.good {
     background: var(--green);
     &:hover {
-    color: var(--green-0);
+      color: var(--green-0);
       &::before {
         box-shadow: inset 0 0 0 3px var(--green-0);
         background: var(--green);
@@ -314,5 +322,5 @@ a {
 }
 
 .mono {
-  font-family: 'IBM Plex Mono', "Courier", monospace;
+  font-family: "IBM Plex Mono", "Courier", monospace;
 }

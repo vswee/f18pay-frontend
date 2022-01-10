@@ -103,7 +103,12 @@ export default {
       stores: 'stores',
     })
   },
-  created(){window.scrollTo({top: 0, behavior: 'smooth'});},
+  created() {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  },
   methods: {
     async checkStoreName() {
       this.working = true;
@@ -146,6 +151,7 @@ export default {
           this.working = false;
         })
         .catch((error) => {
+          this.message = this.message + ' \nError: ' + error + '\n';
           console.error("Error:", error);
         });
     },
@@ -208,6 +214,7 @@ export default {
             this.working = false;
           })
           .catch((error) => {
+            this.message = this.message + ' \nError: ' + error + '\n';
             console.error("Error:", error);
           });
 
@@ -216,12 +223,12 @@ export default {
     async submitZpub() {
       this.working = true;
       let regExp = /^[A-Za-z0-9]+$/;
-      if(!this.zpub.match(regExp)){
-      this.working = false;
-      this.message = "zpub does not appear to be valid";
-      return false;
-      }else{
-      this.message = "Checking zpub...";
+      if (!this.zpub.match(regExp)) {
+        this.working = false;
+        this.message = "zpub does not appear to be valid";
+        return false;
+      } else {
+        this.message = "Checking zpub...";
       }
       const username = await this.$store.dispatch('encrypt', {
         string: this.user,
@@ -262,6 +269,7 @@ export default {
           this.working = false;
         })
         .catch((error) => {
+          this.message = this.message + ' \nError: ' + error + '\n';
           console.error("Error:", error);
         });
     },
@@ -307,6 +315,7 @@ export default {
           this.working = false;
         })
         .catch((error) => {
+          this.message = this.message + ' \nError: ' + error + '\n';
           console.error("Error:", error);
         });
     },
@@ -314,7 +323,7 @@ export default {
       this.zpubOptions = false;
       this.collectZpub = false;
       this.storeNameConfirmed = false;
-          this.working = false;
+      this.working = false;
     }
   }
 }

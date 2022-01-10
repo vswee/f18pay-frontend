@@ -41,5 +41,8 @@ let getters = {
   viewTitle: state => {
     return state.viewTitle
   },
+  time: state => {
+    return state.time
+  },
 }
 export default getters

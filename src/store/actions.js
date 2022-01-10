@@ -89,6 +89,7 @@ let actions = {
       .then((data) => {
         if (data.proceed == true) {
           commit("setSession", true);
+          commit("setTime", data.time);
           session = true;
 
         } else {
@@ -158,6 +159,7 @@ let actions = {
         }
       })
       .catch((error) => {
+        this.message = this.message + ' \nError: ' + error + '\n';
         console.error("Error:", error);
       });
   },

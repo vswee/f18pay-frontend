@@ -156,7 +156,7 @@
         <tr v-if="active==key" class="list-item active" :key="key+'ex'">
           <td colSpan="5" class="border-bottom-right border-bottom-left">
             <div class="inline-table-notes">
-            
+
               <label v-if="request.token">Link:</label><span v-if="request.token"><a :href="'https://pay.flat18.co.uk/api/v1/payment-requests/'+request.token" target="_blank">Payment Link {{request.token.substr(0,6)}} <i class="fas fa-external-link-square-alt"></i></a></span>
               <label v-if="request.description">Description:</label><span v-if="request.description">{{_decode(request.description)}}</span>
               <label v-if="request.payee_email">Payee:</label><span v-if="request.payee_email">{{request.payee_email}}</span>
@@ -436,6 +436,7 @@ export default {
             }
           })
           .catch((error) => {
+            this.message = this.message + ' \nError: ' + error + '\n';
             console.error("Error:", error);
           });
       } else {
@@ -447,7 +448,10 @@ export default {
       this.select[index].open = false;
     },
     newRequest() {
-      window.scrollTo({top: 0, behavior: 'smooth'});
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
       this.modal = true;
       this.confirmedCreatedAddress = false;
       this.copied = false;
@@ -503,6 +507,7 @@ export default {
           }
         })
         .catch((error) => {
+          this.message = this.message + ' \nError: ' + error + '\n';
           console.error("Error:", error);
         });
     },
@@ -584,6 +589,7 @@ export default {
           }
         })
         .catch((error) => {
+          this.message = this.message + ' \nError: ' + error + '\n';
           console.error("Error:", error);
         });
     },
@@ -654,6 +660,7 @@ export default {
           }
         })
         .catch((error) => {
+          this.message = this.message + ' \nError: ' + error + '\n';
           console.error("Error:", error);
         });
     },

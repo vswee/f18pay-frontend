@@ -74,13 +74,15 @@ export default {
     }
     window.addEventListener('scroll', this.scrollUITriggers);
   },
-  mounted(){
-      
-    if(!this.activeStore){this.$store.commit("setViewTitle", 'Dashboard');}
+  mounted() {
+
+    if (!this.activeStore) {
+      this.$store.commit("setViewTitle", 'Dashboard');
+    }
   },
   methods: {
     scrollUITriggers() {
-      if (window.scrollY>80) {
+      if (window.scrollY > 80) {
         this.$store.commit('setShowTitle', true);
       } else {
         this.$store.commit('setShowTitle', false);
@@ -117,6 +119,7 @@ export default {
           }
         })
         .catch((error) => {
+          this.message = this.message + ' \nError: ' + error + '\n';
           console.error("Error:", error);
         });
     },

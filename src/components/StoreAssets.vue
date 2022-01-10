@@ -90,13 +90,13 @@
 
       <h2 @click="accordianIndexSet(1)">Payment Page <i :class="accordianIndex==1?'fas fa-caret-down':'fas fa-caret-right'"></i></h2>
       <div class="accordian-sect" v-if="accordianIndex==1">
-      <div class="sub-sect" v-if="accordianIndex==1">
-        <div class="switch">
-          <a :target="'_blank_'+random" :class="currentStore.payment_page==='1'?'btn active':'btn'" @click.stop="setPaymentPage(1)">{{currentStore.payment_page==='1'?'Page Enabled':'Enable Page'}}</a>
-          <a :class="currentStore.payment_page==='1'?'btn':'btn severe active'" @click.stop="setPaymentPage(0)">{{currentStore.payment_page==='1'?'Disable Page':'Page Disabled'}}</a>
+        <div class="sub-sect" v-if="accordianIndex==1">
+          <div class="switch">
+            <a :target="'_blank_'+random" :class="currentStore.payment_page==='1'?'btn active':'btn'" @click.stop="setPaymentPage(1)">{{currentStore.payment_page==='1'?'Page Enabled':'Enable Page'}}</a>
+            <a :class="currentStore.payment_page==='1'?'btn':'btn severe active'" @click.stop="setPaymentPage(0)">{{currentStore.payment_page==='1'?'Disable Page':'Page Disabled'}}</a>
+          </div>
+          <span class="help-text">A Payment page allows anyone with the link to generate invoices for this store. This may be useful as a backup POS terminal or for receiving donations.</span>
         </div>
-        <span class="help-text">A Payment page allows anyone with the link to generate invoices for this store. This may be useful as a backup POS terminal or for receiving donations.</span>
-      </div>
         <div class="sub-sect">
           <label for="storeName">Payment Pgae URL <i v-if="settingPaymentPage" class="fas fa-asterisk spin"></i></label>
           <div class="input-placeholder">
@@ -115,22 +115,21 @@
         </div>
       </div>
 
-
-    <h2 @click="accordianIndexSet(2)">Invoice Behaviour <i :class="accordianIndex==2?'fas fa-caret-down':'fas fa-caret-right'"></i></h2>
-    <div class="accordian-sect" v-if="accordianIndex==2">
-      <div class="sub-sect">
-        <label for="storeName">Payee must provide email on invoice <i v-if="settingEmailRequired" class="fas fa-asterisk spin"></i></label>
-        <div class="switch">
-          <a :target="'_blank_'+random" :class="currentStore.require_email==='1'?'btn active':'btn'" @click.stop="setPRequireEmail(1)">{{currentStore.require_email==='1'?'Email Required':'Require Payee Email'}}</a>
-          <a :class="currentStore.require_email==='1'?'btn':'btn severe active'" @click.stop="setPRequireEmail(0)">{{currentStore.require_email==='1'?'Allow Anonymous':'Not Required'}}</a>
+      <h2 @click="accordianIndexSet(2)">Invoice Behaviour <i :class="accordianIndex==2?'fas fa-caret-down':'fas fa-caret-right'"></i></h2>
+      <div class="accordian-sect" v-if="accordianIndex==2">
+        <div class="sub-sect">
+          <label for="storeName">Payee must provide email on invoice <i v-if="settingEmailRequired" class="fas fa-asterisk spin"></i></label>
+          <div class="switch">
+            <a :target="'_blank_'+random" :class="currentStore.require_email==='1'?'btn active':'btn'" @click.stop="setPRequireEmail(1)">{{currentStore.require_email==='1'?'Email Required':'Require Payee Email'}}</a>
+            <a :class="currentStore.require_email==='1'?'btn':'btn severe active'" @click.stop="setPRequireEmail(0)">{{currentStore.require_email==='1'?'Allow Anonymous':'Not Required'}}</a>
+          </div>
+          <span class="help-text">Choose whether a payee should identify themselves on an invoice by entering their email before proceeding to pay, or if invoices can be paid anonymously.</span>
         </div>
-        <span class="help-text">Choose whether a payee should identify themselves on an invoice by entering their email before proceeding to pay, or if invoices can be paid anonymously.</span>
       </div>
-    </div>
 
+    </div>
+    <input id="copy_to_clipboard_workspace" class="transparent">
   </div>
-  <input id="copy_to_clipboard_workspace" class="transparent">
-</div>
 
 </div>
 </template>
@@ -273,6 +272,7 @@ export default {
           }
         })
         .catch((error) => {
+          this.message = this.message + ' \nError: ' + error + '\n';
           console.error("Error:", error);
         });
       return value
@@ -301,7 +301,10 @@ export default {
       }
     },
     async showCode(id) {
-      window.scrollTo({top: 0, behavior: 'smooth'});
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
       this.modal.payload = await document.getElementById(id).innerHTML
         .replace(/</g, "\n\n<")
         .replace(/&quot;/g, '\'')

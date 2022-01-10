@@ -293,6 +293,7 @@ export default {
           this.working = false;
         })
         .catch((error) => {
+          this.message = this.message + ' \nError: ' + error + '\n';
           console.error("Error:", error);
         });
     },
@@ -345,6 +346,7 @@ export default {
           this.working = false;
         })
         .catch((error) => {
+          this.message = this.message + ' \nError: ' + error + '\n';
           console.error("Error:", error);
         });
     },
@@ -426,6 +428,7 @@ export default {
           this.working = false;
         })
         .catch((error) => {
+          this.message = this.message + ' \nError: ' + error + '\n';
           console.error("Error:", error);
         });
     },
@@ -480,6 +483,7 @@ export default {
           this.working = false;
         })
         .catch((error) => {
+          this.message = this.message + ' \nError: ' + error + '\n';
           console.error("Error:", error);
         });
     },
