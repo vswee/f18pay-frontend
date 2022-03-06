@@ -1,5 +1,5 @@
 <template lang="">
-<div class="header" id="header">
+<div :class="session && (showTitle && viewTitle) && working?'header working':'header'" id="header">
   <a @click="clearToHome()" title="home" class="logo"><svg clip-rule="evenodd" fill-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="2" viewBox="0 0 158 201" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
       <clipPath id="a">
         <path clip-rule="evenodd" d="m100 10.547c49.37 0 89.453 40.083 89.453 89.453 0 93.284-109.752 139.496-157.332 155.146-5.028 1.597-10.516.699-14.774-2.416s-6.774-8.074-6.774-13.35c-.026-44.211-.026-139.38-.026-139.38 0-49.37 40.083-89.453 89.453-89.453z" />
@@ -54,6 +54,7 @@ export default {
       showTitle: 'showTitle',
       viewTitle: 'viewTitle',
       theme: 'theme',
+      working: 'working',
     }),
     currentRouteName() {
       return this.$route.name;
@@ -112,6 +113,35 @@ export default {
     flex-direction: row;
     flex-wrap: wrap;
   }
+
+  &.working {
+    position: relative;
+    overflow: hidden;
+
+    &::before {
+      content: "";
+      display: block;
+      position: absolute;
+      height: 2px;
+      width: 100%;
+      left: 0;
+      transition: 0.2s ease;
+      background: linear-gradient(90deg, var(--black), var(--accent));
+      -webkit-animation: shootingBar 1s ease forwards infinite;
+      animation: shootingBar 1s ease forwards infinite;
+      top: 0;
+    }
+
+    @keyframes shootingBar {
+      from {
+        transform: translateX(-100%);
+      }
+
+      to {
+        transform: translateX(100%);
+      }
+    }
+  }
 }
 
 .logo {
@@ -132,12 +162,12 @@ export default {
 
     @keyframes slideUp {
       from {
-        opacity:0;
+        opacity: 0;
         transform: translateY(-2rem);
       }
 
       to {
-        opacity:1;
+        opacity: 1;
         transform: translateY(0);
       }
     }

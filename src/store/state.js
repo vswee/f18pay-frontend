@@ -13,6 +13,7 @@ let state = {
   storeModalView: false,
   viewTitle: false,
   showTitle: false,
-  time:false,
+  time: false,
+  working:false,
 }
 export default state

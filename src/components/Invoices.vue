@@ -19,13 +19,15 @@
 
     <div class="flex">
       <div class="button-cluster">
+        <a class="btn" @click="getInvoices" title="Refresh"><i class="fas fa-sync"></i></a>
+      </div>
+      <div class="button-cluster">
         <a class="btn" @click="viewing=20"><i><i class="fas fa-chevron-left"></i><i class="fas fa-chevron-left"></i></i></a>
         <a class="btn" @click="viewing=viewing-20<20?20:viewing=viewing-20"><i class="fas fa-chevron-left"></i></a>
         <a class="">{{range}} to {{viewing>=count?count:viewing}} of {{count}}</a>
         <a class="btn" @click="viewing=viewing+20>count?count:viewing+20"><i class="fas fa-chevron-right"></i></a>
         <a class="btn" @click="viewing=count"><i><i class="fas fa-chevron-right"></i><i class="fas fa-chevron-right"></i></i></a>
       </div>
-
       <div class="date-range-parent">
         <date-range-picker ref="picker" :locale-data="{ firstDay: 1, format: 'dd-mm-yyyy' }" :minDate="null" :maxDate="null" :singleDatePicker="false" :timePicker="false" :timePicker24Hour="false" :showWeekNumbers="true" :showDropdowns="false" :autoApply="true" v-model="dateRange" @update="getInvoices" :linkedCalendars="false">
 
@@ -234,7 +236,7 @@ export default {
       return 'F18Pay Report for Store: ' + this._decode(this.currentStore.store_name) + ' ::' + this.dateRange.startDate + ' to ' + this.dateRange.endDate + ' ::' + (this.filter ? this.filter : 'unfiltered')
     },
     computedDateRange() {
-      return new Date(); 
+      return new Date();
     },
     statisticsOrganised() {
       let array = [];
@@ -310,14 +312,17 @@ export default {
     filter: function () {
       this.viewing = 20;
       this.getInvoices()
-    }
+    },
+    working(){
+      this.$store.commit("setWorking", this.working);
+    },
   },
   mounted() {
     this.getInvoiceStatistics();
     this.getInvoices();
   },
   created() {
-    this.dateRange.startDate = this.currentStore.created;
+    this.dateRange.startDate = this.currentStore.created.indexOf(' ') >= 0 ? this.currentStore.created.split(' ')[0] : this.currentStore.created;
     this.dateRange.endDate = this.time;
   },
   methods: {
@@ -550,7 +555,7 @@ export default {
 
     &.active {
       td {
-        background: var(--accent-3);
+        background: var(--black);
       }
 
       .border-top-left {

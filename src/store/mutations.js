@@ -58,5 +58,8 @@ let mutations = {
   setTime(state, payload) {
     state.time = payload
   },
+  setWorking(state, payload) {
+    state.working = payload
+  },
 }
 export default mutations

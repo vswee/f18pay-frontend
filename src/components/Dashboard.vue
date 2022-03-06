@@ -1,7 +1,7 @@
 <template lang="">
 <div>
   <div class="stores" v-if="!activeStore || activeStore==='false'">
-    <div v-for="store in stores" :key="store.store_id" :class="store.deleted==1?'store-tile disabled':'store-tile active'" @click="openStore(store.store_id)">
+    <div v-for="(store, index) in stores" :key="store.store_id" :class="store.deleted==1?'store-tile disabled':'store-tile active'" :style="'animation-delay:'+index/10+'s;'" @click="openStore(store.store_id)">
       <h2>
         <img class="store-icon" v-if="store.store_logo" :src="store.store_logo">
         <span class="store-name-title-text">{{decodeURIComponent(decodeURI(store.store_name))}} <i class="fab fa-bitcoin" v-if="store.network==='btc'"></i> <i class="fab fa-ethereum" v-if="store.network==='eth'"></i></span>

@@ -44,5 +44,8 @@ let getters = {
   time: state => {
     return state.time
   },
+  working: state => {
+    return state.working
+  },
 }
 export default getters

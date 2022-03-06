@@ -98,6 +98,9 @@
     <div class="message" v-if="message"><i class="fas fa-exclamation-circle"></i> {{message}}</div>
     <div class="flex">
       <div class="button-cluster">
+        <a class="btn" @click="getPaymentRequests" title="Refresh"><i class="fas fa-sync"></i></a>
+      </div>
+      <div class="button-cluster">
         <a class="btn" @click="newRequest()" title="Create Payment Request"><i class="fas fa-plus"></i> <span>New Request</span></a>
       </div>
       <div class="button-cluster">
@@ -344,7 +347,13 @@ export default {
     filter: function () {
       this.viewing = 20;
       this.getPaymentRequests()
-    }
+    },
+    working() {
+      this.$store.commit("setWorking", this.working);
+    },   
+     modal: function () {
+      this.getPaymentRequests()
+    },
   },
   mounted() {
     this.getPrePopulate();
@@ -353,7 +362,7 @@ export default {
 
   },
   created() {
-    this.dateRange.startDate = this.currentStore.created;
+    this.dateRange.startDate = this.currentStore.created.indexOf(' ') >= 0 ? this.currentStore.created.split(' ')[0] : this.currentStore.created;
   },
   methods: {
     copyCode(copied) {
@@ -691,7 +700,7 @@ export default {
 
     &.active {
       td {
-        background: var(--accent-3);
+        background: var(--black);
       }
 
       .border-top-left {

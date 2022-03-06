@@ -179,6 +179,14 @@ export default {
       downloadFile: false,
     }
   },
+  watch:{
+    deleted(){
+      this.saveSettings()
+    },
+    working(){
+      this.$store.commit("setWorking", this.working);
+    },
+  },
   computed: {
     ...mapGetters({
       session: 'session',

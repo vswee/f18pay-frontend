@@ -1,8 +1,7 @@
 <template lang="">
 <div id="sidebar" :class="sidebarCollapse?'sidebar':'sidebar collapse'" v-if="session">
-  <div class="sidebar-shortcuts">
-    <a class="sidebar-shortcut" @click="toggleCollapse()"><i :class="sidebarCollapse?'fas fa-caret-square-left':'fas fa-caret-square-right'"></i><span class="collapsible">{{sidebarCollapse?'Compact':'Expand Sidebar'}}</span></a>
-  </div>
+  <a :class="sidebarCollapse?'collapse-sidebar collapsed':'collapse-sidebar'" @click="toggleCollapse()" title="Collapse or expand sidebar.">
+  </a>
   <div class="sidebar-shortcuts">
     <div :class="activeStore==store.store_id?'sidebar-shortcut active':'sidebar-shortcut'" v-for="store in stores" :key="store.store_id" @click="openStore(store.store_id)">
       <span class="store-flag">
@@ -58,28 +57,32 @@ export default {
       this.$store.commit("setStores", false);
     }
   },
-  mounted(){
-    if(document.getElementById("main")){document.documentElement.style.setProperty('--main', document.getElementById("main").getBoundingClientRect().width + "px")}
-    if(!this.activeStore && this.activeStore!=='false'){
-        this.$store.commit('setActiveStore', false)
+  mounted() {
+    if (document.getElementById("main")) {
+      document.documentElement.style.setProperty('--main', document.getElementById("main").getBoundingClientRect().width + "px")
+    }
+    if (!this.activeStore && this.activeStore !== 'false') {
+      this.$store.commit('setActiveStore', false)
       this.$store.commit('setStoreView', false);
       this.$store.commit('setViewTitle', false);
     }
   },
   methods: {
-    decodedString(string){
+    decodedString(string) {
       return decodeURIComponent(decodeURI(string));
     },
     toggleCollapse() {
       this.$store.commit("setSidebarCollapse", !this.sidebarCollapse);
-      if(document.getElementById("main")){document.documentElement.style.setProperty('--main', document.getElementById("main").getBoundingClientRect().width + "px")}
+      if (document.getElementById("main")) {
+        document.documentElement.style.setProperty('--main', document.getElementById("main").getBoundingClientRect().width + "px")
+      }
     },
     openStore(id) {
       this.$store.commit("setActiveStore", id);
       this.$store.commit("setStoreView", 'overview');
       this.$store.commit("setViewTitle", 'Store Overview');
     },
-    summaryView(){
+    summaryView() {
       this.$store.commit("setStoreView", 'overview');
       this.$store.commit("setViewTitle", 'Store Overview');
     },
@@ -95,11 +98,11 @@ export default {
       this.$store.commit("setStoreView", 'invoices');
       this.$store.commit("setViewTitle", 'Invoices');
     },
-    requestsView(){
+    requestsView() {
       this.$store.commit("setStoreView", 'requests');
       this.$store.commit("setViewTitle", 'Payment Requests');
     },
-    newStore(){
+    newStore() {
       this.$store.commit("setStoreModalView", 'new');
     },
   }
@@ -108,4 +111,166 @@ export default {
 
 <style lang="scss">
 @import "../assets/css/dashboard.scss";
+
+.sidebar {
+  >div {
+    box-shadow: 0 1px 0 0 var(--dark);
+  }
+
+  .sidebar-shortcuts {
+    padding: 15px 0;
+
+    .sidebar-shortcut {
+      &.active-bar {
+        box-shadow: inset -4px 0 0;
+      }
+      display: grid;
+      grid-template-columns: 1.5rem 1fr;
+      align-items: center;
+      padding: 10px;
+      cursor: pointer;
+
+      > :first-child {
+        text-align: center;
+        font-size: 1.1rem;
+      }
+
+      &:not(.active) {
+        &:hover {
+          .collapsible {
+            opacity: 1;
+          }
+                &.active-bar {
+        box-shadow: inset -6px 0 0;
+      }
+      // &:not(&.active-bar) {
+      //   box-shadow: inset -2px 0 0;
+      // }
+        }
+      }
+
+      &.active {
+        background: var(--white);
+      }
+    }
+  }
+
+  .collapsible {
+    max-width: 150px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+    margin-left: 10px;
+    font-weight: 400;
+    font-size: 0.8rem;
+    opacity: .7;
+
+    i {
+      font-size: 0.8rem;
+    }
+  }
+
+  &:not(.collapse) {
+    .sidebar-shortcuts {
+      .sidebar-shortcut {
+        &.active {
+          color: var(--black);
+        }
+      }
+    }
+  }
+
+  &.collapse {
+    text-align: center;
+
+    .collapsible {
+      display: none;
+    }
+  }
+
+  &.collapse {
+    .sidebar-shortcut {
+      display: grid;
+      grid-template-columns: auto;
+      align-items: center;
+
+      &:hover {
+        position: relative;
+
+        .collapsible {
+          position: absolute;
+          bottom: 0;
+          top: 0;
+          right: 0;
+          left: calc(100% + 10px);
+          // font-size: 12px;
+          // font-weight: 600;
+          // text-transform: uppercase;
+          padding: .5rem;
+          box-shadow: 0 10px 30px -15px #000;
+          border-radius: 6px;
+          z-index: 2;
+          background: var(--black);
+          display: block;
+          width: 100%;
+          height: -webkit-max-content;
+          height: -moz-max-content;
+          height: max-content;
+          min-width: 100px;
+          margin: auto;
+        }
+      }
+    }
+  }
+}
+
+.collapse-sidebar {
+  height: 2rem;
+  width: 1rem;
+  position: absolute;
+  display: grid;
+  grid-template: 1fr 1fr/ 1fr;
+  left: calc(100% + 0px);
+  padding: 0 1rem;
+  margin: auto 0;
+  top: 0;
+  bottom: 0;
+  cursor: pointer;
+
+  &:before,
+  &:after {
+    content: '';
+    height: 1rem;
+    width: 3px;
+    background: var(--accent);
+    position: relative;
+    transition: .2s ease;
+  }
+
+  &:hover {
+    &.collapsed {
+      &:before {
+        transform-origin: 0 0;
+        transform: rotate(15deg)translateY(1px);
+      }
+
+      &:after {
+        transform-origin: 0 100%;
+        transform: rotate(-15deg);
+      }
+    }
+
+    &:not(&.collapsed) {
+      &:before {
+        transform-origin: 0 0;
+        transform: rotate(-15deg)translateY(2px);
+      }
+
+      &:after {
+        transform-origin: 0 100%;
+        transform: rotate(15deg);
+      }
+    }
+  }
+}
 </style>
