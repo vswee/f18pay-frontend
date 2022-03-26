@@ -137,7 +137,7 @@
         </div>
       </div>
       <div class="flex">
-        <a class="btn" @click="saveSettings()">Save</a>
+        <a class="btn" id="saveButton" @click="saveSettings()">Save</a>
         <a v-if="deleted==0" class="btn severe" @click="deleted=1">Disable Store</a>
         <a v-if="deleted==1" class="btn good" @click="deleted=0">Enable Store</a>
       </div>
@@ -179,11 +179,11 @@ export default {
       downloadFile: false,
     }
   },
-  watch:{
-    deleted(){
+  watch: {
+    deleted() {
       this.saveSettings()
     },
-    working(){
+    working() {
       this.$store.commit("setWorking", this.working);
     },
   },
@@ -233,6 +233,7 @@ export default {
   },
   mounted() {
     let t = this;
+    document.querySelector('.dynamic-cta-header-space')&&(document.querySelector('.dynamic-cta-header-space').innerHTML = '')
     document.getElementById("imageInput").addEventListener("change", function () {
       if (this.files && this.files[0]) {
         let reader = new FileReader();
@@ -250,6 +251,15 @@ export default {
     this.email = this.currentStore.email || '';
     this.addressDerivationType = this.currentStore.zpub ? 'external' : 'internal'
     this.deleted = !this.currentStore.deleted ? 0 : this.currentStore.deleted;
+
+    if (document.querySelectorAll('.dynamic-cta-header-space').length == 1 && document.querySelector('#saveButton')) {
+      let cta = document.querySelector('#saveButton').cloneNode(true);
+      cta.setAttribute('id', cta.getAttribute('id') + '_' + Date.now())
+      cta.addEventListener("click", function () {
+        t.saveSettings()
+      })
+      document.querySelector('.dynamic-cta-header-space').append(cta);
+    }
   },
   methods: {
     downloaded() {

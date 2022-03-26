@@ -13,15 +13,18 @@
     margin-top: 0;
   }
 }
+h1,h2,h3{
+  user-select: none;
+}
 
 .store-icon {
   max-height: 3rem;
   max-width: 3rem;
   border-radius: 6px;
 }
-.active{
+.active {
   .store-flag {
-    box-shadow: 0 0 0 1px var(--black);
+    // box-shadow: 0 0 0 1px var(--black);
   }
 }
 .store-flag {
@@ -48,13 +51,13 @@
   width: 300px;
   display: grid;
   gap: 10px;
-  opacity:0;
-      transform: translateY(10px);
-      animation: b1 .4s ease forwards 1;
-      @keyframes b1{
-    to{
-      opacity:1;
-      transform: translateY(0)
+  opacity: 0;
+  transform: translateY(10px);
+  animation: b1 0.4s ease forwards 1;
+  @keyframes b1 {
+    to {
+      opacity: 1;
+      transform: translateY(0);
     }
   }
   &:hover {
@@ -98,7 +101,6 @@
   }
 }
 
-
 .graph {
   rect {
     fill: var(--accent) !important;
@@ -110,7 +112,7 @@
 }
 .store-management {
   padding: 2rem 5rem;
-  margin: auto 0;
+  margin: auto;
   width: max-content;
   h1 {
     margin-top: 0;
@@ -138,8 +140,8 @@
     line-height: 1.4;
   }
   .graph {
-    width: 80vw;
-    max-width: 600px;
+    width: 70vw;
+    max-width: 900px;
   }
   .subsect {
     padding: 1rem;
@@ -329,7 +331,7 @@
     height: 100%;
     color: var(--accent-3);
     text-transform: capitalize;
-    appearance:none;
+    appearance: none;
     &:hover {
       color: var(--white);
     }
@@ -474,4 +476,15 @@
       }
     }
   }
+}
+
+.form-section{
+  h2{
+    z-index: 2;
+  }
+.accordian-sect {
+  background: var(--black);
+  padding: 2rem;
+  box-shadow: 0 -4rem var(--black), -1rem 0 var(--black), -1rem -4rem 0 var(--black);
+}
 }

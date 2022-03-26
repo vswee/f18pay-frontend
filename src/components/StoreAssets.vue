@@ -227,6 +227,7 @@ export default {
     },
   },
   mounted() {
+    document.querySelector('.dynamic-cta-header-space')&&(document.querySelector('.dynamic-cta-header-space').innerHTML = '')
     this.supportedCurrencies.push(this.currentStore.network.toUpperCase())
   },
   methods: {

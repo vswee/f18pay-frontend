@@ -356,6 +356,7 @@ export default {
     },
   },
   mounted() {
+    document.querySelector('.dynamic-cta-header-space')&&(document.querySelector('.dynamic-cta-header-space').innerHTML = '')
     this.getPrePopulate();
     this.getPaymentRequests();
     this.select[2].options.push(this.currentStore.network.toUpperCase())

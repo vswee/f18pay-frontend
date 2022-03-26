@@ -2,13 +2,18 @@
 <div id="sidebar" :class="sidebarCollapse?'sidebar':'sidebar collapse'" v-if="session">
   <a :class="sidebarCollapse?'collapse-sidebar collapsed':'collapse-sidebar'" @click="toggleCollapse()" title="Collapse or expand sidebar.">
   </a>
-  <div class="sidebar-shortcuts">
-    <div :class="activeStore==store.store_id?'sidebar-shortcut active':'sidebar-shortcut'" v-for="store in stores" :key="store.store_id" @click="openStore(store.store_id)">
+  <div :class="storesDropdown?'sidebar-shortcuts dropdown open':'sidebar-shortcuts dropdown'" @click="storesDropdown=!storesDropdown">
+    <div :class="activeStore==store.store_id?'sidebar-shortcut active':'sidebar-shortcut'" v-for="(store, index) in stores" :key="store.store_id" @click="activeStore!=store.store_id&&(openStore(store.store_id))" :style="'animation-delay:' + index/10 + 's'">
       <span class="store-flag">
         <i :style="'background: #' + store.store_colour"></i>
         <i :style="'background: #' + store.store_accent_colour"></i>
       </span>
-      <span class="collapsible">{{decodedString(store.store_name)}} | <i class="fab fa-btc" v-if="store.network==='btc'"></i> <i class="fab fa-ethereum" v-if="store.network==='eth'"></i></span>
+      <span class="collapsible">
+        <span class="text">{{decodedString(store.store_name)}}</span>
+        <span :class="'store-badge ' + store.network">
+          {{store.network}}
+        </span>
+      </span>
     </div>
   </div>
   <div></div>
@@ -38,7 +43,7 @@ export default {
   name: "Sidebar",
   data() {
     return {
-
+      storesDropdown: false,
     }
   },
   computed: {
@@ -109,6 +114,119 @@ export default {
 }
 </script>
 
+<style lang="scss" scoped>
+.sidebar {
+  .compartmentalise {
+    display: grid;
+    grid-template: 1fr/auto auto 1fr;
+    gap: .5rem;
+
+    .text-clip {
+      max-height: 2rem;
+      max-width: 125px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: block;
+    }
+  }
+
+  .dropdown {
+    &.open {
+      display: grid;
+      grid-auto-flow: row;
+      box-shadow: 0 1px;
+
+      .sidebar-shortcut {
+        &.active {
+          grid-row: 1/2;
+          margin-bottom: .5rem;
+          box-shadow: 0 1px;
+
+          &::after {
+            content: "\f077";
+            font-size: 0.8rem;
+            font-family: 'Font Awesome 5 Free';
+            font-weight: 900;
+            -moz-osx-font-smoothing: grayscale;
+            font-style: normal;
+            font-variant: normal;
+            text-rendering: auto;
+            line-height: 1;
+            margin-left: 10px;
+          }
+
+          grid-template-columns: 1.5rem 1fr auto;
+        }
+
+        &:not(.active) {
+          animation: u0 200ms linear forwards 1;
+          opacity: 0;
+          transform: scale(.95)translateY(1rem);
+          animation-origin: center;
+
+          @keyframes u0 {
+            to {
+              opacity: 1;
+              transform: scale(1)translateY(0)
+            }
+          }
+        }
+      }
+    }
+
+    &:not(.open) {
+      .sidebar-shortcut {
+        &:not(.active) {
+          display: none;
+        }
+
+        &.active {
+          &::after {
+            content: "\f078";
+            font-size: 0.8rem;
+            font-family: 'Font Awesome 5 Free';
+            font-weight: 900;
+            -moz-osx-font-smoothing: grayscale;
+            font-style: normal;
+            font-variant: normal;
+            text-rendering: auto;
+            line-height: 1;
+            margin-left: 10px;
+          }
+
+          grid-template-columns: 1.5rem 1fr auto;
+        }
+
+      }
+    }
+
+    .text {
+
+      margin-right: 10px;
+    }
+
+    .store-badge {
+      display: inline-block;
+      padding: .5px 6px;
+      font-size: 10px;
+      border-radius: 10px;
+      text-transform: uppercase;
+      font-weight: 800;
+
+      &.btc {
+        background: #ffa700;
+        color: #441300;
+      }
+
+      &.eth {
+        background: #5d76d7;
+        color: #fff;
+      }
+    }
+  }
+}
+</style>
+
 <style lang="scss">
 @import "../assets/css/dashboard.scss";
 
@@ -124,6 +242,7 @@ export default {
       &.active-bar {
         box-shadow: inset -4px 0 0;
       }
+
       display: grid;
       grid-template-columns: 1.5rem 1fr;
       align-items: center;
@@ -140,17 +259,23 @@ export default {
           .collapsible {
             opacity: 1;
           }
-                &.active-bar {
-        box-shadow: inset -6px 0 0;
-      }
-      // &:not(&.active-bar) {
-      //   box-shadow: inset -2px 0 0;
-      // }
+
+          &.active-bar {
+            box-shadow: inset -6px 0 0;
+          }
+
+          // &:not(&.active-bar) {
+          //   box-shadow: inset -2px 0 0;
+          // }
         }
       }
 
       &.active {
-        background: var(--white);
+
+        // background: var(--white);
+        .collapsible {
+          opacity: 1;
+        }
       }
     }
   }
@@ -174,7 +299,7 @@ export default {
     .sidebar-shortcuts {
       .sidebar-shortcut {
         &.active {
-          color: var(--black);
+          // color: var(--black);
         }
       }
     }
