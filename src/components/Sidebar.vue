@@ -1,7 +1,7 @@
 <template lang="">
 <div id="sidebar" :class="sidebarCollapse?'sidebar':'sidebar collapse'" v-if="session">
   <a :class="sidebarCollapse?'collapse-sidebar collapsed':'collapse-sidebar'" @click="toggleCollapse()" title="Collapse or expand sidebar.">
-  </a>
+  </a> 
   <div :class="storesDropdown?'sidebar-shortcuts dropdown open store-length-'+stores.length:'sidebar-shortcuts dropdown store-length-'+stores.length" @click="storesDropdown=!storesDropdown">
     <div :class="activeStore==store.store_id?'sidebar-shortcut active':'sidebar-shortcut'" v-for="store in stores" :key="store.store_id" @click="activeStore!=store.store_id&&(openStore(store.store_id))">
       <span class="store-flag">
