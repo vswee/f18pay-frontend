@@ -12,10 +12,7 @@
             <ol>
               <li v-for="(address, key) in addressesForConfirmation" :key="key">{{address}}</li>
             </ol>
-            <span class="help-text"></span>
-          </div>
-          <div class="sub-sect">
-            <span class="help-text">Confirm that the addresses above match the <b>first 10</b> addresses on your wallet.<br>For Wasabi wallet, you may need to generate 10 addresses manually (under the 'receive' tab).</span>
+            <span class="help-text">Confirm that the addresses above match the <b>first {{numberOfAddressesToConfirm}}</b> addresses on your wallet.<br>For Wasabi wallet, you may need to generate {{numberOfAddressesToConfirm}} addresses manually (under the 'receive' tab).</span>
           </div>
           <div class="flex">
             <a class="btn sec" @click.stop="confirmAddresses=false"><i class="fas fa-arrow-left"></i></a>
@@ -66,10 +63,10 @@ import {
   mapGetters
 } from 'vuex';
 export default {
-  name: "StoreSettingsModal",
+  name: "WalletSettingsModal",
   components: {
   },
-  props: ['addressesForConfirmation', 'confirmAddresses','confirmCode', 'code' ],
+  props: ['addressesForConfirmation', 'confirmAddresses','confirmCode', 'code', 'numberOfAddressesToConfirm' ],
   emits:['setConfirmAddresses', 'setConfirmCode','confirmAddressesMatchWallet'],
   data() {
     return {
@@ -221,6 +218,9 @@ export default {
     },
     _null() {
       return false
+    },
+    uploadNewImage() {
+      document.getElementById("imageInput").click();
     },
     accordianIndexSet(number) {
       this.accordianIndex = this.accordianIndex == number ? -1 : number;

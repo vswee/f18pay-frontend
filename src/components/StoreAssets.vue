@@ -19,7 +19,7 @@
   </div>
   <!-- MODAL -->
   <div :class="working?'form page working':'form page'" @click.stop="_null()">
-    <h1><span>Payment Assets</span><span>{{_decode(currentStore.store_name)}}</span></h1>
+    <h1><span>Payment Assets</span></h1>
 
     <div class="message" v-if="message"><i class="fas fa-exclamation-circle"></i> {{message}}</div>
     <div class="form-section">

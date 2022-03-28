@@ -1,6 +1,6 @@
 <template lang="">
 <div class="store-management">
-  <h1><img class="store-icon" v-if="currentStore.store_logo" :src="currentStore.store_logo"><span>{{_decode(currentStore.store_name)}} <i class="fab fa-bitcoin" v-if="currentStore.network==='btc'"></i> <i class="fab fa-ethereum" v-if="currentStore.network==='eth'"></i> </span></h1>
+  <h1><img class="store-icon" v-if="currentStore.store_logo" :src="currentStore.store_logo"><span>{{_decode(currentStore.store_name)}}</span><span :class="'badge ' + currentStore.network">{{currentStore.network}}</span></h1>
   <h2>{{currentStore.sum || '0.00'}} {{currentStore.network.toUpperCase()}}</h2>
   <small :class="currentStore.deleted==1?'status bad':'status good'">{{currentStore.deleted==1?'Disabled':'Active'}}</small>
   <p class="help-text"><i class="fas fa-info-circle"></i> We never monitor wallet addresses outside of the scope of 'incoming transactions for associated invoices'.<br>This means that your Balance won't reflect withdrawals or transactions on addresses not associated with invoices on this platform.</p>

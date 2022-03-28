@@ -17,6 +17,7 @@
   </div>
   <StoreSummary v-if="activeStore && storeView=='overview'"></StoreSummary>
   <StoreSettings v-if="activeStore && storeView=='settings'"></StoreSettings>
+  <WalletSettings v-if="activeStore && storeView=='wallet'"></WalletSettings>
   <StoreAssets v-if="activeStore && storeView=='buttons'"></StoreAssets>
   <Invoices v-if="activeStore && storeView=='invoices'"></Invoices>
   <PaymentRequest v-if="activeStore && storeView=='requests'"></PaymentRequest>
@@ -29,6 +30,7 @@ import {
 } from 'vuex';
 import StoreSummary from '@/components/StoreSummary'
 import StoreSettings from '@/components/StoreSettings'
+import WalletSettings from '@/components/WalletSettings'
 import StoreAssets from '@/components/StoreAssets'
 import Invoices from '@/components/Invoices'
 import PaymentRequest from '@/components/PaymentRequest'
@@ -37,6 +39,7 @@ export default {
   components: {
     StoreSummary,
     StoreSettings,
+    WalletSettings,
     StoreAssets,
     Invoices,
     PaymentRequest,
@@ -60,6 +63,7 @@ export default {
       activeStore: 'activeStore',
       storeView: 'storeView',
       storeModalView: 'storeModalView',
+      viewTitle: 'viewTitle'
     })
   },
   async created() {
@@ -75,6 +79,7 @@ export default {
     window.addEventListener('scroll', this.scrollUITriggers);
   },
   mounted() {
+    this.$store.dispatch('getStores')
 
     if (!this.activeStore) {
       this.$store.commit("setViewTitle", 'Dashboard');
@@ -82,7 +87,7 @@ export default {
   },
   methods: {
     scrollUITriggers() {
-      if (window.scrollY > 80) {
+      if (window.scrollY > 80 && this.setViewTitle) {
         this.$store.commit('setShowTitle', true);
       } else {
         this.$store.commit('setShowTitle', false);
@@ -157,12 +162,14 @@ export default {
   opacity: 0;
   transform: translateY(10px);
   animation: b1 0.4s ease forwards 1;
+
   @keyframes b1 {
     to {
       opacity: 1;
       transform: translateY(0);
     }
   }
+
   &:hover {
     box-shadow: 0 5px 15px -10px #000;
 
@@ -170,6 +177,7 @@ export default {
       animation: build-tooltip 0.1s ease forwards 1;
     }
   }
+
   &::before {
     content: "";
     height: 6px;
@@ -179,16 +187,19 @@ export default {
     top: 10px;
     left: 10px;
   }
+
   &.active {
     &::before {
-      background:var(--green);
+      background: var(--green);
     }
   }
+
   &.disabled {
     &::before {
-      background:var(--red);
+      background: var(--red);
     }
   }
+
   .mono {
     display: block;
     max-width: 14rem;

@@ -5,7 +5,7 @@
   <div :class="storesDropdown?'sidebar-shortcuts dropdown open store-length-'+stores.length:'sidebar-shortcuts dropdown store-length-'+stores.length" @click="storesDropdown=!storesDropdown">
     <template v-if="!activeStore && stores.length>0">
       <div class="sidebar-shortcut active">
-      <i class="fas fa-hand-pointer"></i>
+        <i class="fas fa-hand-pointer"></i>
         <span class="collapsible"><span class="text"> Select Store </span>
           <!-- <i class="fas fa-hand-pointer"></i> -->
         </span>
@@ -13,18 +13,18 @@
     </template>
 
     <!-- <template v-if="activeStore"> -->
-      <div :class="activeStore==store.store_id?'sidebar-shortcut active':'sidebar-shortcut'" v-for="(store, index) in stores" :key="store.store_id" @click="activeStore!=store.store_id&&(openStore(store.store_id))" :style="'animation-delay:' + (index+1)/20 + 's'">
-        <span class="store-flag">
-          <i :style="'background: #' + store.store_colour"></i>
-          <i :style="'background: #' + store.store_accent_colour"></i>
+    <div :class="activeStore==store.store_id?'sidebar-shortcut active':'sidebar-shortcut'" v-for="(store, index) in stores" :key="store.store_id" @click="activeStore!=store.store_id&&(openStore(store.store_id))" :style="'animation-delay:' + (index+1)/20 + 's'">
+      <span class="store-flag">
+        <i :style="'background: #' + store.store_colour"></i>
+        <i :style="'background: #' + store.store_accent_colour"></i>
+      </span>
+      <span class="collapsible">
+        <span class="text">{{decodedString(store.store_name)}}</span>
+        <span :class="'badge ' + store.network">
+          {{store.network}}
         </span>
-        <span class="collapsible">
-          <span class="text">{{decodedString(store.store_name)}}</span>
-          <span :class="'badge ' + store.network">
-            {{store.network}}
-          </span>
-        </span>
-      </div>
+      </span>
+    </div>
     <!-- </template> -->
   </div>
   <div></div>
@@ -32,6 +32,8 @@
     <a :class="storeView=='overview'?'sidebar-shortcut active-bar':'sidebar-shortcut'" @click="summaryView()"><i class="fas fa-chart-area"></i><span class="collapsible">Store Overview</span></a>
 
     <a :class="storeView=='settings'?'sidebar-shortcut active-bar':'sidebar-shortcut'" @click="settingsView()"><i class="fas fa-sliders-h"></i><span class="collapsible">Manage Store</span></a>
+
+    <a :class="storeView=='wallet'?'sidebar-shortcut active-bar':'sidebar-shortcut'" @click="walletView()"><i class="fas fa-wallet"></i><span class="collapsible">Wallet</span></a>
 
     <a :class="storeView=='buttons'?'sidebar-shortcut active-bar':'sidebar-shortcut'" @click="assetsView()"><i class="fas fa-code"></i><span class="collapsible">Payment Assets</span></a>
 
@@ -105,6 +107,10 @@ export default {
     settingsView() {
       this.$store.commit("setStoreView", 'settings');
       this.$store.commit("setViewTitle", 'Manage Store');
+    },
+    walletView() {
+      this.$store.commit("setStoreView", 'wallet');
+      this.$store.commit("setViewTitle", 'Wallet');
     },
     assetsView() {
       this.$store.commit("setStoreView", 'buttons');
@@ -218,7 +224,6 @@ export default {
 
       margin-right: 10px;
     }
-
 
   }
 

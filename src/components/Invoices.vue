@@ -1,7 +1,7 @@
 <template lang="">
 <div :class="working && spinning?'store-management no-click spin-fresco':(working && !spinning?'store-management no-click':'store-management')">
   <div :class="working?'form page working':'form page'" @click.stop="_null()">
-    <h1><span>Invoices</span><span>{{_decode(currentStore.store_name)}} <i class="fab fa-bitcoin" v-if="currentStore.network==='btc'"></i> <i class="fab fa-ethereum" v-if="currentStore.network==='eth'"></i> </span></h1>
+    <h1><span>Invoices</span><span :class="'badge ' + currentStore.network">{{currentStore.network}}</span></h1>
 
     <div class="message" v-if="message"><i class="fas fa-exclamation-circle"></i> {{message}}</div>
 
