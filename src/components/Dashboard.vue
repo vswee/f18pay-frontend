@@ -1,7 +1,7 @@
 <template lang="">
 <div>
   <div class="stores" v-if="!activeStore || activeStore==='false'">
-    <div v-for="(store, index) in stores" :key="store.store_id" :class="store.deleted==1?'store-tile disabled':'store-tile active'" :style="'animation-delay:'+index/10+'s;'" @click="openStore(store.store_id)">
+    <div v-for="(store, index) in stores" :key="store.store_id" :class="store.deleted==1?'store-tile disabled':'store-tile active'" :style="'animation-delay:'+(index+1)/10+'s;'" @click="openStore(store.store_id)">
       <h2>
         <img class="store-icon" v-if="store.store_logo" :src="store.store_logo">
         <span class="store-name-title-text">{{decodeURIComponent(decodeURI(store.store_name))}} <i class="fab fa-bitcoin" v-if="store.network==='btc'"></i> <i class="fab fa-ethereum" v-if="store.network==='eth'"></i></span>
@@ -10,9 +10,9 @@
           <i :style="'background: #' + store.store_accent_colour"></i>
         </span>
       </h2>
-      <span class="store-value"><span class="mono">{{store.sum?store.sum:"0.00"}}</span><small>{{store.network.toUpperCase()}}</small></span>
+      <span class="store-value"><span class="mono">{{store.sum?store.sum:"0.00"}}</span><small :class="'badge ' + store.network">{{store.network.toUpperCase()}}</small></span>
       <span>{{store.zpub?'External':'Internal'}} wallet</span>
-      <span>{{store.deleted==1?'Disabled':'Active'}}</span>
+      <span :class="'badge active-' + store.deleted">{{store.deleted==1?'Disabled':'Active'}}</span>
     </div>
   </div>
   <StoreSummary v-if="activeStore && storeView=='overview'"></StoreSummary>
@@ -136,4 +136,64 @@ export default {
 </style>
 <style lang="css">
 @import "../assets/css/fonts-mono.css";
+</style>
+
+<style lang="scss">
+.store-tile {
+  position: relative;
+  z-index: 1;
+  margin-bottom: 0;
+  box-shadow: 0 15px 50px -40px #000;
+  padding: 2rem 1rem 1rem 1rem;
+  border-radius: 10px;
+  transition: ease;
+  cursor: pointer;
+  background: var(--black);
+  max-width: 90vw;
+  width: 250px;
+  display: grid;
+  grid-template-rows: auto auto auto 1fr;
+  gap: 10px;
+  opacity: 0;
+  transform: translateY(10px);
+  animation: b1 0.4s ease forwards 1;
+  @keyframes b1 {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  &:hover {
+    box-shadow: 0 5px 15px -10px #000;
+
+    .tooltip {
+      animation: build-tooltip 0.1s ease forwards 1;
+    }
+  }
+  &::before {
+    content: "";
+    height: 6px;
+    width: calc(100% - 20px);
+    border-radius: 6px;
+    position: absolute;
+    top: 10px;
+    left: 10px;
+  }
+  &.active {
+    &::before {
+      background:var(--green);
+    }
+  }
+  &.disabled {
+    &::before {
+      background:var(--red);
+    }
+  }
+  .mono {
+    display: block;
+    max-width: 14rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
 </style>

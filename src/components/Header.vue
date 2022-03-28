@@ -17,7 +17,7 @@
       </g>
     </svg>
     <b v-if="!showTitle || (!showTitle || !viewTitle)">F18 Pay</b>
-    <b v-if="session && (showTitle && viewTitle)">{{viewTitle}}</b>
+    <b v-if="session && (showTitle && viewTitle)" class="ui-scroll-title">{{viewTitle}}</b>
   </a>
   <div :class="session && (showTitle && viewTitle) ? 'dynamic-cta-header-space active':'dynamic-cta-header-space'"></div>
   <div></div>
@@ -183,6 +183,11 @@ export default {
 
   b {
     animation: slideUp .1s linear forwards 1;
+
+    &.ui-scroll-title {
+      text-transform: capitalize;
+      font-weight: 400;
+    }
 
     @keyframes slideUp {
       from {

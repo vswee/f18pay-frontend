@@ -1,20 +1,31 @@
 <template lang="">
 <div id="sidebar" :class="sidebarCollapse?'sidebar':'sidebar collapse'" v-if="session">
   <a :class="sidebarCollapse?'collapse-sidebar collapsed':'collapse-sidebar'" @click="toggleCollapse()" title="Collapse or expand sidebar.">
-  </a> 
+  </a>
   <div :class="storesDropdown?'sidebar-shortcuts dropdown open store-length-'+stores.length:'sidebar-shortcuts dropdown store-length-'+stores.length" @click="storesDropdown=!storesDropdown">
-    <div :class="activeStore==store.store_id?'sidebar-shortcut active':'sidebar-shortcut'" v-for="store in stores" :key="store.store_id" @click="activeStore!=store.store_id&&(openStore(store.store_id))">
-      <span class="store-flag">
-        <i :style="'background: #' + store.store_colour"></i>
-        <i :style="'background: #' + store.store_accent_colour"></i>
-      </span>
-      <span class="collapsible">
-        <span class="text">{{decodedString(store.store_name)}}</span>
-        <span :class="'store-badge ' + store.network">
-          {{store.network}}
+    <template v-if="!activeStore && stores.length>0">
+      <div class="sidebar-shortcut active">
+      <i class="fas fa-hand-pointer"></i>
+        <span class="collapsible"><span class="text"> Select Store </span>
+          <!-- <i class="fas fa-hand-pointer"></i> -->
         </span>
-      </span>
-    </div>
+      </div>
+    </template>
+
+    <!-- <template v-if="activeStore"> -->
+      <div :class="activeStore==store.store_id?'sidebar-shortcut active':'sidebar-shortcut'" v-for="(store, index) in stores" :key="store.store_id" @click="activeStore!=store.store_id&&(openStore(store.store_id))" :style="'animation-delay:' + (index+1)/20 + 's'">
+        <span class="store-flag">
+          <i :style="'background: #' + store.store_colour"></i>
+          <i :style="'background: #' + store.store_accent_colour"></i>
+        </span>
+        <span class="collapsible">
+          <span class="text">{{decodedString(store.store_name)}}</span>
+          <span :class="'badge ' + store.network">
+            {{store.network}}
+          </span>
+        </span>
+      </div>
+    <!-- </template> -->
   </div>
   <div></div>
   <div class="sidebar-shortcuts" v-if="activeStore && activeStore!=='false'">
@@ -165,11 +176,11 @@ export default {
           }
 
           &:not(.active) {
-            animation: u0 150ms linear forwards 1;
+            padding-left: 2rem;
             opacity: 0;
             transform: scale(.5)translateY(1rem);
+            animation: u0 150ms linear forwards 1;
             animation-origin: center;
-
           }
         }
       }
@@ -208,24 +219,7 @@ export default {
       margin-right: 10px;
     }
 
-    .store-badge {
-      display: inline-block;
-      padding: .5px 6px;
-      font-size: 10px;
-      border-radius: 10px;
-      text-transform: uppercase;
-      font-weight: 800;
 
-      &.btc {
-        background: #ffa700;
-        color: #441300;
-      }
-
-      &.eth {
-        background: #5d76d7;
-        color: #fff;
-      }
-    }
   }
 
   @keyframes u0 {

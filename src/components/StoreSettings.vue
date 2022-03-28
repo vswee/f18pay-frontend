@@ -1,62 +1,7 @@
 <template lang="">
 <div :class="working?'store-management no-click':'store-management'">
   <!-- MODAL -->
-  <div class="modal" @click="closeModal()" v-if="confirmAddresses">
-    <div class="modal-input">
-      <div :class="working?'form page working':'form page'" @click.stop="false">
-        <h1>Confirm Addresses</h1>
-        <div class="message" v-if="message"><i class="fas fa-exclamation-circle"></i> {{message}}</div>
-        <div class="form-section">
-          <div class="sub-sect">
-            <label for="storeName">Wallet Addresses</label>
-            <ol>
-              <li v-for="(address, key) in addressesForConfirmation" :key="key">{{address}}</li>
-            </ol>
-            <span class="help-text"></span>
-          </div>
-          <div class="sub-sect">
-            <span class="help-text">Confirm that the addresses above match the <b>first 10</b> addresses on your wallet.<br>For Wasabi wallet, you may need to generate 10 addresses manually (under the 'receive' tab).</span>
-          </div>
-          <div class="flex">
-            <a class="btn sec" @click.stop="confirmAddresses=false"><i class="fas fa-arrow-left"></i></a>
-            <a class="btn" @click.stop="!working && (confirmAddressesMatchWallet())">Confirm Addresses<i class="fas fa-arrow-right"></i></a>
-          </div>
-        </div>
-
-      </div>
-    </div>
-  </div>
-  <div class="modal" @click="confirmCode=false" v-if="confirmCode">
-    <div class="modal-input">
-      <div :class="working?'form page working':'form page'" @click.stop="false">
-        <h1>Confirm Code</h1>
-        <div class="message" v-if="message"><i class="fas fa-exclamation-circle"></i> {{message}}</div>
-        <div class="form-section" v-if="!downloadFile">
-          <div class="sub-sect">
-            <label for="storeName">Enter code</label>
-            <input v-model="code" type="text" placeholder="123456" v-on:keyup.enter="verifyCode()" />
-            <span class="help-text">We've sent a code to the email address for this F18 Pay account owner. Enter it above to download all the internal keys associated with this Store.</span>
-          </div>
-          <div class="flex">
-            <a class="btn sec" @click.stop="confirmCode=false"><i class="fas fa-arrow-left"></i></a>
-            <a class="btn" @click.stop="!working && (verifyCode())">Verify Code<i class="fas fa-arrow-right"></i></a>
-          </div>
-        </div>
-        <div class="form-section" v-if="downloadFile">
-          <div class="sub-sect">
-            <label for="storeName">Download File</label>
-            <a class="btn severe" style="margin-right: auto;" :href="downloadFile" @click.stop="downloaded()" download="keys.csv"><i class="fas fa-download"></i> Download Keys as .CSV</a>
-            <span class="help-text"><i class="fas fa-exclamation-triangle"></i> Keep these keys safe. Anyone with access to these downloaded, decrypted keys can spend any existing and future balances.</span>
-          </div>
-          <div class="flex">
-            <a class="btn sec" @click.stop="confirmCode=false"><i class="fas fa-arrow-left"></i></a>
-            <a class="btn" @click.stop="!working && (verifyCode())">Verify Code<i class="fas fa-arrow-right"></i></a>
-          </div>
-        </div>
-
-      </div>
-    </div>
-  </div>
+  <StoreSettingsModal :confirmAddresses="confirmAddresses" :addressesForConfirmation="addressesForConfirmation" :confirmCode="confirmCode" :code="code" @setConfirmAddresses="confirmAddresses=false" @setConfirmCode="confirmCode=false" @confirmAddressesMatchWallet="confirmAddressesMatchWallet()" />
   <!-- MODAL -->
   <div :class="working?'form page working':'form page'" @click.stop="_null()">
 
@@ -64,7 +9,7 @@
 
     <div class="message" v-if="message"><i class="fas fa-exclamation-circle"></i> {{message}}</div>
     <div class="form-section">
-      <h2 @click="accordianIndexSet(0)">Store Identity <i :class="accordianIndex==0?'fas fa-caret-down':'fas fa-caret-right'"></i></h2>
+      <h2 class="accordian-trigger" @click="accordianIndexSet(0)">Store Identity <i :class="accordianIndex==0?'fas fa-caret-down':'fas fa-caret-right'"></i></h2>
       <div class="accordian-sect" v-if="accordianIndex==0">
 
         <div class="sub-sect">
@@ -99,7 +44,7 @@
         </div>
       </div>
 
-      <h2 @click="accordianIndexSet(1)">Wallet <i :class="accordianIndex==1?'fas fa-caret-down':'fas fa-caret-right'"></i></h2>
+      <h2 class="accordian-trigger" @click="accordianIndexSet(1)">Wallet <i :class="accordianIndex==1?'fas fa-caret-down':'fas fa-caret-right'"></i></h2>
       <div class="accordian-sect" v-if="accordianIndex==1">
         <div class="sub-sect">
           <label for="storeName">Address Derivation</label>
@@ -121,7 +66,7 @@
         </div>
       </div>
 
-      <h2 @click="accordianIndexSet(2)">Optional <i :class="accordianIndex==2?'fas fa-caret-down':'fas fa-caret-right'"></i></h2>
+      <h2 class="accordian-trigger" @click="accordianIndexSet(2)">Optional <i :class="accordianIndex==2?'fas fa-caret-down':'fas fa-caret-right'"></i></h2>
       <div class="accordian-sect" v-if="accordianIndex==2">
         <div class="sub-sect">
           <label for="storeName">Store URL</label>
@@ -153,10 +98,12 @@ import {
   mapGetters
 } from 'vuex';
 import InputColorPicker from 'vue-native-color-picker'
+import StoreSettingsModal from './StoreSettingsModal'
 export default {
   name: "StoreSettings",
   components: {
-    "v-input-colorpicker": InputColorPicker
+    "v-input-colorpicker": InputColorPicker,
+    StoreSettingsModal: StoreSettingsModal,
   },
   data() {
     return {
@@ -176,7 +123,7 @@ export default {
       url: false,
       confirmCode: false,
       code: '',
-      downloadFile: false,
+      // downloadFile: false,
     }
   },
   watch: {
@@ -233,7 +180,7 @@ export default {
   },
   mounted() {
     let t = this;
-    document.querySelector('.dynamic-cta-header-space')&&(document.querySelector('.dynamic-cta-header-space').innerHTML = '')
+    document.querySelector('.dynamic-cta-header-space') && (document.querySelector('.dynamic-cta-header-space').innerHTML = '')
     document.getElementById("imageInput").addEventListener("change", function () {
       if (this.files && this.files[0]) {
         let reader = new FileReader();
@@ -262,14 +209,6 @@ export default {
     }
   },
   methods: {
-    downloaded() {
-      let t = this
-      setTimeout(function () {
-        t.confirmCode = false
-        t.code = ''
-        t.downloadFile = false
-      }, 3000)
-    },
     async startRequestForKeys() {
       //COMPLETE
       this.working = true;
@@ -304,59 +243,6 @@ export default {
                 behavior: 'smooth'
               });
               this.confirmCode = true;
-            }
-          } else {
-            this.message = data.debug ? data.debug : "There was a problem with the information provided."
-          }
-          this.working = false;
-        })
-        .catch((error) => {
-          this.message = this.message + ' \nError: ' + error + '\n';
-          console.error("Error:", error);
-        });
-    },
-    async verifyCode() {
-      //COMPLETE
-      this.working = true;
-      const username = await this.$store.dispatch('encrypt', {
-        string: this.user,
-        keyiv: this.keyiv
-      });
-      const storeName = await this.$store.dispatch('encrypt', {
-        string: this.currentStore.store_id,
-        keyiv: this.keyiv
-      });
-      const code = await this.$store.dispatch('encrypt', {
-        string: this.code,
-        keyiv: this.keyiv
-      });
-      await fetch("https://money-api.flat18.co.uk/store-management-request-keys-verify-code", {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'multipart/form-data'
-          },
-          body: JSON.stringify({
-            username: username,
-            store_id: storeName,
-            fingerprint: this.fingerprint,
-            keyivId: this.keyivId,
-            code: code,
-          }),
-        })
-        .then((response) => response.json())
-        .then(async (data) => {
-          this.message = data.debug ? data.debug : false
-          if (data.proceed == true) {
-            if (data.extra == 'downloadFile') {
-              let decrypted = JSON.parse(await this.$store.dispatch('decrypt', {
-                string: data.keys,
-                keyiv: this.keyiv
-              }))
-              let csvContent = 'data:text/csv;charset=utf-8,'
-              for (const key of decrypted) {
-                csvContent += key.private_key + ',\r\n'
-              }
-              this.downloadFile = encodeURI(csvContent);
             }
           } else {
             this.message = data.debug ? data.debug : "There was a problem with the information provided."
@@ -465,6 +351,14 @@ export default {
         string: this.zpub,
         keyiv: this.keyiv
       });
+      const url = await this.$store.dispatch('encrypt', {
+        string: this.url,
+        keyiv: this.keyiv
+      });
+      const email = await this.$store.dispatch('encrypt', {
+        string: this.email,
+        keyiv: this.keyiv
+      });
       await fetch("https://money-api.flat18.co.uk/store-settings-bulk-confirm-zpub-addresses", {
           method: 'POST',
           headers: {
@@ -482,6 +376,8 @@ export default {
             keyivId: this.keyivId,
             store_id: this.currentStore.store_id,
             disabled: this.deleted,
+            url: url,
+            email: email,
           }),
         })
         .then((response) => response.json())
@@ -491,6 +387,8 @@ export default {
             if (!data.extra && data.currentStore) {
               this.$store.dispatch('getStores')
               this.$store.commit("setActiveStore", data.currentStore);
+              this.confirmAddresses = false;
+              this.addressesForConfirmation = false
             } else if (data.extra == 'confirm-addresses') {
               this.confirmAddresses = true;
               this.addressesForConfirmation = data.confirmAddresses
@@ -505,10 +403,6 @@ export default {
           console.error("Error:", error);
         });
     },
-    closeModal() {
-      this.working = false
-      this.confirmAddresses = false
-    }
   },
 }
 </script>

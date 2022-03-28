@@ -23,7 +23,7 @@
 
     <div class="message" v-if="message"><i class="fas fa-exclamation-circle"></i> {{message}}</div>
     <div class="form-section">
-      <h2 @click="accordianIndexSet(0)">Payment Buttons <i :class="accordianIndex==0?'fas fa-caret-down':'fas fa-caret-right'"></i></h2>
+      <h2 class="accordian-trigger" @click="accordianIndexSet(0)">Payment Buttons <i :class="accordianIndex==0?'fas fa-caret-down':'fas fa-caret-right'"></i></h2>
       <div class="accordian-sect" v-if="accordianIndex==0">
         <div class="sub-sect">
           <label for="storeName">Assets Currency</label>
@@ -88,7 +88,7 @@
         </div>
       </div>
 
-      <h2 @click="accordianIndexSet(1)">Payment Page <i :class="accordianIndex==1?'fas fa-caret-down':'fas fa-caret-right'"></i></h2>
+      <h2 class="accordian-trigger" @click="accordianIndexSet(1)">Payment Page <i :class="accordianIndex==1?'fas fa-caret-down':'fas fa-caret-right'"></i></h2>
       <div class="accordian-sect" v-if="accordianIndex==1">
         <div class="sub-sect" v-if="accordianIndex==1">
           <div class="switch">
@@ -115,7 +115,7 @@
         </div>
       </div>
 
-      <h2 @click="accordianIndexSet(2)">Invoice Behaviour <i :class="accordianIndex==2?'fas fa-caret-down':'fas fa-caret-right'"></i></h2>
+      <h2 class="accordian-trigger" @click="accordianIndexSet(2)">Invoice Behaviour <i :class="accordianIndex==2?'fas fa-caret-down':'fas fa-caret-right'"></i></h2>
       <div class="accordian-sect" v-if="accordianIndex==2">
         <div class="sub-sect">
           <label for="storeName">Payee must provide email on invoice <i v-if="settingEmailRequired" class="fas fa-asterisk spin"></i></label>
@@ -166,6 +166,11 @@ export default {
       settingPaymentPage: false,
       settingEmailRequired: false,
     }
+  },
+  watch: {
+    working() {
+      this.$store.commit("setWorking", this.working);
+    },
   },
   computed: {
     ...mapGetters({
@@ -227,7 +232,7 @@ export default {
     },
   },
   mounted() {
-    document.querySelector('.dynamic-cta-header-space')&&(document.querySelector('.dynamic-cta-header-space').innerHTML = '')
+    document.querySelector('.dynamic-cta-header-space') && (document.querySelector('.dynamic-cta-header-space').innerHTML = '')
     this.supportedCurrencies.push(this.currentStore.network.toUpperCase())
   },
   methods: {
