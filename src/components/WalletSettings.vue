@@ -9,25 +9,25 @@
 
     <div class="message" v-if="message"><i class="fas fa-exclamation-circle"></i> {{message}}</div>
     <div class="form-section">
-      <h2 class="accordian-trigger" @click="accordianIndexSet(0)">Address Derivation <i :class="accordianIndex==0?'fas fa-caret-down':'fas fa-caret-right'"></i></h2>
+      <h2 class="accordian-trigger" @click="accordianIndexSet(0)">{{network=='eth'?'Account ':''}}Address {{network=='btc'?'Derivation':''}} <i :class="accordianIndex==0?'fas fa-caret-down':'fas fa-caret-right'"></i></h2>
       <div class="accordian-sect" v-if="accordianIndex==0">
-        <div class="sub-sect">
+        <div class="sub-sect" v-if="network=='btc'">
           <label for="storeName">Address Derivation Type</label>
           <div class="switch">
             <a :class="addressDerivationType=='external'?'btn active':'btn'" @click.stop="addressDerivationType='external'">External</a>
             <a :class="addressDerivationType=='internal'?'btn active':'btn'" @click.stop="addressDerivationType='internal'">Internal</a>
           </div>
           <span class="help-text">
-            <template v-if="addressDerivationType=='external'">
-              <template v-if="network=='btc'">
+            <template v-if="network=='eth'">
+              This address will be treated as your primary address for transfering payments and for linking ERC-20 Tokens.
+            </template>
+            <template v-if="network=='btc'">
+              <template v-if="addressDerivationType=='external'">
                 Only Native SegWit external wallets are supported. We recommend Electrum or Wasabi Wallet.
               </template>
-              <template v-if="network=='eth'">
-                This address will be treated as your primary address for transfering payments and for linking ERC-20 Tokens.
+              <template v-if="addressDerivationType=='internal'">
+                Invoice Adresses will be randomly generated. You can sweep them at any time.
               </template>
-            </template>
-            <template v-if="addressDerivationType=='internal'">
-              Invoice Adresses will be randomly generated. You can sweep them at any time.
             </template>
           </span>
         </div>
@@ -35,15 +35,19 @@
         <div class="sub-sect" v-if="addressDerivationType=='external'">
           <label for="storeName" v-if="network=='btc'">Native SegWit zpub</label>
           <label for="storeName" v-if="network=='eth'">Ethereum address</label>
-          <input v-model="zpub" type="text" :placeholder="'E.g.' + network=='btc'? 'zpub6nALs1VXMgnQF7eU35PHhB...' : network=='eth'?'0x1d15114cbF4c55c7f001a8b7...' : ''" />
-          <span class="help-text">For Electrum wallets; Menu > Wallet > Information > Master Public Key.</span>
+          <div class="input-placeholder actionable" v-if="!inputFocus" @click="inputFocus=true">
+            {{zpub}} <i class="fas fa-check-circle good"></i>
+          </div>
+          <input v-if="inputFocus" v-model="zpub" type="text" :placeholder="'E.g.' + network=='btc'? 'zpub6nALs1VXMgnQF7eU35PHhB...' : network=='eth'?'0x1d15114cbF4c55c7f001a8b7...' : ''" />
+          <span class="help-text" v-if="network=='btc'">For Electrum wallets; Menu > Wallet > Information > Master Public Key.</span>
+          <span class="help-text" v-if="network=='eth'">You can use any valid Ethereum address account from your wallet.<br><br>Invoice addresses are generated randomly and you will need to sweep those keys to retrieve your funds.</span>
         </div>
       </div>
-      <template v-if="addressDerivationType=='internal'">
+      <template v-if="addressDerivationType=='internal' || network=='eth'">
         <h2 class="accordian-trigger" @click="accordianIndexSet(1)">Private Keys <i :class="accordianIndex==1?'fas fa-caret-down':'fas fa-caret-right'"></i></h2>
         <div class="accordian-sect" v-if="accordianIndex==1">
 
-          <div class="sub-sect" v-if="addressDerivationType=='internal'">
+          <div class="sub-sect" v-if="addressDerivationType=='internal' || network=='eth'">
             <label for="">Internal wallet keys</label>
             <a class="btn severe" style="margin-right: auto;" @click="startRequestForKeys()"><i class="fas fa-download"></i> Request Keys Download</a>
             <span class="help-text">Download the keys for your Store Invoices so you can manage funds in an external wallet.</span>
@@ -84,11 +88,19 @@ export default {
       confirmCode: false,
       code: '',
       network: false,
-      numberOfAddressesToConfirm:false,
-      // downloadFile: false,
+      numberOfAddressesToConfirm: false,
+      inputFocus: false,
     }
   },
   watch: {
+    addressDerivationType() {
+      this.inputFocus = false
+    },
+    inputFocus() {
+      setTimeout(() => {
+        document.querySelector("input").select()
+      }, 200)
+    },
     deleted() {
       this.saveSettings()
     },

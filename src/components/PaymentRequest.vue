@@ -2,7 +2,7 @@
 <div :class="working && spinning?'store-management no-click spin-fresco':(working && !spinning?'store-management no-click':'store-management')">
   <!-- MODAL -->
   <div class="modal" @click="modal=false" v-if="modal">
-    <div :class="working?'form page working':'form page'" @click.stop="false">
+    <div :class="working?'form page working':'form page'" @click.stop="">
       <h1>New Payment request</h1>
       <div class="message" v-if="message"><i class="fas fa-exclamation-circle"></i> {{message}}</div>
       <template v-if="confirmedCreatedAddress">

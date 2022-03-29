@@ -1,7 +1,7 @@
 <template lang="">
 <div class="modal" @click="closeModal()">
   <div class="modal-input">
-    <div :class="working?'form working':'form'" @click.stop="false">
+    <div :class="working?'form working':'form'" @click.stop="">
       <h1>Create New Store</h1>
       <div class="message" v-if="message"><i class="fas fa-exclamation-circle"></i> {{message}}</div>
       <div class="form-section" v-if="!storeNameConfirmed">
@@ -11,7 +11,7 @@
           <span class="help-text">This name will appear on invoices, financial reports and on the F18 Pay Dashboard.</span>
         </div>
         <div class="sub-sect">
-          <label for="storeName">Store Type: {{storeType}}</label>
+          <label for="storeName">Store Type: <span :class="'badge ' + storeType">{{storeType}}</span></label>
           <div class="switch">
             <a :class="storeType=='btc'?'btn active':'btn'" @click.stop="storeType='btc'"><i class="fab fa-bitcoin"></i> Bitcoin</a>
             <a :class="storeType=='eth'?'btn active':'btn'" @click.stop="storeType='eth'"><i class="fab fa-ethereum"></i> Ethereum</a>
@@ -24,52 +24,67 @@
         </div>
       </div>
 
-      <div class="form-section" v-if="storeNameConfirmed && zpubOptions && !collectZpub && !confirmAddresses">
-        <div class="sub-sect">
-          <label for="storeName">Address Derivation</label>
-          <div class="switch">
-            <a :class="addressDerivationType=='external'?'btn active':'btn'" @click.stop="addressDerivationType='external'">External</a>
-            <a :class="addressDerivationType=='internal'?'btn active':'btn'" @click.stop="addressDerivationType='internal'">Internal</a>
+      <template v-if="storeType=='btc'">
+        <div class="form-section" v-if="storeNameConfirmed && zpubOptions && !collectZpub && !confirmAddresses">
+          <div class="sub-sect">
+            <label for="storeName">Address Derivation</label>
+            <div class="switch">
+              <a :class="addressDerivationType=='external'?'btn active':'btn'" @click.stop="addressDerivationType='external'">External</a>
+              <a :class="addressDerivationType=='internal'?'btn active':'btn'" @click.stop="addressDerivationType='internal'">Internal</a>
+            </div>
+            <span class="help-text">You can use your own (external) wallet with F18 Pay as long as the addresses are Native SegWit.<br>If you'd like to use randomly generated addresses for your store invoices choose 'Internal' and we'll generate key pairs which you can sweep at any time.</span>
           </div>
-          <span class="help-text">You can use your own (external) wallet with F18 Pay as long as the addresses are Native SegWit.<br>If you'd like to use randomly generated addresses for your store invoices choose 'Internal' and we'll generate key pairs which you can sweep at any time.</span>
+          <div class="flex">
+            <a class="btn sec" @click.stop="backToStart()"><i class="fas fa-arrow-left"></i>Back</a>
+            <a class="btn" @click.stop="!working && (setAddressDerivationType())">Next<i class="fas fa-arrow-right"></i></a></div>
         </div>
-        <div class="flex">
-          <a class="btn sec" @click.stop="backToStart()"><i class="fas fa-arrow-left"></i>Back</a>
-          <a class="btn" @click.stop="!working && (setAddressDerivationType())">Next<i class="fas fa-arrow-right"></i></a></div>
-      </div>
 
-      <div class="form-section" v-if="storeNameConfirmed && zpubOptions && collectZpub && !confirmAddresses">
-        <div class="sub-sect">
-          <label for="storeName">Native SegWit zpub</label>
-          <input v-model="zpub" type="text" placeholder="E.g. zpub6nALs1VXMgnQF7eU35PHhB..." />
-          <span class="help-text">For Electrum wallets; Menu > Wallet > Information > Master Public Key.</span>
+        <div class="form-section" v-if="storeNameConfirmed && zpubOptions && collectZpub && !confirmAddresses">
+          <div class="sub-sect">
+            <label for="storeName">Native SegWit zpub</label>
+            <input v-model="zpub" type="text" placeholder="E.g. zpub6nALs1VXMgnQF7eU35PHhB..." />
+            <span class="help-text">For Electrum wallets; Menu > Wallet > Information > Master Public Key.</span>
+          </div>
+          <div class="sub-sect">
+            <span class="help-text">F18 Pay will <b>only</b> be able to generate addresses and check balances for your wallet.<br>We recommend that you use a dedicated wallet for F18 Pay to avoid untracked transactions on your addresses.</span>
+          </div>
+          <div class="flex">
+            <a class="btn sec" @click.stop="collectZpub=false"><i class="fas fa-arrow-left"></i>Back</a>
+            <a class="btn" @click.stop="!working && (submitZpub())">Next<i class="fas fa-arrow-right"></i></a>
+          </div>
         </div>
-        <div class="sub-sect">
-          <span class="help-text">F18 Pay will <b>only</b> be able to generate addresses and check balances for your wallet.<br>We recommend that you use a dedicated wallet for F18 Pay to avoid untracked transactions on your addresses.</span>
-        </div>
-        <div class="flex">
-          <a class="btn sec" @click.stop="collectZpub=false"><i class="fas fa-arrow-left"></i>Back</a>
-          <a class="btn" @click.stop="!working && (submitZpub())">Next<i class="fas fa-arrow-right"></i></a>
-        </div>
-      </div>
 
-      <div class="form-section" v-if="storeNameConfirmed && zpubOptions && collectZpub && confirmAddresses">
-        <div class="sub-sect">
-          <label for="storeName">Wallet Addresses</label>
-          <ol>
-            <li v-for="(address, key) in confirmAddresses" :key="key">{{address}}</li>
-          </ol>
-          <span class="help-text"></span>
+        <div class="form-section" v-if="storeNameConfirmed && zpubOptions && collectZpub && confirmAddresses">
+          <div class="sub-sect">
+            <label for="storeName">Wallet Addresses</label>
+            <ol>
+              <li v-for="(address, key) in confirmAddresses" :key="key">{{address}}</li>
+            </ol>
+            <span class="help-text"></span>
+          </div>
+          <div class="sub-sect">
+            <span class="help-text">Confirm that the addresses above match the <b>first 10</b> addresses on your wallet.<br>For Wasabi wallet, you may need to generate 10 addresses manually (under the 'receive' tab).</span>
+          </div>
+          <div class="flex">
+            <a class="btn sec" @click.stop="confirmAddresses=false"><i class="fas fa-arrow-left"></i></a>
+            <a class="btn" @click.stop="!working && (confirmAddressesMatchWallet())">Confirm Addresses<i class="fas fa-arrow-right"></i></a>
+          </div>
         </div>
-        <div class="sub-sect">
-          <span class="help-text">Confirm that the addresses above match the <b>first 10</b> addresses on your wallet.<br>For Wasabi wallet, you may need to generate 10 addresses manually (under the 'receive' tab).</span>
-        </div>
-        <div class="flex">
-          <a class="btn sec" @click.stop="confirmAddresses=false"><i class="fas fa-arrow-left"></i></a>
-          <a class="btn" @click.stop="!working && (confirmAddressesMatchWallet())">Confirm Addresses<i class="fas fa-arrow-right"></i></a>
-        </div>
-      </div>
+      </template>
 
+      <template v-if="storeType=='eth'">
+        <div class="form-section" v-if="storeNameConfirmed && zpubOptions">
+          <div class="sub-sect">
+            <label for="storeName">Ethereum Account Address</label>
+            <input v-model="zpub" type="text" placeholder="E.g. 0x1d15114cbF4c55c7f001a8b7..." />
+            <span class="help-text">You can use any valid Ethereum address account from your wallet.</span>
+          </div>
+          <div class="flex">
+            <a class="btn sec" @click.stop="collectZpub=false"><i class="fas fa-arrow-left"></i>Back</a>
+            <a class="btn" @click.stop="!working && (submitZpub())">Finish<i class="fas fa-arrow-right"></i></a>
+          </div>
+        </div>
+      </template>
     </div>
   </div>
 </div>
@@ -92,6 +107,7 @@ export default {
       collectZpub: false,
       addressDerivationType: 'external',
       confirmAddresses: false,
+      zpubOptions: false,
     }
   },
   computed: {
@@ -140,7 +156,7 @@ export default {
             //HANDLE STORES DATA
             if (!data.extra && data.currentStore) {
               this.$store.commit("setActiveStore", data.currentStore);
-              this.$router.go()
+              this.complete()
             } else if (data.extra == 'zpub') {
               this.zpubOptions = true;
             }
@@ -185,7 +201,7 @@ export default {
           string: this.storeName,
           keyiv: this.keyiv
         });
-        await fetch("https://money-api.flat18.co.uk/new-store-bitcoin-internal", {
+        await fetch("https://money-api.flat18.co.uk/new-store-derivation-internal", {
             method: 'POST',
             headers: {
               'Content-Type': 'multipart/form-data'
@@ -206,7 +222,7 @@ export default {
               //HANDLE STORES DATA
               if (data.currentStore) {
                 this.$store.commit("setActiveStore", data.currentStore);
-                this.$router.go()
+                this.complete()
               } else {
                 this.message = data.debug ? data.debug : "There was a problem with the information provided."
               }
@@ -228,7 +244,7 @@ export default {
         this.message = "zpub does not appear to be valid";
         return false;
       } else {
-        this.message = "Checking zpub...";
+        this.message = "Validating...";
       }
       const username = await this.$store.dispatch('encrypt', {
         string: this.user,
@@ -242,7 +258,7 @@ export default {
         string: this.zpub,
         keyiv: this.keyiv
       });
-      await fetch("https://money-api.flat18.co.uk/new-store-query-bitcoin-zpub", {
+      await fetch("https://money-api.flat18.co.uk/new-store-query-zpub", {
           method: 'POST',
           headers: {
             'Content-Type': 'multipart/form-data'
@@ -262,6 +278,9 @@ export default {
           if (data.proceed == true) {
             if (data.extra == 'confirm-addresses' && data.confirmAddresses) {
               this.confirmAddresses = data.confirmAddresses;
+            } else if (data.currentStore) {
+              this.$store.commit("setActiveStore", data.currentStore);
+              this.complete()
             }
           } else {
             this.message = data.debug ? data.debug : "There was a problem with the information provided."
@@ -307,7 +326,7 @@ export default {
           if (data.proceed == true) {
             if (!data.extra && data.currentStore) {
               this.$store.commit("setActiveStore", data.currentStore);
-              this.$router.go()
+              this.complete()
             }
           } else {
             this.message = data.debug ? data.debug : "There was a problem with the information provided."
@@ -324,7 +343,11 @@ export default {
       this.collectZpub = false;
       this.storeNameConfirmed = false;
       this.working = false;
-    }
+    },
+    complete() {
+      this.$store.dispatch('getStores')
+      this.closeModal()
+    },
   }
 }
 </script>

@@ -44,11 +44,11 @@ h1,h2,h3{
   transform: translateY(-15%);
   border-radius: 10px;
   text-transform: uppercase;
-  font-weight: 800;
+  font-weight: 500;
 
   &.active-0, &.active-false, &.active-null{
     margin: 0 auto auto 0;
-    background: var(--green);
+    background: var(--green-2);
     color: var(--green-0);
   }
   &.active-1, &.active-true{

@@ -83,12 +83,8 @@ export default {
       zpub: false,
       accordianIndex: 0,
       deleted: false,
-      // confirmAddresses: false,
-      // addressesForConfirmation: false,
       email: false,
       url: false,
-      // confirmCode: false,
-      // code: '',
       downloadFile: false,
     }
   },

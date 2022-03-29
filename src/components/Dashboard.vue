@@ -87,7 +87,7 @@ export default {
   },
   methods: {
     scrollUITriggers() {
-      if (window.scrollY > 80 && this.setViewTitle) {
+      if (window.scrollY > 80 && this.viewTitle) {
         this.$store.commit('setShowTitle', true);
       } else {
         this.$store.commit('setShowTitle', false);
@@ -190,7 +190,7 @@ export default {
 
   &.active {
     &::before {
-      background: var(--green);
+      background: var(--green-2);
     }
   }
 

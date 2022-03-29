@@ -1,49 +1,59 @@
 <template lang="">
-<div id="sidebar" :class="sidebarCollapse?'sidebar':'sidebar collapse'" v-if="session">
-  <a :class="sidebarCollapse?'collapse-sidebar collapsed':'collapse-sidebar'" @click="toggleCollapse()" title="Collapse or expand sidebar.">
-  </a>
-  <div :class="storesDropdown?'sidebar-shortcuts dropdown open store-length-'+stores.length:'sidebar-shortcuts dropdown store-length-'+stores.length" @click="storesDropdown=!storesDropdown">
-    <template v-if="!activeStore && stores.length>0">
-      <div class="sidebar-shortcut active">
-        <i class="fas fa-hand-pointer"></i>
-        <span class="collapsible"><span class="text"> Select Store </span>
-          <!-- <i class="fas fa-hand-pointer"></i> -->
-        </span>
+<div id="sidebar" :style="'width:'+sidebarWidth+'px'">
+  <div class="sidebar-outer-wrapper-outer">
+    <div class="sidebar-outer-wrapper">
+      <div class="sidebar-inner-wrapper">
+        <div class="sidebar-inner-wrapper-inner">
+          <div :class="sidebarCollapse?'sidebar':'sidebar collapse'" v-if="session">
+            <a :class="sidebarCollapse?'collapse-sidebar collapsed':'collapse-sidebar'" @click="toggleCollapse()" title="Collapse or expand sidebar.">
+            </a>
+            <div :class="storesDropdown?'sidebar-shortcuts dropdown open store-length-'+stores.length:'sidebar-shortcuts dropdown store-length-'+stores.length" @click="storesDropdown=!storesDropdown">
+              <template v-if="!activeStore && stores.length>0">
+                <div class="sidebar-shortcut active">
+                  <i class="fas fa-hand-pointer"></i>
+                  <span class="collapsible"><span class="text"> Select Store </span>
+                    <!-- <i class="fas fa-hand-pointer"></i> -->
+                  </span>
+                </div>
+              </template>
+
+              <!-- <template v-if="activeStore"> -->
+              <div :class="activeStore==store.store_id?'sidebar-shortcut active':'sidebar-shortcut'" v-for="(store, index) in stores" :key="store.store_id" @click="activeStore!=store.store_id&&(openStore(store.store_id))" :style="'animation-delay:' + (index+1)/20 + 's'">
+                <span class="store-flag">
+                  <i :style="'background: #' + store.store_colour"></i>
+                  <i :style="'background: #' + store.store_accent_colour"></i>
+                </span>
+                <span class="collapsible">
+                  <span class="text">{{decodedString(store.store_name)}}</span>
+                  <span :class="'badge ' + store.network">
+                    {{store.network}}
+                  </span>
+                </span>
+              </div>
+              <!-- </template> -->
+            </div>
+            <div></div>
+            <div class="sidebar-shortcuts" v-if="activeStore && activeStore!=='false'">
+              <a :class="storeView=='overview'?'sidebar-shortcut active-bar':'sidebar-shortcut'" @click="summaryView()"><i class="fas fa-chart-area"></i><span class="collapsible">Store Overview</span></a>
+
+              <a :class="storeView=='settings'?'sidebar-shortcut active-bar':'sidebar-shortcut'" @click="settingsView()"><i class="fas fa-sliders-h"></i><span class="collapsible">Manage Store</span></a>
+
+              <a :class="storeView=='wallet'?'sidebar-shortcut active-bar':'sidebar-shortcut'" @click="walletView()"><i class="fas fa-wallet"></i><span class="collapsible">Wallet</span></a>
+
+              <a :class="storeView=='buttons'?'sidebar-shortcut active-bar':'sidebar-shortcut'" @click="assetsView()"><i class="fas fa-code"></i><span class="collapsible">Payment Assets</span></a>
+
+              <a :class="storeView=='invoices'?'sidebar-shortcut active-bar':'sidebar-shortcut'" @click="invoicesView()"><i class="fas fa-file-invoice"></i><span class="collapsible">Invoices</span></a>
+
+              <a :class="storeView=='requests'?'sidebar-shortcut active-bar':'sidebar-shortcut'" @click="requestsView()"><i class="fas fa-inbox"></i><span class="collapsible">Payment Requests</span></a>
+            </div>
+            <div></div>
+            <div class="sidebar-shortcuts">
+              <a class="sidebar-shortcut" @click="newStore()"><i class="fas fa-plus"></i><span class="collapsible">Create New Store</span></a>
+            </div>
+          </div>
+        </div>
       </div>
-    </template>
-
-    <!-- <template v-if="activeStore"> -->
-    <div :class="activeStore==store.store_id?'sidebar-shortcut active':'sidebar-shortcut'" v-for="(store, index) in stores" :key="store.store_id" @click="activeStore!=store.store_id&&(openStore(store.store_id))" :style="'animation-delay:' + (index+1)/20 + 's'">
-      <span class="store-flag">
-        <i :style="'background: #' + store.store_colour"></i>
-        <i :style="'background: #' + store.store_accent_colour"></i>
-      </span>
-      <span class="collapsible">
-        <span class="text">{{decodedString(store.store_name)}}</span>
-        <span :class="'badge ' + store.network">
-          {{store.network}}
-        </span>
-      </span>
     </div>
-    <!-- </template> -->
-  </div>
-  <div></div>
-  <div class="sidebar-shortcuts" v-if="activeStore && activeStore!=='false'">
-    <a :class="storeView=='overview'?'sidebar-shortcut active-bar':'sidebar-shortcut'" @click="summaryView()"><i class="fas fa-chart-area"></i><span class="collapsible">Store Overview</span></a>
-
-    <a :class="storeView=='settings'?'sidebar-shortcut active-bar':'sidebar-shortcut'" @click="settingsView()"><i class="fas fa-sliders-h"></i><span class="collapsible">Manage Store</span></a>
-
-    <a :class="storeView=='wallet'?'sidebar-shortcut active-bar':'sidebar-shortcut'" @click="walletView()"><i class="fas fa-wallet"></i><span class="collapsible">Wallet</span></a>
-
-    <a :class="storeView=='buttons'?'sidebar-shortcut active-bar':'sidebar-shortcut'" @click="assetsView()"><i class="fas fa-code"></i><span class="collapsible">Payment Assets</span></a>
-
-    <a :class="storeView=='invoices'?'sidebar-shortcut active-bar':'sidebar-shortcut'" @click="invoicesView()"><i class="fas fa-file-invoice"></i><span class="collapsible">Invoices</span></a>
-
-    <a :class="storeView=='requests'?'sidebar-shortcut active-bar':'sidebar-shortcut'" @click="requestsView()"><i class="fas fa-inbox"></i><span class="collapsible">Payment Requests</span></a>
-  </div>
-  <div></div>
-  <div class="sidebar-shortcuts">
-    <a class="sidebar-shortcut" @click="newStore()"><i class="fas fa-plus"></i><span class="collapsible">Create New Store</span></a>
   </div>
 </div>
 </template>
@@ -57,6 +67,7 @@ export default {
   data() {
     return {
       storesDropdown: false,
+      sidebarWidth: false,
     }
   },
   computed: {
@@ -68,12 +79,21 @@ export default {
       storeView: 'storeView',
     })
   },
+  watch: {
+    storesDropdown() {
+      // this.setSidebarWidth()
+    },
+    sidebarCollapse() {
+      // this.setSidebarWidth()
+    },
+  },
   async created() {
     let session = await this.$store.dispatch('verifySession')
     if (!session) {
       console.log("NO SESSION")
       this.$store.commit("setStores", false);
     }
+    // this.setSidebarWidth()
   },
   mounted() {
     if (document.getElementById("main")) {
@@ -86,6 +106,11 @@ export default {
     }
   },
   methods: {
+    setSidebarWidth() {
+      setTimeout(() => {
+        this.sidebarWidth = document.querySelector('.sidebar').getBoundingClientRect().width;
+      }, 20)
+    },
     decodedString(string) {
       return decodeURIComponent(decodeURI(string));
     },
@@ -132,6 +157,50 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+#sidebar {
+  transition: 0.05s linear;
+  background: var(--black);
+  display: grid;
+  grid-template: auto auto auto auto 1fr auto/1fr;
+  height: calc(100vh - 60px);
+  position: sticky;
+  top: 60px;
+
+  .sidebar-outer-wrapper-outer {
+
+    .sidebar-outer-wrapper {
+      position: relative;
+      width: 100%;
+      height: calc(100vh - 60px);
+
+      .sidebar-inner-wrapper {
+        overflow: auto;
+        height: calc(100vh - 60px);
+        width: 100%;
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+
+        &::-webkit-scrollbar {
+          display: none;
+        }
+
+        .sidebar-inner-wrapper-inner {
+          position: static;
+
+          .sidebar {
+            transition: 0.05s linear;
+
+            &:not(.collapse) {
+              width: max-content;
+              max-width: calc(var(--main, 100vw) * .2);
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
 .sidebar {
   .compartmentalise {
     display: grid;
@@ -163,7 +232,14 @@ export default {
           &.active {
             grid-row: 1/2;
             margin-bottom: .5rem;
+            padding-top: 1.5rem;
+            padding-bottom: 1.5rem;
             box-shadow: 0 1px;
+            position: sticky;
+            top: 15px;
+            background: var(--black);
+            z-index: 2;
+            transform: translateY(-15px);
 
             &::after {
               content: "\f077";
@@ -272,16 +348,10 @@ export default {
           &.active-bar {
             box-shadow: inset -6px 0 0;
           }
-
-          // &:not(&.active-bar) {
-          //   box-shadow: inset -2px 0 0;
-          // }
         }
       }
 
       &.active {
-
-        // background: var(--white);
         .collapsible {
           opacity: 1;
         }
@@ -307,9 +377,7 @@ export default {
   &:not(.collapse) {
     .sidebar-shortcuts {
       .sidebar-shortcut {
-        &.active {
-          // color: var(--black);
-        }
+        &.active {}
       }
     }
   }
@@ -337,9 +405,6 @@ export default {
           top: 0;
           right: 0;
           left: calc(100% + 10px);
-          // font-size: 12px;
-          // font-weight: 600;
-          // text-transform: uppercase;
           padding: .5rem;
           box-shadow: 0 10px 30px -15px #000;
           border-radius: 6px;

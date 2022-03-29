@@ -10,7 +10,7 @@
   --accent-5: #c9cfdb;
   --green-0: #075311;
   --green: #19d87f;
-  --green-2: #d8fae5;
+  --green-2: #47ff8d;
   --red-0: #3f0713;
   --red: #db1641;
   --red-2: #fad8df;
@@ -45,9 +45,11 @@
       --accent-2: #2d70ff;
       --accent: #0041cc;
       --red: #ff5278;
-      --green: #11e281;
-  --screen: #d3ddff;
-  --shadow-5: rgba(0, 0, 0, 0.01);
+      --green: #0bc06c;
+      --green-2: #4af3a4;
+
+      --screen: #d3ddff;
+      --shadow-5: rgba(0, 0, 0, 0.01);
       --shadow-10: rgba(0, 0, 0, 0.05);
       --shadow-20: rgba(0, 0, 0, 0.075);
       --shadow-30: rgba(0, 0, 0, 0.1);
@@ -70,12 +72,6 @@
 #sidebar {
   grid-row: 2/4;
   grid-column: 1/2;
-  background: var(--black);
-  display: grid;
-  grid-template: auto auto auto auto 1fr auto/1fr;
-  height: calc(100vh - 60px);
-  position: sticky;
-  top: 60px;
   z-index: 2;
 }
 #main {
@@ -210,7 +206,7 @@ a {
 }
 
 .btn {
-  padding: 15px 25px;
+  padding: 10px 15px;
   border-radius: 5px;
   position: relative;
   text-decoration: none;
@@ -219,7 +215,7 @@ a {
   z-index: 1;
   overflow: hidden;
   font-weight: 500;
-  text-transform: uppercase;
+  // text-transform: uppercase;
   font-size: 16px;
   display: flex;
   flex-direction: row;

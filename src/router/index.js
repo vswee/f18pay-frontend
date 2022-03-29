@@ -1,18 +1,11 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-// Home, Login, Dashboard, Store, Profile, StoreSettings, Invoices, Summary, PayElements,  
 import Home from '@/components/Home'
 import Login from '@/components/Login'
 import Signup from '@/components/Signup'
 import VerifyEmail from '@/components/VerifyEmail'
 import ResetPassword from '@/components/ResetPassword'
 import Dashboard from '@/components/Dashboard'
-// import Store from '@/components/Store'
-// import Profile from '@/components/Profile'
-// import StoreSettings from '@/components/StoreSettings'
-// import Invoices from '@/components/Invoices'
-// import StoreSummary from '@/components/StoreSummary'
-// import PayElements from '@/components/PayElements'
 
 Vue.use(VueRouter)
 
