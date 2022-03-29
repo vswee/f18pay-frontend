@@ -12,12 +12,9 @@
                 <div class="sidebar-shortcut active">
                   <i class="fas fa-hand-pointer"></i>
                   <span class="collapsible"><span class="text"> Select Store </span>
-                    <!-- <i class="fas fa-hand-pointer"></i> -->
                   </span>
                 </div>
               </template>
-
-              <!-- <template v-if="activeStore"> -->
               <div :class="activeStore==store.store_id?'sidebar-shortcut active':'sidebar-shortcut'" v-for="(store, index) in stores" :key="store.store_id" @click="activeStore!=store.store_id&&(openStore(store.store_id))" :style="'animation-delay:' + (index+1)/20 + 's'">
                 <span class="store-flag">
                   <i :style="'background: #' + store.store_colour"></i>
@@ -30,7 +27,6 @@
                   </span>
                 </span>
               </div>
-              <!-- </template> -->
             </div>
             <div></div>
             <div class="sidebar-shortcuts" v-if="activeStore && activeStore!=='false'">
@@ -165,31 +161,25 @@ export default {
   height: calc(100vh - 60px);
   position: sticky;
   top: 60px;
-
   .sidebar-outer-wrapper-outer {
-
     .sidebar-outer-wrapper {
       position: relative;
       width: 100%;
       height: calc(100vh - 60px);
-
       .sidebar-inner-wrapper {
-        overflow: auto;
+        overflow-x: hidden;
+        overflow-y: auto;
         height: calc(100vh - 60px);
         width: 100%;
         -ms-overflow-style: none;
         scrollbar-width: none;
-
         &::-webkit-scrollbar {
           display: none;
         }
-
         .sidebar-inner-wrapper-inner {
           position: static;
-
           .sidebar {
             transition: 0.05s linear;
-
             &:not(.collapse) {
               width: max-content;
               max-width: calc(var(--main, 100vw) * .2);
@@ -199,114 +189,98 @@ export default {
       }
     }
   }
-}
-
-.sidebar {
-  .compartmentalise {
-    display: grid;
-    grid-template: 1fr/auto auto 1fr;
-    gap: .5rem;
-
-    .text-clip {
-      max-height: 2rem;
-      max-width: 125px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      display: block;
-    }
-  }
-
-  .dropdown {
-    &:not(.store-length-1) {
-      &.open {
-        box-shadow: 0 1px;
-      }
-    }
-
-    &.open {
+  .sidebar {
+    .compartmentalise {
       display: grid;
-      grid-auto-flow: row;
-
+      grid-template: 1fr/auto auto 1fr;
+      gap: .5rem;
+      .text-clip {
+        max-height: 2rem;
+        max-width: 125px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: block;
+      }
+    }
+    .dropdown {
       &:not(.store-length-1) {
-        .sidebar-shortcut {
-          &.active {
-            grid-row: 1/2;
-            margin-bottom: .5rem;
-            padding-top: 1.5rem;
-            padding-bottom: 1.5rem;
-            box-shadow: 0 1px;
-            position: sticky;
-            top: 15px;
-            background: var(--black);
-            z-index: 2;
-            transform: translateY(-15px);
-
-            &::after {
-              content: "\f077";
-              font-size: 0.8rem;
-              font-family: 'Font Awesome 5 Free';
-              font-weight: 900;
-              -moz-osx-font-smoothing: grayscale;
-              font-style: normal;
-              font-variant: normal;
-              text-rendering: auto;
-              line-height: 1;
-              margin-left: 10px;
+        &.open {
+          box-shadow: 0 1px;
+        }
+      }
+      &.open {
+        display: grid;
+        grid-auto-flow: row;
+        &:not(.store-length-1) {
+          .sidebar-shortcut {
+            &.active {
+              grid-row: 1/2;
+              margin-bottom: .5rem;
+              padding-top: 1.5rem;
+              padding-bottom: 1.5rem;
+              box-shadow: 0 1px;
+              position: sticky;
+              top: 15px;
+              background: var(--black);
+              z-index: 2;
+              transform: translateY(-15px);
+              &::after {
+                content: "\f077";
+                font-size: 0.8rem;
+                font-family: 'Font Awesome 5 Free';
+                font-weight: 900;
+                -moz-osx-font-smoothing: grayscale;
+                font-style: normal;
+                font-variant: normal;
+                text-rendering: auto;
+                line-height: 1;
+                margin-left: 10px;
+              }
+              grid-template-columns: 1.5rem 1fr auto;
             }
-
-            grid-template-columns: 1.5rem 1fr auto;
-          }
-
-          &:not(.active) {
-            padding-left: 2rem;
-            opacity: 0;
-            transform: scale(.5)translateY(1rem);
-            animation: u0 150ms linear forwards 1;
-            animation-origin: center;
+            &:not(.active) {
+              padding-left: 2rem;
+              opacity: 0;
+              transform: scale(.5)translateY(1rem);
+              animation: u0 150ms linear forwards 1;
+              animation-origin: center;
+            }
           }
         }
       }
-    }
-
-    &:not(.open) {
-      &:not(.store-length-1) {
-        .sidebar-shortcut {
-          &:not(.active) {
-            display: none;
-          }
-
-          &.active {
-            &::after {
-              content: "\f078";
-              font-size: 0.8rem;
-              font-family: 'Font Awesome 5 Free';
-              font-weight: 900;
-              -moz-osx-font-smoothing: grayscale;
-              font-style: normal;
-              font-variant: normal;
-              text-rendering: auto;
-              line-height: 1;
-              margin-left: 10px;
+      &:not(.open) {
+        &:not(.store-length-1) {
+          .sidebar-shortcut {
+            &:not(.active) {
+              display: none;
             }
-
-            grid-template-columns: 1.5rem 1fr auto;
+            &.active {
+              &::after {
+                content: "\f078";
+                font-size: 0.8rem;
+                font-family: 'Font Awesome 5 Free';
+                font-weight: 900;
+                -moz-osx-font-smoothing: grayscale;
+                font-style: normal;
+                font-variant: normal;
+                text-rendering: auto;
+                line-height: 1;
+                margin-left: 10px;
+              }
+              grid-template-columns: 1.5rem 1fr auto;
+            }
           }
-
         }
       }
+      .text {
+        margin-right: 10px;
+      }
     }
-
-    .text {
-
-      margin-right: 10px;
-    }
-
-  }
-
-  @keyframes u0 {
-    to {
-      opacity: 1;
-      transform: scale(1)translateY(0)
+    @keyframes u0 {
+      to {
+        opacity: 1;
+        transform: scale(1)translateY(0)
+      }
     }
   }
 }
@@ -319,38 +293,35 @@ export default {
   >div {
     box-shadow: 0 1px 0 0 var(--dark);
   }
-
   .sidebar-shortcuts {
     padding: 15px 0;
-
     .sidebar-shortcut {
       &.active-bar {
-        box-shadow: inset -4px 0 0;
+        box-shadow: inset -2px 0 0;
+        color: var(--accent);
+        .collapsible {
+          opacity: 1 !important;
+        }
       }
-
       display: grid;
       grid-template-columns: 1.5rem 1fr;
       align-items: center;
       padding: 10px;
       cursor: pointer;
-
       > :first-child {
         text-align: center;
         font-size: 1.1rem;
       }
-
       &:not(.active) {
         &:hover {
           .collapsible {
             opacity: 1;
           }
-
           &.active-bar {
-            box-shadow: inset -6px 0 0;
+            box-shadow: inset -4px 0 0;
           }
         }
       }
-
       &.active {
         .collapsible {
           opacity: 1;
@@ -358,7 +329,6 @@ export default {
       }
     }
   }
-
   .collapsible {
     max-width: 150px;
     overflow: hidden;
@@ -368,12 +338,10 @@ export default {
     font-weight: 400;
     font-size: 0.8rem;
     opacity: .7;
-
     i {
       font-size: 0.8rem;
     }
   }
-
   &:not(.collapse) {
     .sidebar-shortcuts {
       .sidebar-shortcut {
@@ -381,7 +349,6 @@ export default {
       }
     }
   }
-
   &.collapse {
     text-align: center;
 
@@ -389,21 +356,14 @@ export default {
       display: none;
     }
   }
-
   &.collapse {
     .sidebar-shortcut {
       display: grid;
       grid-template-columns: auto;
       align-items: center;
-
       &:hover {
-        position: relative;
-
         .collapsible {
           position: absolute;
-          bottom: 0;
-          top: 0;
-          right: 0;
           left: calc(100% + 10px);
           padding: .5rem;
           box-shadow: 0 10px 30px -15px #000;
@@ -422,7 +382,6 @@ export default {
     }
   }
 }
-
 .collapse-sidebar {
   height: 2rem;
   width: 1rem;
@@ -435,7 +394,6 @@ export default {
   top: 0;
   bottom: 0;
   cursor: pointer;
-
   &:before,
   &:after {
     content: '';
@@ -445,26 +403,22 @@ export default {
     position: relative;
     transition: .2s ease;
   }
-
   &:hover {
     &.collapsed {
       &:before {
         transform-origin: 0 0;
         transform: rotate(15deg)translateY(1px);
       }
-
       &:after {
         transform-origin: 0 100%;
         transform: rotate(-15deg);
       }
     }
-
     &:not(&.collapsed) {
       &:before {
         transform-origin: 0 0;
         transform: rotate(-15deg)translateY(2px);
       }
-
       &:after {
         transform-origin: 0 100%;
         transform: rotate(15deg);
