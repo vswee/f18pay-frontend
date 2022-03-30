@@ -118,8 +118,8 @@ h1,h2,h3{
     line-height: 1.4;
   }
   .graph {
-    width: 70vw;
-    max-width: 900px;
+    width: calc((var(--main) * .8) - 14rem);
+    // max-width: 900px;
   }
   .subsect {
     padding: 1rem;

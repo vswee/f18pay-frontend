@@ -15,18 +15,36 @@
                   </span>
                 </div>
               </template>
-              <div :class="activeStore==store.store_id?'sidebar-shortcut active':'sidebar-shortcut'" v-for="(store, index) in stores" :key="store.store_id" @click="activeStore!=store.store_id&&(openStore(store.store_id))" :style="'animation-delay:' + (index+1)/50 + 's'">
-                <span class="store-flag">
-                  <i :style="'background: #' + store.store_colour"></i>
-                  <i :style="'background: #' + store.store_accent_colour"></i>
-                </span>
-                <span class="collapsible">
-                  <span class="text">{{decodedString(store.store_name)}}</span>
-                  <span :class="'badge ' + store.network">
-                    {{store.network}}
-                  </span>
-                </span>
-              </div>
+              <template v-for="store in stores">
+                <template v-if="activeStore==store.store_id">
+                  <div class="sidebar-shortcut active" :key="store.store_id" @click="activeStore!=store.store_id&&(openStore(store.store_id))">
+                    <span class="store-flag">
+                      <i :style="'background: #' + store.store_colour"></i>
+                      <i :style="'background: #' + store.store_accent_colour"></i>
+                    </span>
+                    <span class="collapsible">
+                      <span class="text">{{decodedString(store.store_name)}}</span>
+                      <span :class="'badge ' + store.network">
+                        {{store.network}}
+                      </span>
+                    </span>
+                  </div>
+                </template>
+                <template v-if="activeStore!=store.store_id && storesDropdown">
+                  <div class="sidebar-shortcut" :key="store.store_id" @click="activeStore!=store.store_id&&(openStore(store.store_id))">
+                    <span class="store-flag">
+                      <i :style="'background: #' + store.store_colour"></i>
+                      <i :style="'background: #' + store.store_accent_colour"></i>
+                    </span>
+                    <span class="collapsible">
+                      <span class="text">{{decodedString(store.store_name)}}</span>
+                      <span :class="'badge ' + store.network">
+                        {{store.network}}
+                      </span>
+                    </span>
+                  </div>
+                </template>
+              </template>
             </div>
             <div></div>
             <div class="sidebar-shortcuts" v-if="activeStore && activeStore!=='false'">
@@ -161,11 +179,13 @@ export default {
   height: calc(100vh - 60px);
   position: sticky;
   top: 60px;
+
   .sidebar-outer-wrapper-outer {
     .sidebar-outer-wrapper {
       position: relative;
       width: 100%;
       height: calc(100vh - 60px);
+
       .sidebar-inner-wrapper {
         overflow-x: hidden;
         overflow-y: auto;
@@ -173,13 +193,17 @@ export default {
         width: 100%;
         -ms-overflow-style: none;
         scrollbar-width: none;
+
         &::-webkit-scrollbar {
           display: none;
         }
+
         .sidebar-inner-wrapper-inner {
           position: static;
+
           .sidebar {
             transition: 0.05s linear;
+
             &:not(.collapse) {
               width: max-content;
               max-width: calc(var(--main, 100vw) * .2);
@@ -189,11 +213,13 @@ export default {
       }
     }
   }
+
   .sidebar {
     .compartmentalise {
       display: grid;
       grid-template: 1fr/auto auto 1fr;
       gap: .5rem;
+
       .text-clip {
         max-height: 2rem;
         max-width: 125px;
@@ -202,15 +228,18 @@ export default {
         display: block;
       }
     }
+
     .dropdown {
       &:not(.store-length-1) {
         &.open {
           box-shadow: 0 1px;
         }
       }
+
       &.open {
         display: grid;
         grid-auto-flow: row;
+
         &:not(.store-length-1) {
           .sidebar-shortcut {
             &.active {
@@ -224,6 +253,7 @@ export default {
               background: var(--black);
               z-index: 2;
               transform: translateY(-15px);
+
               &::after {
                 content: "\f077";
                 font-size: 0.8rem;
@@ -236,8 +266,10 @@ export default {
                 line-height: 1;
                 margin-left: 10px;
               }
+
               grid-template-columns: 1.5rem 1fr auto;
             }
+
             &:not(.active) {
               padding-left: 2rem;
               opacity: 0;
@@ -246,12 +278,14 @@ export default {
           }
         }
       }
+
       &:not(.open) {
         &:not(.store-length-1) {
           .sidebar-shortcut {
             &:not(.active) {
               display: none;
             }
+
             &.active {
               &::after {
                 content: "\f078";
@@ -265,15 +299,18 @@ export default {
                 line-height: 1;
                 margin-left: 10px;
               }
+
               grid-template-columns: 1.5rem 1fr auto;
             }
           }
         }
       }
+
       .text {
         margin-right: 10px;
       }
     }
+
     @keyframes u0 {
       to {
         opacity: 1;
@@ -290,35 +327,43 @@ export default {
   >div {
     box-shadow: 0 1px 0 0 var(--dark);
   }
+
   .sidebar-shortcuts {
     padding: 15px 0;
+
     .sidebar-shortcut {
       &.active-bar {
         box-shadow: inset -2px 0 0;
         color: var(--accent);
+
         .collapsible {
           opacity: 1 !important;
         }
       }
+
       display: grid;
       grid-template-columns: 1.5rem 1fr;
       align-items: center;
       padding: 10px;
       cursor: pointer;
+
       > :first-child {
         text-align: center;
         font-size: 1.1rem;
       }
+
       &:not(.active) {
         &:hover {
           .collapsible {
             opacity: 1;
           }
+
           &.active-bar {
             box-shadow: inset -4px 0 0;
           }
         }
       }
+
       &.active {
         .collapsible {
           opacity: 1;
@@ -326,6 +371,7 @@ export default {
       }
     }
   }
+
   .collapsible {
     max-width: 150px;
     overflow: hidden;
@@ -335,10 +381,12 @@ export default {
     font-weight: 400;
     font-size: 0.8rem;
     opacity: .5;
+
     i {
       font-size: 0.8rem;
     }
   }
+
   &:not(.collapse) {
     .sidebar-shortcuts {
       .sidebar-shortcut {
@@ -346,6 +394,7 @@ export default {
       }
     }
   }
+
   &.collapse {
     text-align: center;
 
@@ -353,11 +402,13 @@ export default {
       display: none;
     }
   }
+
   &.collapse {
     .sidebar-shortcut {
       display: grid;
       grid-template-columns: auto;
       align-items: center;
+
       &:hover {
         .collapsible {
           position: absolute;
@@ -379,6 +430,7 @@ export default {
     }
   }
 }
+
 .collapse-sidebar {
   height: 2rem;
   width: 1rem;
@@ -391,6 +443,7 @@ export default {
   top: 0;
   bottom: 0;
   cursor: pointer;
+
   &:before,
   &:after {
     content: '';
@@ -400,22 +453,26 @@ export default {
     position: relative;
     transition: .2s ease;
   }
+
   &:hover {
     &.collapsed {
       &:before {
         transform-origin: 0 0;
         transform: rotate(15deg)translateY(1px);
       }
+
       &:after {
         transform-origin: 0 100%;
         transform: rotate(-15deg);
       }
     }
+
     &:not(&.collapsed) {
       &:before {
         transform-origin: 0 0;
         transform: rotate(-15deg)translateY(2px);
       }
+
       &:after {
         transform-origin: 0 100%;
         transform: rotate(15deg);
