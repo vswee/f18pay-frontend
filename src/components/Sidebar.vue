@@ -5,7 +5,7 @@
       <div class="sidebar-inner-wrapper">
         <div class="sidebar-inner-wrapper-inner">
           <div :class="sidebarCollapse?'sidebar':'sidebar collapse'" v-if="session">
-            <a :class="sidebarCollapse?'collapse-sidebar collapsed':'collapse-sidebar'" @click="toggleCollapse()" title="Collapse or expand sidebar.">
+            <a :class="sidebarCollapse?'collapse-sidebar collapsed':'collapse-sidebar'" @click="toggleCollapse()" :title="!sidebarCollapse? 'Expand sidebar.':'Collapse sidebar.'">
             </a>
             <div :class="storesDropdown?'sidebar-shortcuts dropdown open store-length-'+stores.length:'sidebar-shortcuts dropdown store-length-'+stores.length" @click="storesDropdown=!storesDropdown">
               <template v-if="!activeStore && stores.length>0">
@@ -15,7 +15,7 @@
                   </span>
                 </div>
               </template>
-              <div :class="activeStore==store.store_id?'sidebar-shortcut active':'sidebar-shortcut'" v-for="(store, index) in stores" :key="store.store_id" @click="activeStore!=store.store_id&&(openStore(store.store_id))" :style="'animation-delay:' + (index+1)/20 + 's'">
+              <div :class="activeStore==store.store_id?'sidebar-shortcut active':'sidebar-shortcut'" v-for="(store, index) in stores" :key="store.store_id" @click="activeStore!=store.store_id&&(openStore(store.store_id))" :style="'animation-delay:' + (index+1)/50 + 's'">
                 <span class="store-flag">
                   <i :style="'background: #' + store.store_colour"></i>
                   <i :style="'background: #' + store.store_accent_colour"></i>
@@ -241,9 +241,7 @@ export default {
             &:not(.active) {
               padding-left: 2rem;
               opacity: 0;
-              transform: scale(.5)translateY(1rem);
-              animation: u0 150ms linear forwards 1;
-              animation-origin: center;
+              animation: u0 200ms linear forwards 1;
             }
           }
         }
@@ -279,7 +277,6 @@ export default {
     @keyframes u0 {
       to {
         opacity: 1;
-        transform: scale(1)translateY(0)
       }
     }
   }
