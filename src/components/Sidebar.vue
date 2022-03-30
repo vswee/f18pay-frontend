@@ -334,7 +334,7 @@ export default {
     margin-left: 10px;
     font-weight: 400;
     font-size: 0.8rem;
-    opacity: .7;
+    opacity: .5;
     i {
       font-size: 0.8rem;
     }

@@ -3,7 +3,7 @@
   <h1><img class="store-icon" v-if="currentStore.store_logo" :src="currentStore.store_logo"><span>{{_decode(currentStore.store_name)}}</span><span :class="'badge ' + currentStore.network">{{currentStore.network}}</span></h1>
   <h2>{{currentStore.sum || '0.00'}} {{currentStore.network.toUpperCase()}}</h2>
   <small :class="currentStore.deleted==1?'status bad':'status good'">{{currentStore.deleted==1?'Disabled':'Active'}}</small>
-  <p class="help-text"><i class="fas fa-info-circle"></i> We never monitor wallet addresses outside of the scope of 'incoming transactions for associated invoices'.<br>This means that your Balance won't reflect withdrawals or transactions on addresses not associated with invoices on this platform.</p>
+  <p class="help-text"><i class="fas fa-info-circle"></i> F18Pay only monitors incoming transactions on addresses generated on the platform.<br>Your store balance will not reflect any outgoing transactions (sweeps, spends).</p>
   <div v-if="chart.chartData" class="subsect">
     <h3>Invoice Statistics</h3>
     <p class="help-text">Displays paid v total invoices generated over the last 6 months.</p>
