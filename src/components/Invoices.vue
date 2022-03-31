@@ -6,7 +6,7 @@
     <div class="message" v-if="message"><i class="fas fa-exclamation-circle"></i> {{message}}</div>
 
     <div class="form-section">
-      <div class="sub-sect">
+      <div class="sub-sect compact">
         <label for="">Invoice Statistics</label>
         <div class="flex info-combo-parent">
           <div class="info-combo" v-for="(stat, key) of statisticsOrganised" :key="key">
@@ -19,7 +19,7 @@
 
     <div class="flex">
       <div class="button-cluster">
-        <a class="btn" @click="getInvoices" title="Refresh"><i class="fas fa-sync"></i></a>
+        <a class="btn refresh-button" @click="getInvoices" title="Refresh"><i class="fas fa-sync"></i></a>
       </div>
       <div class="button-cluster">
         <a class="btn" @click="viewing=20"><i><i class="fas fa-chevron-left"></i><i class="fas fa-chevron-left"></i></i></a>
@@ -36,14 +36,20 @@
 
       <div class="button-cluster">
         <a class="btn" @click="filter=false" title="Clear filters"><i class="fas fa-filter"></i></a>
-        <select v-model="filter">
+        <!-- <select v-model="filter">
           <option value="false">No Filter</option>
           <option v-for="filter_ of filters" :key="filter_" v-bind:value="filter_">{{capitalise(filter_)}}</option>
-        </select>
+        </select> -->
+        <div class="modern-select" @click.stop="select[0].open=!select[0].open">
+          <span class="selected">{{select[0].selected || 'Filter'}} <i v-if="select[0].open" class="fas fa-caret-up"></i><i v-else class="fas fa-caret-down"></i></span>
+          <ul v-if="select[0].open">
+            <li v-for="(value, key) of select[0].options" :key="key" @click.stop="modernSelect(0,value);filter=value">{{value}}</li>
+          </ul>
+        </div>
       </div>
 
       <div class="button-cluster" v-if="!working">
-        <a class="btn" @click="downloadFile()" title="Download Report"><i class="fas fa-file-download"></i></a>
+        <a class="btn download-file" @click="downloadFile()" title="Download Report"><i class="fas fa-file-download"></i></a>
       </div>
 
     </div>
@@ -210,7 +216,7 @@ export default {
       viewing: 20,
       total: false,
       filter: false,
-      filters: ['expired', 'confirmed', 'receiving', 'partial', '1 conf.', '2 confs'],
+      // filters: ['expired', 'confirmed', 'receiving', 'partial', '1 conf.', '2 confs'],
       invoices: false,
       count: 0,
       active: false,
@@ -219,6 +225,11 @@ export default {
         startDate: false,
         endDate: false,
       },
+      select: [{
+        open: false,
+        selected: false,
+        options: ['expired', 'confirmed', 'receiving', 'partial', '1 confirmation', '2 confirmations']
+      }, ],
     }
   },
   computed: {
@@ -313,20 +324,32 @@ export default {
       this.viewing = 20;
       this.getInvoices()
     },
-    working(){
+    working() {
       this.$store.commit("setWorking", this.working);
     },
   },
   mounted() {
-    document.querySelector('.dynamic-cta-header-space')&&(document.querySelector('.dynamic-cta-header-space').innerHTML = '')
+    document.querySelector('.dynamic-cta-header-space') && (document.querySelector('.dynamic-cta-header-space').innerHTML = '')
     this.getInvoiceStatistics();
     this.getInvoices();
+
+    this.$store.dispatch('headerUIAppend', [{
+      id: '.refresh-button',
+      fn: this.getInvoices,
+    }, {
+      id: '.download-file',
+      fn: this.downloadFile,
+    }]);
   },
   created() {
     this.dateRange.startDate = this.currentStore.created.indexOf(' ') >= 0 ? this.currentStore.created.split(' ')[0] : this.currentStore.created;
     this.dateRange.endDate = this.time;
   },
   methods: {
+    modernSelect(index, value) {
+      this.select[index].selected = value;
+      this.select[index].open = false;
+    },
     dateTime() {
       let currentdate = new Date();
       return currentdate.getFullYear() + "-" +

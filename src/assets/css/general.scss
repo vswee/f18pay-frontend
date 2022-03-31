@@ -78,7 +78,11 @@
   grid-row: 2/3;
   grid-column: 2/3;
   min-height: calc(100vh - 120px);
-  overflow-y: scroll;
+  &.sessioned {
+    height: calc(100vh - 60px);
+    overflow: auto;
+    padding-bottom: 300px;
+  }
   > div {
     &:not(.no-animate) {
       animation: buildUp 0.6s ease forwards 1;
@@ -187,6 +191,9 @@ a {
   flex-wrap: wrap;
   gap: 10px;
   justify-content: center;
+  position: sticky;
+  top: 10px;
+  z-index: 2;
 }
 
 .container {

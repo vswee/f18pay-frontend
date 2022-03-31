@@ -245,12 +245,11 @@ export default {
             &.active {
               grid-row: 1/2;
               margin-bottom: .5rem;
-              padding-top: 1.5rem;
-              padding-bottom: 1.5rem;
-              box-shadow: 0 1px;
+              padding-top: 10px;
+              padding-bottom: 10px;
               position: sticky;
               top: 15px;
-              background: var(--black);
+              background: var(--shadow-20);
               z-index: 2;
               transform: translateY(-15px);
 
@@ -271,7 +270,7 @@ export default {
             }
 
             &:not(.active) {
-              padding-left: 2rem;
+              // padding-left: 2rem;
               opacity: 0;
               animation: u0 200ms linear forwards 1;
             }
@@ -333,8 +332,9 @@ export default {
 
     .sidebar-shortcut {
       &.active-bar {
-        box-shadow: inset -2px 0 0;
+        // box-shadow: inset -2px 0 0;
         color: var(--accent);
+        background: var(--shadow-20);
 
         .collapsible {
           opacity: 1 !important;
@@ -346,6 +346,8 @@ export default {
       align-items: center;
       padding: 10px;
       cursor: pointer;
+      margin: 5px 10px;
+      border-radius: 7px;
 
       > :first-child {
         text-align: center;
@@ -359,8 +361,10 @@ export default {
           }
 
           &.active-bar {
-            box-shadow: inset -4px 0 0;
+            background: var(--shadow-30);
           }
+
+          // box-shadow: inset -4px 0 0;
         }
       }
 

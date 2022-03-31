@@ -13,7 +13,9 @@
     margin-top: 0;
   }
 }
-h1,h2,h3{
+h1,
+h2,
+h3 {
   user-select: none;
 }
 
@@ -39,19 +41,22 @@ h1,h2,h3{
 
 .badge {
   display: inline-block;
-  padding: .5px 6px;
+  padding: 0.5px 6px;
   font-size: 70%;
   transform: translateY(-15%);
   border-radius: 10px;
   text-transform: uppercase;
   font-weight: 500;
 
-  &.active-0, &.active-false, &.active-null{
+  &.active-0,
+  &.active-false,
+  &.active-null {
     margin: 0 auto auto 0;
     background: var(--green-2);
     color: var(--green-0);
   }
-  &.active-1, &.active-true{
+  &.active-1,
+  &.active-true {
     margin: 0 auto auto 0;
     background: var(--red);
     color: var(--red-0);
@@ -66,8 +71,6 @@ h1,h2,h3{
     color: #fff;
   }
 }
-
-
 
 @keyframes build-tooltip {
   to {
@@ -107,7 +110,7 @@ h1,h2,h3{
         font-size: 3rem;
       }
     }
-    a{
+    a {
       margin-left: auto;
     }
   }
@@ -118,7 +121,7 @@ h1,h2,h3{
     line-height: 1.4;
   }
   .graph {
-    width: calc((var(--main) * .8) - 14rem);
+    width: calc((var(--main) * 0.8) - 14rem);
     // max-width: 900px;
   }
   .subsect {
@@ -257,9 +260,10 @@ h1,h2,h3{
       background: var(--shadow-30);
       text-align: center;
       &:not(.severe) {
-        color: var(--green);
+        background: var(--green);
         height: 100%;
         border-radius: 3px;
+        color: var(--black);
         &:hover {
         }
       }
@@ -313,6 +317,10 @@ h1,h2,h3{
     &:hover {
       color: var(--white);
     }
+  }
+  .selected {
+    background: transparent !important;
+    color: var(--black);
   }
 }
 .vue-daterange-picker {
@@ -456,13 +464,19 @@ h1,h2,h3{
   }
 }
 
-.form-section{
-  h2{
+.form-section {
+  h2 {
     z-index: 2;
   }
-.accordian-sect {
-  background: var(--black);
-  padding: 2rem;
-  box-shadow: 0 -4rem var(--black), -1rem 0 var(--black), -1rem -4rem 0 var(--black);
+  .accordian-sect {
+    background: var(--black);
+    padding: 2rem;
+    box-shadow: 0 -4rem var(--black), -1rem 0 var(--black), -1rem -4rem 0 var(--black);
+  }
 }
+.dynamic-cta-header-space {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 5px;
 }

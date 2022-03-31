@@ -6,6 +6,21 @@ Vue.use(VueCryptojs)
 
 let actions = {
 
+  headerUIAppend(context, payload) {
+    for (const item of payload) {
+      let fn = item.fn?item.fn:false
+      let id = item.id;
+      if (document.querySelectorAll('.dynamic-cta-header-space').length == 1 && document.querySelector(id)) {
+        let cta = document.querySelector(id).cloneNode(true);
+        cta.setAttribute('id', cta.getAttribute('id') + '_' + Date.now())
+        cta.addEventListener("click", function () {
+          fn()
+        })
+        document.querySelector('.dynamic-cta-header-space').append(cta);
+      }
+    }
+  },
+
   async encrypt(context, payload) {
     let string = payload.string, keyiv = payload.keyiv;
     let key = keyiv.substr(0, 32);

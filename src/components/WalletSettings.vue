@@ -36,7 +36,7 @@
           <label for="storeName" v-if="network=='btc'">Native SegWit zpub</label>
           <label for="storeName" v-if="network=='eth'">Ethereum address</label>
           <div class="input-placeholder actionable" v-if="!inputFocus" @click="inputFocus=true">
-            {{zpub}} <i class="fas fa-check-circle good"></i>
+            {{zpub}} <i v-if="zpub" class="fas fa-check-circle good"></i>
           </div>
           <input v-if="inputFocus" v-model="zpub" type="text" :placeholder="'E.g.' + network=='btc'? 'zpub6nALs1VXMgnQF7eU35PHhB...' : network=='eth'?'0x1d15114cbF4c55c7f001a8b7...' : ''" />
           <span class="help-text" v-if="network=='btc'">For Electrum wallets; Menu > Wallet > Information > Master Public Key.</span>
@@ -153,19 +153,14 @@ export default {
     },
   },
   mounted() {
-    let t = this;
     document.querySelector('.dynamic-cta-header-space') && (document.querySelector('.dynamic-cta-header-space').innerHTML = '')
     this.zpub = this.currentStore.zpub || '';
     this.network = this.currentStore.network || '';
     this.addressDerivationType = this.currentStore.zpub ? 'external' : 'internal'
-    if (document.querySelectorAll('.dynamic-cta-header-space').length == 1 && document.querySelector('#saveButton')) {
-      let cta = document.querySelector('#saveButton').cloneNode(true);
-      cta.setAttribute('id', cta.getAttribute('id') + '_' + Date.now())
-      cta.addEventListener("click", function () {
-        t.saveSettings()
-      })
-      document.querySelector('.dynamic-cta-header-space').append(cta);
-    }
+    this.$store.dispatch('headerUIAppend', [{
+      id: '#saveButton',
+      fn: this.saveSettings,
+    }]);
   },
   methods: {
     async startRequestForKeys() {

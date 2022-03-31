@@ -28,10 +28,12 @@
         <div class="sub-sect">
           <label for="storeName">Assets Currency</label>
           <div class="">
-            <select v-model="currency">
-              <option disabled value="">Button currency</option>
-              <option v-for="cur of supportedCurrencies" :key="cur" v-bind:value="cur">{{cur}}</option>
-            </select>
+            <div class="modern-select" @click.stop="select[0].open=!select[0].open">
+              <span class="selected">{{select[0].selected || 'Currency'}} <i v-if="select[0].open" class="fas fa-caret-up"></i><i v-else class="fas fa-caret-down"></i></span>
+              <ul v-if="select[0].open">
+                <li v-for="(value, key) of select[0].options" :key="key" @click.stop="modernSelect(0,value)">{{value}}</li>
+              </ul>
+            </div>
           </div>
         </div>
         <div class="sub-sect">
@@ -41,9 +43,9 @@
               <input type="hidden" name="store_id" :value="currentStore.store_id" />
               <input type="hidden" name="price" :value="fixedPrice" />
               <input type="hidden" name="redirectURL" :value="currentStore.url" />
-              <input type="hidden" name="currency" :value="currency" />
+              <input type="hidden" name="currency" :value="select[0].selected" />
 
-              <button type="submit" :style="'cursor:pointer;min-width: 150px;width: max-content;background: ' + storePrimaryColour+ ';color:' + textColor + ';border: 0;font-size: 14px;font-family: \'Arial\', sans-serif;border-radius: 100px;padding: 15px 20px;max-width: calc(200px - 40px);line-height: 14px;transition:.1s ease;'" alt="Click here to complete this payment." :onmouseenter="'this.style[\'background-color\']=\''+storeSecondaryColour+'\';this.style.color=\'' + textAccent + '\';'" :onmouseleave="'this.style[\'background-color\']=\''+storePrimaryColour+'\';this.style.color=\'' + textColor + '\';'">Pay <span style="display: inline-grid; grid-template: 1fr auto / 1fr;vertical-align: top;gap: 0;line-height: 1;position: relative;"><span>{{fixedPrice}}</span> <span style="font-size: 7px;position: absolute;bottom: 7px;width: 100%;text-align: center;top: 100%;opacity: .5;">{{currency}}</span></span> with F18</button>
+              <button type="submit" :style="'cursor:pointer;min-width: 150px;width: max-content;background: ' + storePrimaryColour+ ';color:' + textColor + ';border: 0;font-size: 14px;font-family: \'Arial\', sans-serif;border-radius: 100px;padding: 15px 20px;max-width: calc(200px - 40px);line-height: 14px;transition:.1s ease;'" alt="Click here to complete this payment." :onmouseenter="'this.style[\'background-color\']=\''+storeSecondaryColour+'\';this.style.color=\'' + textAccent + '\';'" :onmouseleave="'this.style[\'background-color\']=\''+storePrimaryColour+'\';this.style.color=\'' + textColor + '\';'">Pay <span style="display: inline-grid; grid-template: 1fr auto / 1fr;vertical-align: top;gap: 0;line-height: 1;position: relative;"><span>{{fixedPrice}}</span> <span style="font-size: 7px;position: absolute;bottom: 7px;width: 100%;text-align: center;top: 100%;opacity: .5;">{{select[0].selected}}</span></span> with F18</button>
             </form>
           </div>
           <div class="flex">
@@ -60,12 +62,12 @@
               <input type="hidden" name="store_id" :value="currentStore.store_id" />
               <input type="hidden" name="price" :value="fixedPrice" class="priceValue" />
               <input type="hidden" name="redirectURL" :value="currentStore.url" />
-              <input type="hidden" name="currency" :value="currency" />
+              <input type="hidden" name="currency" :value="select[0].selected" />
 
               <div>
                 <a :style="'margin-right:.5rem;cursor:pointer;min-width: 150px;width: max-content;background: ' + storePrimaryColour+ ';color: ' + textColor + ';border: 0;font-size: 14px;font-family: \'Arial\', sans-serif;border-radius: 100px;padding: 15px 20px;max-width: calc(200px - 40px);line-height: 14px;transition:.1s ease;'" alt="Increase value" :onmouseenter="'this.style[\'background-color\']=\''+storeSecondaryColour+'\';this.style.color=\'' + textAccent + '\';'" :onmouseleave="'this.style[\'background-color\']=\''+storePrimaryColour+'\';this.style.color=\'' + textColor + '\';'" onclick="this.parentNode.parentNode.querySelector('.priceValue').value=Number(this.parentNode.parentNode.querySelector('.priceValue').value)+1;this.parentNode.querySelector('.priceValueDisplay').innerHTML=Number(this.parentNode.querySelector('.priceValueDisplay').innerHTML)+1;">+</a>
 
-                <button type="submit" :style="'cursor:pointer;min-width: 150px;width: max-content;background: ' + storePrimaryColour+ ';color: ' + textColor + ';border: 0;font-size: 14px;font-family: \'Arial\', sans-serif;border-radius: 100px;padding: 15px 20px;max-width: calc(200px - 40px);line-height: 14px;transition:.1s ease;'" alt="Click here to complete this payment." :onmouseenter="'this.style[\'background-color\']=\''+storeSecondaryColour+'\';this.style.color=\'' + textAccent + '\';'" :onmouseleave="'this.style[\'background-color\']=\''+storePrimaryColour+'\';this.style.color=\'' + textColor + '\';'">Pay <span style="display: inline-grid; grid-template: 1fr auto / 1fr;vertical-align: top;gap: 0;line-height: 1;position: relative;"><span class="priceValueDisplay">{{fixedPrice}}</span> <span style="font-size: 7px;position: absolute;bottom: 7px;width: 100%;text-align: center;top: 100%;opacity: .5;">{{currency}}</span></span> with F18</button>
+                <button type="submit" :style="'cursor:pointer;min-width: 150px;width: max-content;background: ' + storePrimaryColour+ ';color: ' + textColor + ';border: 0;font-size: 14px;font-family: \'Arial\', sans-serif;border-radius: 100px;padding: 15px 20px;max-width: calc(200px - 40px);line-height: 14px;transition:.1s ease;'" alt="Click here to complete this payment." :onmouseenter="'this.style[\'background-color\']=\''+storeSecondaryColour+'\';this.style.color=\'' + textAccent + '\';'" :onmouseleave="'this.style[\'background-color\']=\''+storePrimaryColour+'\';this.style.color=\'' + textColor + '\';'">Pay <span style="display: inline-grid; grid-template: 1fr auto / 1fr;vertical-align: top;gap: 0;line-height: 1;position: relative;"><span class="priceValueDisplay">{{fixedPrice}}</span> <span style="font-size: 7px;position: absolute;bottom: 7px;width: 100%;text-align: center;top: 100%;opacity: .5;">{{select[0].selected}}</span></span> with F18</button>
 
                 <a :style="'margin-left:.5rem;cursor:pointer;min-width: 150px;width: max-content;background: ' + storePrimaryColour+ ';color: ' + textColor + ';border: 0;font-size: 14px;font-family: \'Arial\', sans-serif;border-radius: 100px;padding: 15px 20px;max-width: calc(200px - 40px);line-height: 14px;transition:.1s ease;'" alt="Increase value" :onmouseenter="'this.style[\'background-color\']=\''+storeSecondaryColour+'\';this.style.color=\'' + textAccent + '\';'" :onmouseleave="'this.style[\'background-color\']=\''+storePrimaryColour+'\';this.style.color=\'' + textColor + '\';'" onclick="this.parentNode.parentNode.querySelector('.priceValue').value=Number(this.parentNode.parentNode.querySelector('.priceValue').value)-1||1;this.parentNode.querySelector('.priceValueDisplay').innerHTML=Number(this.parentNode.querySelector('.priceValueDisplay').innerHTML)-1 || 1;">-</a>
               </div>
@@ -108,9 +110,9 @@
         <div class="sub-sect">
           <label for="storeName">Payment Pgae API <i v-if="settingPaymentPage" class="fas fa-asterisk spin"></i></label>
           <div class="input-placeholder">
-            https://pay.flat18.co.uk/store/{{storeCode}}/<b>{{currency}}</b>/<i>Item name or code</i> <i class="fas fa-check-circle"></i>
+            https://pay.flat18.co.uk/store/{{storeCode}}/<b>{{select[0].selected}}</b>/<i>Item name or code</i> <i class="fas fa-check-circle"></i>
           </div>
-          <a :href="'https://pay.flat18.co.uk/store/'+storeCode+'/'+currency+'/Item name or code'"><i class="fas fa-external-link-square-alt"></i></a>
+          <a :href="'https://pay.flat18.co.uk/store/'+storeCode+'/'+select[0].selected+'/Item name or code'"><i class="fas fa-external-link-square-alt"></i></a>
           <span class="help-text">Store Payment Page API is programmable by setting the currency and item name as text strings in the URL.</span>
         </div>
       </div>
@@ -153,7 +155,6 @@ export default {
       message: false,
       working: false,
       accordianIndex: 0,
-      currency: 'USD',
       supportedCurrencies: ['USD', 'GBP', 'EUR', 'TTD'],
       fixedPrice: 10,
       primryColour: false,
@@ -165,9 +166,15 @@ export default {
       text2: false,
       settingPaymentPage: false,
       settingEmailRequired: false,
+      select: [{
+        open: false,
+        selected: false,
+        options: false
+      },],
     }
   },
   watch: {
+
     working() {
       this.$store.commit("setWorking", this.working);
     },
@@ -234,8 +241,13 @@ export default {
   mounted() {
     document.querySelector('.dynamic-cta-header-space') && (document.querySelector('.dynamic-cta-header-space').innerHTML = '')
     this.supportedCurrencies.push(this.currentStore.network.toUpperCase())
+    this.select[0].options=this.supportedCurrencies;
   },
   methods: {
+    modernSelect(index, value) {
+      this.select[index].selected = value;
+      this.select[index].open = false;
+    },
     async setPaymentPage(onOff) {
       await this.settingsAsync('payment_page', onOff, 'settingPaymentPage');
     },

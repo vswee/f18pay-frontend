@@ -98,14 +98,14 @@
     <div class="message" v-if="message"><i class="fas fa-exclamation-circle"></i> {{message}}</div>
     <div class="flex">
       <div class="button-cluster">
-        <a class="btn" @click="getPaymentRequests" title="Refresh"><i class="fas fa-sync"></i></a>
+        <a class="btn refresh-button" @click="getPaymentRequests" title="Refresh"><i class="fas fa-sync"></i></a>
       </div>
       <div class="button-cluster">
-        <a class="btn" @click="newRequest()" title="Create Payment Request"><i class="fas fa-plus"></i> <span>New Request</span></a>
+        <a class="btn" id="newRequests" @click="newRequest()" title="Create Payment Request"><i class="fas fa-plus"></i> <span>New Request</span></a>
       </div>
       <div class="button-cluster">
         <a class="btn" @click="viewing=20"><i><i class="fas fa-chevron-left"></i><i class="fas fa-chevron-left"></i></i></a>
-        <a class="btn" @click="viewing=viewing-20<20?20:viewing=viewing-20"><i class="fas fa-chevron-left"></i></a>
+        <a class="btn list-back" @click="viewing=viewing-20<20?20:viewing=viewing-20"><i class="fas fa-chevron-left"></i></a>
         <a class="">{{range}} to {{viewing>=count?count:viewing}} of {{count}}</a>
         <a class="btn" @click="viewing=viewing+20>count?count:viewing+20"><i class="fas fa-chevron-right"></i></a>
         <a class="btn" @click="viewing=count"><i><i class="fas fa-chevron-right"></i><i class="fas fa-chevron-right"></i></i></a>
@@ -350,17 +350,25 @@ export default {
     },
     working() {
       this.$store.commit("setWorking", this.working);
-    },   
-     modal: function () {
+    },
+    modal: function () {
       this.getPaymentRequests()
     },
   },
   mounted() {
-    document.querySelector('.dynamic-cta-header-space')&&(document.querySelector('.dynamic-cta-header-space').innerHTML = '')
+    // let t = this;
+    document.querySelector('.dynamic-cta-header-space') && (document.querySelector('.dynamic-cta-header-space').innerHTML = '')
     this.getPrePopulate();
     this.getPaymentRequests();
     this.select[2].options.push(this.currentStore.network.toUpperCase())
 
+    this.$store.dispatch('headerUIAppend', [{
+      id: '#newRequests',
+      fn: this.newRequest,
+    }, {
+      id: '.refresh-button',
+      fn: this.getPaymentRequests,
+    }]);
   },
   created() {
     this.dateRange.startDate = this.currentStore.created.indexOf(' ') >= 0 ? this.currentStore.created.split(' ')[0] : this.currentStore.created;
@@ -458,7 +466,7 @@ export default {
       this.select[index].open = false;
     },
     newRequest() {
-      window.scrollTo({
+      document.getElementById("main").scrollTo({
         top: 0,
         behavior: 'smooth'
       });

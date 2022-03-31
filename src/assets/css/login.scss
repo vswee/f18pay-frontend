@@ -24,12 +24,16 @@ input:focus {
 }
 
 .message {
-  background: var(--accent-3);
-  padding: 5px;
-  font-size: 0.8rem;
+  background: var(--green);
+  padding: 10px 15px;
+  font-size: 1rem;
   border-radius: 6px;
   margin: auto;
-  max-width: 700px;
+  max-width: 400px;
+  position: sticky;
+  top: 10px;
+  z-index: 3;
+  color: var(--black);
 }
   .modal-input {
     .form {
@@ -105,7 +109,9 @@ input:focus {
       display: grid;
       gap: 10px;
       margin-top: 10px;
-      margin-bottom: 60px;
+      &:not(.compact){
+        margin-bottom: 60px;
+      }
       .help-text {
         margin-top: 2px;
         padding: 0 0px;

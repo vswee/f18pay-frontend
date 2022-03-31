@@ -169,14 +169,10 @@ export default {
     this.email = this.currentStore.email || '';
     this.deleted = !this.currentStore.deleted ? 0 : this.currentStore.deleted;
 
-    if (document.querySelectorAll('.dynamic-cta-header-space').length == 1 && document.querySelector('#saveButton')) {
-      let cta = document.querySelector('#saveButton').cloneNode(true);
-      cta.setAttribute('id', cta.getAttribute('id') + '_' + Date.now())
-      cta.addEventListener("click", function () {
-        t.saveSettings()
-      })
-      document.querySelector('.dynamic-cta-header-space').append(cta);
-    }
+    this.$store.dispatch('headerUIAppend', [{
+      id: '#saveButton',
+      fn: this.saveSettings,
+    }]);
   },
   methods: {
     _decode(string) {

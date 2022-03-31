@@ -1,5 +1,5 @@
 <template lang="">
-<div>
+<div class="dashboard-root">
   <div class="stores" v-if="!activeStore || activeStore==='false'">
     <div v-for="(store, index) in stores" :key="store.store_id" :class="store.deleted==1?'store-tile disabled':'store-tile active'" :style="'animation-delay:'+(index+1)/10+'s;'" @click="openStore(store.store_id)">
       <h2>
@@ -63,7 +63,6 @@ export default {
       activeStore: 'activeStore',
       storeView: 'storeView',
       storeModalView: 'storeModalView',
-      viewTitle: 'viewTitle'
     })
   },
   async created() {
@@ -76,7 +75,7 @@ export default {
     } else {
       this.fetchStores()
     }
-    window.addEventListener('scroll', this.scrollUITriggers);
+    
   },
   mounted() {
     this.$store.dispatch('getStores')
@@ -86,13 +85,7 @@ export default {
     }
   },
   methods: {
-    scrollUITriggers() {
-      if (window.scrollY > 80 && this.viewTitle) {
-        this.$store.commit('setShowTitle', true);
-      } else {
-        this.$store.commit('setShowTitle', false);
-      }
-    },
+
     async fetchStores() {
       const username = await this.$store.dispatch('encrypt', {
         string: this.user,
