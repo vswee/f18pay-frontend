@@ -374,7 +374,7 @@ export default {
         string: encodeURIComponent(encodeURI(this.storeName)),
         keyiv: this.keyiv
       });
-      await fetch("https://money-api.flat18.co.uk/store-invoice-statistics", {
+      await fetch("https://f18pay-api.flat18.co.uk/store-invoice-statistics", {
           method: 'POST',
           headers: {
             'Content-Type': 'multipart/form-data'
@@ -433,7 +433,7 @@ export default {
       let rangeEnd = this.dateRange.endDate instanceof Date ? this.dateRange.endDate.yyyymmdd() : String(this.dateRange.endDate);
       rangeEnd = rangeEnd.indexOf("T") >= 0 ? rangeEnd.split('T')[0] : (rangeEnd.indexOf(" ") >= 0 ? rangeEnd.split(' ')[0] : rangeEnd);
       let viewing = this.viewing; //==this.count?this.range:this.viewing;
-      await fetch("https://money-api.flat18.co.uk/store-invoices", {
+      await fetch("https://f18pay-api.flat18.co.uk/store-invoices", {
           method: 'POST',
           headers: {
             'Content-Type': 'multipart/form-data'
@@ -510,7 +510,7 @@ export default {
         string: invoice.status,
         keyiv: this.keyiv
       });
-      await fetch("https://money-api.flat18.co.uk/invoice-check-status", {
+      await fetch("https://f18pay-api.flat18.co.uk/invoice-check-status", {
           method: 'POST',
           headers: {
             'Content-Type': 'multipart/form-data'

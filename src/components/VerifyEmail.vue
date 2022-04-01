@@ -85,7 +85,7 @@ export default {
         this.message = "Please enter your email address"
       } else {
         const username = this.encrypt(this.usernameManual);
-        fetch('https://money-api.flat18.co.uk/check-username-for-activation', {
+        fetch('https://f18pay-api.flat18.co.uk/check-username-for-activation', {
             method: 'POST', // or 'PUT'
             headers: {
               'Content-Type': 'multipart/form-data',
@@ -116,7 +116,7 @@ export default {
       this.working = true;
       if (this.code.length >= 6 && (this.username || this.usernameManual)) {
         const username = this.encrypt(this.username);
-        fetch('https://money-api.flat18.co.uk/code-verify', {
+        fetch('https://f18pay-api.flat18.co.uk/code-verify', {
             method: 'POST',
             headers: {
               'Content-Type': 'multipart/form-data',
@@ -154,7 +154,7 @@ export default {
       this.working = true;
       if (this.username || this.usernameManual) {
         const username = this.username ? this.encrypt(this.username) : this.encrypt(this.usernameManual);
-        fetch('https://money-api.flat18.co.uk/request-new-code', {
+        fetch('https://f18pay-api.flat18.co.uk/request-new-code', {
             method: 'POST',
             headers: {
               'Content-Type': 'multipart/form-data',
@@ -190,7 +190,7 @@ export default {
       return
     }
     if (!this.keyivId) {
-      fetch("https://money-api.flat18.co.uk/get-keyiv", {
+      fetch("https://f18pay-api.flat18.co.uk/get-keyiv", {
           headers: {
             "Content-Type": "multipart/form-data",
           },

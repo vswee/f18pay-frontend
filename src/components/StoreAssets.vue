@@ -264,7 +264,7 @@ export default {
         string: encodeURIComponent(encodeURI(this.storeName)),
         keyiv: this.keyiv
       });
-      await fetch("https://money-api.flat18.co.uk/store-settings-async", {
+      await fetch("https://f18pay-api.flat18.co.uk/store-settings-async", {
           method: 'POST',
           headers: {
             'Content-Type': 'multipart/form-data'

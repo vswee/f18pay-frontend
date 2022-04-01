@@ -91,7 +91,7 @@ export default {
         string: this.user,
         keyiv: this.keyiv
       });
-      await fetch("https://money-api.flat18.co.uk/stores", {
+      await fetch("https://f18pay-api.flat18.co.uk/stores", {
           method: 'POST',
           headers: {
             'Content-Type': 'multipart/form-data'

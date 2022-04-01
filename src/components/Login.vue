@@ -82,7 +82,7 @@ export default {
         this.message = "Please enter your account email address"
       } else {
         const username = this.encrypt(this.username);
-        fetch('https://money-api.flat18.co.uk/check-username', {
+        fetch('https://f18pay-api.flat18.co.uk/check-username', {
             method: 'POST', // or 'PUT'
             headers: {
               'Content-Type': 'multipart/form-data',
@@ -114,7 +114,7 @@ export default {
       this.working = true;
       const encrypted = this.encrypt(this.password);
       const username = this.encrypt(this.username);
-      fetch('https://money-api.flat18.co.uk/password-login', {
+      fetch('https://f18pay-api.flat18.co.uk/password-login', {
           method: 'POST',
           headers: {
             'Content-Type': 'multipart/form-data',
@@ -153,7 +153,7 @@ export default {
       this.$router.push('dashboard');
       return
     }
-    fetch("https://money-api.flat18.co.uk/get-keyiv", {
+    fetch("https://f18pay-api.flat18.co.uk/get-keyiv", {
         headers: {
           "Content-Type": "multipart/form-data",
         },

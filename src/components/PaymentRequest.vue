@@ -420,7 +420,7 @@ export default {
           keyiv: this.keyiv
         });
 
-        await fetch("https://money-api.flat18.co.uk/store-requests-create-new", {
+        await fetch("https://f18pay-api.flat18.co.uk/store-requests-create-new", {
             method: 'POST',
             headers: {
               'Content-Type': 'multipart/form-data'
@@ -498,7 +498,7 @@ export default {
         string: this.currentStore.store_id,
         keyiv: this.keyiv
       });
-      await fetch("https://money-api.flat18.co.uk/store-requests-pre-populate", {
+      await fetch("https://f18pay-api.flat18.co.uk/store-requests-pre-populate", {
           method: 'POST',
           headers: {
             'Content-Type': 'multipart/form-data'
@@ -568,7 +568,7 @@ export default {
       let rangeEnd = this.dateRange.endDate instanceof Date ? this.dateRange.endDate.yyyymmdd() : String(this.dateRange.endDate);
       rangeEnd = rangeEnd.indexOf("T") >= 0 ? rangeEnd.split('T')[0] : (rangeEnd.indexOf(" ") >= 0 ? rangeEnd.split(' ')[0] : rangeEnd);
       let viewing = this.viewing; //==this.count?this.range:this.viewing;
-      await fetch("https://money-api.flat18.co.uk/store-requests", {
+      await fetch("https://f18pay-api.flat18.co.uk/store-requests", {
           method: 'POST',
           headers: {
             'Content-Type': 'multipart/form-data'
@@ -641,7 +641,7 @@ export default {
         string: request.status,
         keyiv: this.keyiv
       });
-      await fetch("https://money-api.flat18.co.uk/request-check-status", {
+      await fetch("https://f18pay-api.flat18.co.uk/request-check-status", {
           method: 'POST',
           headers: {
             'Content-Type': 'multipart/form-data'

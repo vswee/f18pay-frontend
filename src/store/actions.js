@@ -95,7 +95,7 @@ let actions = {
     }
 
     const username = await dispatch('encrypt', { string: user, keyiv: keyiv });
-    await fetch("https://money-api.flat18.co.uk/validate-fingerprint-check-username", {
+    await fetch("https://f18pay-api.flat18.co.uk/validate-fingerprint-check-username", {
       method: 'POST',
       headers: { 'Content-Type': 'multipart/form-data', },
       body: JSON.stringify({ fingerprint: fingerprint, username: username, keyivId: keyivId }),
@@ -155,7 +155,7 @@ let actions = {
       string: getters.user,
       keyiv: getters.keyiv
     });
-    await fetch("https://money-api.flat18.co.uk/stores", {
+    await fetch("https://f18pay-api.flat18.co.uk/stores", {
       method: 'POST',
       headers: {
         'Content-Type': 'multipart/form-data'

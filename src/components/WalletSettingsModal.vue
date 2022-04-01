@@ -170,7 +170,7 @@ export default {
         string: this.code,
         keyiv: this.keyiv
       });
-      await fetch("https://money-api.flat18.co.uk/store-management-request-keys-verify-code", {
+      await fetch("https://f18pay-api.flat18.co.uk/store-management-request-keys-verify-code", {
           method: 'POST',
           headers: {
             'Content-Type': 'multipart/form-data'
@@ -244,7 +244,7 @@ export default {
         string: this.email,
         keyiv: this.keyiv
       });
-      await fetch("https://money-api.flat18.co.uk/store-settings-bulk", {
+      await fetch("https://f18pay-api.flat18.co.uk/store-settings-bulk", {
           method: 'POST',
           headers: {
             'Content-Type': 'multipart/form-data'
