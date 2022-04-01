@@ -5,12 +5,12 @@
       <h1>Create New Store</h1>
       <div class="message" v-if="message"><i class="fas fa-exclamation-circle"></i> {{message}}</div>
       <div class="form-section" v-if="!storeNameConfirmed">
-        <div class="sub-sect">
+        <div class="sub-sect compact">
           <label for="storeName">Store Name</label>
           <input v-model="storeName" type="text" placeholder="E.g. Donations" />
           <span class="help-text">This name will appear on invoices, financial reports and on the F18 Pay Dashboard.</span>
         </div>
-        <div class="sub-sect">
+        <div class="sub-sect compact">
           <label for="storeName">Store Type: <span :class="'badge ' + storeType">{{storeType}}</span></label>
           <div class="switch">
             <a :class="storeType=='btc'?'btn active':'btn'" @click.stop="storeType='btc'"><i class="fab fa-bitcoin"></i> Bitcoin</a>
@@ -26,7 +26,7 @@
 
       <template v-if="storeType=='btc'">
         <div class="form-section" v-if="storeNameConfirmed && zpubOptions && !collectZpub && !confirmAddresses">
-          <div class="sub-sect">
+          <div class="sub-sect compact">
             <label for="storeName">Address Derivation</label>
             <div class="switch">
               <a :class="addressDerivationType=='external'?'btn active':'btn'" @click.stop="addressDerivationType='external'">External</a>
@@ -40,12 +40,12 @@
         </div>
 
         <div class="form-section" v-if="storeNameConfirmed && zpubOptions && collectZpub && !confirmAddresses">
-          <div class="sub-sect">
+          <div class="sub-sect compact">
             <label for="storeName">Native SegWit zpub</label>
             <input v-model="zpub" type="text" placeholder="E.g. zpub6nALs1VXMgnQF7eU35PHhB..." />
             <span class="help-text">For Electrum wallets; Menu > Wallet > Information > Master Public Key.</span>
           </div>
-          <div class="sub-sect">
+          <div class="sub-sect compact">
             <span class="help-text">F18 Pay will <b>only</b> be able to generate addresses and check balances for your wallet.<br>We recommend that you use a dedicated wallet for F18 Pay to avoid untracked transactions on your addresses.</span>
           </div>
           <div class="flex">
@@ -55,14 +55,14 @@
         </div>
 
         <div class="form-section" v-if="storeNameConfirmed && zpubOptions && collectZpub && confirmAddresses">
-          <div class="sub-sect">
+          <div class="sub-sect compact">
             <label for="storeName">Wallet Addresses</label>
             <ol>
               <li v-for="(address, key) in confirmAddresses" :key="key">{{address}}</li>
             </ol>
             <span class="help-text"></span>
           </div>
-          <div class="sub-sect">
+          <div class="sub-sect compact">
             <span class="help-text">Confirm that the addresses above match the <b>first 10</b> addresses on your wallet.<br>For Wasabi wallet, you may need to generate 10 addresses manually (under the 'receive' tab).</span>
           </div>
           <div class="flex">
@@ -74,13 +74,13 @@
 
       <template v-if="storeType=='eth'">
         <div class="form-section" v-if="storeNameConfirmed && zpubOptions">
-          <div class="sub-sect">
+          <div class="sub-sect compact">
             <label for="storeName">Ethereum Account Address</label>
             <input v-model="zpub" type="text" placeholder="E.g. 0x1d15114cbF4c55c7f001a8b7..." />
             <span class="help-text">You can use any valid Ethereum address account from your wallet.</span>
           </div>
           <div class="flex">
-            <a class="btn sec" @click.stop="collectZpub=false"><i class="fas fa-arrow-left"></i>Back</a>
+            <a class="btn sec" @click.stop="storeNameConfirmed=false"><i class="fas fa-arrow-left"></i>Back</a>
             <a class="btn" @click.stop="!working && (submitZpub())">Finish<i class="fas fa-arrow-right"></i></a>
           </div>
         </div>

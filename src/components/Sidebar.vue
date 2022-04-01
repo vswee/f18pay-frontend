@@ -1,14 +1,14 @@
-<template lang="">
+<template lang="" v-if="session">
 <div id="sidebar" :style="'width:'+sidebarWidth+'px'">
   <div class="sidebar-outer-wrapper-outer">
     <div class="sidebar-outer-wrapper">
       <div class="sidebar-inner-wrapper">
         <div class="sidebar-inner-wrapper-inner">
-          <div :class="sidebarCollapse?'sidebar':'sidebar collapse'" v-if="session">
+          <div :class="sidebarCollapse?'sidebar':'sidebar collapse'">
             <a :class="sidebarCollapse?'collapse-sidebar collapsed':'collapse-sidebar'" @click="toggleCollapse()" :title="!sidebarCollapse? 'Expand sidebar.':'Collapse sidebar.'">
             </a>
             <div :class="storesDropdown?'sidebar-shortcuts dropdown open store-length-'+stores.length:'sidebar-shortcuts dropdown store-length-'+stores.length" @click="storesDropdown=!storesDropdown">
-              <template v-if="!activeStore && stores.length>0">
+              <template v-if="(!activeStore || activeStore === 'false') && stores.length>1">
                 <div class="sidebar-shortcut active">
                   <i class="fas fa-hand-pointer"></i>
                   <span class="collapsible"><span class="text"> Select Store </span>

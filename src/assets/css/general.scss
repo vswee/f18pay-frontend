@@ -191,9 +191,13 @@ a {
   flex-wrap: wrap;
   gap: 10px;
   justify-content: center;
-  position: sticky;
-  top: 10px;
-  z-index: 2;
+}
+.dashboard-root{
+  .flex {
+    position: sticky;
+    top: 10px;
+    z-index: 2;
+  }
 }
 
 .container {
