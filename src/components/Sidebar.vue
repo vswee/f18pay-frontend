@@ -1,5 +1,5 @@
-<template lang="" v-if="session">
-<div id="sidebar" :style="'width:'+sidebarWidth+'px'">
+<template lang="">
+<div id="sidebar" :style="'width:'+sidebarWidth+'px'" v-if="session">
   <div class="sidebar-outer-wrapper-outer">
     <div class="sidebar-outer-wrapper">
       <div class="sidebar-inner-wrapper">
