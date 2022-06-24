@@ -14,6 +14,9 @@ let state = {
   viewTitle: false,
   showTitle: false,
   time: false,
-  working:false,
+  working: false,
+  notifications: {
+    authFailure: false,
+  },
 }
 export default state

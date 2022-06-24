@@ -35,19 +35,26 @@ export default {
     })
   },
   watch: {
-    '$route': function () {
-      this.$store.dispatch('init')
-      this.$store.dispatch('verifySession')
-    }
+    '$route': function(){this.initChecks()}
   },
-  created() {
+  async created() {
     this.$store.dispatch('init')
-    this.$store.dispatch('verifySession')
+    this.$store.dispatch('verifySession', false)
   },
   mounted() {
     document.getElementById("main").addEventListener('scroll', this.scrollUITriggers);
+  let t=this
+    window.addEventListener("focus", t.verifySession)
   },
   methods: {
+    async initChecks(){
+      this.$store.dispatch('init')
+      this.$store.dispatch('verifySession', false)
+    },
+    verifySession(){
+      console.log("verifying session")
+      this.$store.dispatch('verifySession', false)
+    },
     scrollUITriggers() {
       if (document.getElementById("main").scrollTop > 80 && this.viewTitle) {
         this.$store.commit('setShowTitle', true);

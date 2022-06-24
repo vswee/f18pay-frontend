@@ -8,7 +8,7 @@ let actions = {
 
   headerUIAppend(context, payload) {
     for (const item of payload) {
-      let fn = item.fn?item.fn:false
+      let fn = item.fn ? item.fn : false
       let id = item.id;
       if (document.querySelectorAll('.dynamic-cta-header-space').length == 1 && document.querySelector(id)) {
         let cta = document.querySelector(id).cloneNode(true);
@@ -81,7 +81,7 @@ let actions = {
 
   },
 
-  async verifySession({ commit, getters, dispatch }) {
+  async verifySession({ commit, getters, dispatch }, payload) {
     let session = false;
     const user = getters.user
     const fingerprint = getters.fingerprint
@@ -91,7 +91,7 @@ let actions = {
       commit("setSession", false);
       session = false;
       console.warn("No session. Missing parameters.");
-      return session
+      if (!payload) { return session }
     }
 
     const username = await dispatch('encrypt', { string: user, keyiv: keyiv });
@@ -114,17 +114,22 @@ let actions = {
         let route = router.currentRoute.name;
         if (!session) {
           switch (route) {
-            case 'home':
             case 'login':
             case 'signup':
             case 'verify-email':
             case 'reset-password':
+            case undefined:
+              break;
+            case 'dashboard':
+              // console.log("throw error")
+          commit("setAuthFailure", "Session expired. Reload application.");
+          break;
+            case 'home':
               break;
             default:
               router.push({
                 name: 'home'
               });
-
           }
         }
         if (session) {
@@ -134,12 +139,14 @@ let actions = {
             case 'signup':
             case 'verify-email':
             case 'reset-password':
+            case undefined:
               router.push({
                 name: 'dashboard'
               });
               break;
             default:
           }
+          commit("setAuthFailure", false);          
         }
 
       })
@@ -147,7 +154,7 @@ let actions = {
         console.error("Error:", error);
         session = false;
       });
-    return session
+    if (!payload) { return session }
   },
 
   async getStores({ commit, getters, dispatch }) {

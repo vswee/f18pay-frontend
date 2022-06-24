@@ -10,7 +10,7 @@
           <i :style="'background: #' + store.store_accent_colour"></i>
         </span>
       </h2>
-      <span class="store-value"><span class="mono">{{store.sum?store.sum:"0.00"}}</span><small :class="'badge ' + store.network">{{store.network.toUpperCase()}}</small></span>
+      <span class="store-value"><span class="mono">{{store.sum?store.sum:"0.00"}}</span><small v-if="store.network" :class="'badge ' + store.network">{{store.network.toUpperCase()}}</small></span>
       <span>{{store.zpub?'External':'Internal'}} wallet</span>
       <span :class="'badge active-' + store.deleted">{{store.deleted==1?'Disabled':'Active'}}</span>
     </div>
@@ -69,9 +69,12 @@ export default {
     let session = await this.$store.dispatch('verifySession')
     if (!session) {
       console.log("NO SESSION")
+      if (this.$router.currentRoute.name !== 'home')
+        {
       this.$router.push({
         name: 'home'
       });
+        }
     } else {
       this.fetchStores()
     }

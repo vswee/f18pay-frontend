@@ -38,7 +38,9 @@ let mutations = {
     state.theme = payload
     localStorage.setItem("theme", payload)
   },
-
+  setAuthFailure(state, payload) {
+    state.notifications.authFailure = payload
+  },
   setChart(state, payload) {
     state.chart.chartData = payload.chartData;
     state.chart.options = payload.options;

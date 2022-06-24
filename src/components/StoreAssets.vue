@@ -168,7 +168,7 @@ export default {
       settingEmailRequired: false,
       select: [{
         open: false,
-        selected: false,
+        selected: 'USD',
         options: false
       },],
     }

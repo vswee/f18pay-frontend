@@ -26,6 +26,9 @@ let getters = {
   activeStore: state => {
     return state.activeStore
   },
+  authFailure: state => {
+    return state.notifications.authFailure
+  },
   chart: state => {
     return state.chart
   },

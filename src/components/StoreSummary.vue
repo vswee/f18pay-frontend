@@ -1,5 +1,5 @@
 <template lang="">
-<div class="store-management">
+<div class="store-management" v-if="currentStore">
   <h1><img class="store-icon" v-if="currentStore.store_logo" :src="currentStore.store_logo"><span>{{_decode(currentStore.store_name)}}</span><span :class="'badge ' + currentStore.network">{{currentStore.network}}</span></h1>
   <h2>{{currentStore.sum || '0.00'}} {{currentStore.network.toUpperCase()}}</h2>
   <small :class="currentStore.deleted==1?'status bad':'status good'">{{currentStore.deleted==1?'Disabled':'Active'}}</small>

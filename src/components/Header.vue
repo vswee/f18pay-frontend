@@ -20,7 +20,9 @@
     <b v-if="session && (showTitle && viewTitle)" class="ui-scroll-title">{{viewTitle}}</b>
   </a>
   <div :class="session && (showTitle && viewTitle) ? 'dynamic-cta-header-space active':'dynamic-cta-header-space'"></div>
-  <div></div>
+  <div class="notification-workspace"><template v-if="authFailure">
+      <div @click="clearAuthFailure" class="notification foot bad error">{{authFailure}}</div>
+    </template></div>
 
   <div class="links">
     <div class="links" v-if="!session">
@@ -59,27 +61,37 @@ export default {
       viewTitle: 'viewTitle',
       theme: 'theme',
       working: 'working',
+      authFailure: 'authFailure',
     }),
     currentRouteName() {
       return this.$route.name;
     }
   },
   methods: {
+    clearAuthFailure() {
+      this.$store.commit('setAuthFailure', false)
+      this.$router.push({
+        name: 'home'
+      });
+    },
     clearToHome() {
-      console.log("hi")
       if (this.session) {
-        this.$router.push({
-          name: 'dashboard'
-        });
+        if (this.$router.currentRoute.name !== 'dashboard') {
+          this.$router.push({
+            name: 'dashboard'
+          });
+        }
         this.$store.commit('setActiveStore', false)
         this.$store.commit('setStoreView', false);
         this.$store.commit('setViewTitle', false);
         this.$store.commit('setShowTitle', false);
 
       } else {
-        this.$router.push({
-          name: 'home'
-        });
+        if (this.$router.currentRoute.name !== 'home') {
+          this.$router.push({
+            name: 'home'
+          });
+        }
       }
     },
     logout() {
@@ -102,6 +114,39 @@ export default {
 </script>
 
 <style lang="scss">
+.notification {
+  &.foot {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 1.5rem;
+    font-size: 1rem;
+    z-index: 2;
+
+    &::after,
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    &::after {
+      z-index: -2;
+      background: var(--black);
+    }
+
+    &::before {
+      box-shadow: inset 0 0 0 400vw;
+      z-index: -1;
+      opacity: .2;
+    }
+  }
+}
+
 .header {
   display: grid;
   grid-template-columns: auto auto 1fr auto;
@@ -176,6 +221,7 @@ export default {
   font-size: 1.6rem;
   text-transform: uppercase;
   font-weight: 800;
+  cursor: pointer;
 
   svg {
     height: 40px;

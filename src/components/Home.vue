@@ -42,8 +42,8 @@
       </g>
     </svg>
     <div class="hero-focus">
-      <h1>Start Accepting Crypto Payments Online 🎉</h1>
-      <p>F18 Pay is completely free to use.<br>We <b><u>never</u></b> set cookies or harvest your data.</p>
+      <h1>Start Accepting Crypto Payments Online for FREE 🎉</h1>
+      <p>F18 Pay is completely free to use.<br>We <b><u>NEVER</u></b> use KYC or cookies.</p>
       <div class="flex">
         <a class="btn pri" href="signup">Get Started<i class="fas fa-arrow-right"></i></a>
         <a class="btn sec" href="#more">Learn More<i class="fas fa-arrow-down"></i></a>
@@ -53,8 +53,8 @@
 
   <div class="container flex" id="more">
     <div>
-      <h2>A Project for Us and for You 👏</h2>
-      <p>Our payments processor core is built on fully opensource software. We've shaped it and expanded the platform based on your feedback which makes it better for us and for all our users.</p>
+      <h2>You're our everything and you're nobody 👏</h2>
+      <p>We built this software for our use and we want you to love using it and help us make it better for everyone. As much as we love you, we don't want to know who you are or where your money is.</p>
     </div>
     <div>
       <h2>A button like this could be on your website 🔥</h2>
@@ -78,6 +78,11 @@
       <p>F18 Pay is modelled on the payment processor stack, <a href="https://btcpayserver.org" target="_blank">BTCPay Server</a>.</p>
       <p>We wanted to design a payments platform that essentially operates like BTCPay Server but had more flexibility for managed services.</p>
     </div>
+        <div>
+      <h2>Simple anonymity 🧬</h2>
+      <p>Addresses generated internally are generic and random giving them basic anonymity over traditional hierarchical deterministic addresses.</p>
+
+    </div>
     <div>
       <h2>The Primary Difference 🍏🍊</h2>
       <p>Privacy: Like with any third-party service, using F18 Pay requires a degree of trust. We never share any of the data we collect from you or your transactions and we supply all aspects of the processor stack in-house.</p>
@@ -90,9 +95,7 @@
     </div>
     <div>
       <h2>Good to know 🧠</h2>
-      <p>This is a non-custodial Payment gateway service, written in PHP and provided free of charge with no guarantees. You can set up as many stores as you like and process as many payments as needed.</p>
-      <p>If you've opted to use our randomised (Native SegWit - P2WPKH) addresses, you should enable 2-factor authentication to protect your account.</p>
-      <p>Your use of this service is never monitored or recorded and we do not ask for any personally-identifiable details.<sup>2</sup></p>
+      <p>This is a centralised Payment gateway service, written in PHP and provided free of charge with no guarantees. You can set up as many stores as you like and process as many payments as needed.</p>
     </div>
 
   </div>

@@ -6,7 +6,7 @@
     <div class="form-section" v-if="!usernameConfirmed">
       <label for="username">email</label>
       <input v-model="username" type="text" ref="username" placeholder="email@example.com" v-on:keyup.enter="checkUsername()" autofocus />
-      <input type="password" placeholder="" value="false" class="invisible" />
+      <input type="password" v-model="password" placeholder="" value="false" class="invisible" />
       <div class="flex">
 
         <a class="btn" @click="checkUsername()">Next<i class="fas fa-arrow-right"></i></a>
@@ -128,7 +128,6 @@ export default {
         .then((response) => response.json())
         .then((data) => {
           if (data.proceed == true && data.fingerprint) {
-            console.log('ALL OK', this.username, data.fingerprint)
             this.$store.commit("setUser", this.username);
             this.$store.commit("setFingerprint", data.fingerprint);
             this.$router.push('dashboard');
@@ -146,7 +145,8 @@ export default {
     }
   },
   mounted() {
-    this.$refs.username.$el.focus()
+    if(this.$refs.username.$el)
+   { this.$refs.username.$el.focus()}
   },
   async created() {
     if (this.session) {
