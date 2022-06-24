@@ -71,7 +71,7 @@ export default {
     clearAuthFailure() {
       this.$store.commit('setAuthFailure', false)
       this.$router.push({
-        name: 'home'
+        name: 'login'
       });
     },
     clearToHome() {

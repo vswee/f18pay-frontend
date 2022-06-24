@@ -122,7 +122,7 @@ let actions = {
               break;
             case 'dashboard':
               // console.log("throw error")
-          commit("setAuthFailure", "Session expired. Reload application.");
+          commit("setAuthFailure", "Session expired. Please re-authenticate to continue.");
           break;
             case 'home':
               break;
