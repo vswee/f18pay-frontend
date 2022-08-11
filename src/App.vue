@@ -6,6 +6,7 @@
     <router-view></router-view>
   </div>
   <Footer />
+  <ChatWoot />
   <NewStoreModal v-if="session && storeModalView=='new'"></NewStoreModal>
 </div>
 </template>
@@ -14,6 +15,7 @@
 import Footer from './components/Footer.vue'
 import Header from './components/Header.vue'
 import Sidebar from './components/Sidebar.vue'
+import ChatWoot from "./components/ChatWoot.vue";
 import NewStoreModal from '@/components/NewStoreModal'
 import {
   mapGetters
@@ -25,6 +27,7 @@ export default {
     Footer,
     Sidebar,
     NewStoreModal,
+    ChatWoot,
   },
   computed: {
     ...mapGetters({
