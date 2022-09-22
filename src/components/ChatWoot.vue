@@ -15,7 +15,7 @@ window.chatwootSettings = {
         s.parentNode.insertBefore(g,s);
         g.onload=function(){
           window.chatwootSDK.run({
-            websiteToken: 'Xw4FEUhLazPaLYN1RPVPEeiB',
+            websiteToken: 'hnTuzkVigbDMgmCC4SYz7V1Y',
             baseUrl: BASE_URL
           })
         }
