@@ -56,5 +56,4 @@ jobs:
         with:
           username: 'vswee'
           reponame: 'f18pay-frontend'
-          token: ${{ secrets.GH_TOKEN }} # Leave this line unchanged
-          
+          token: ${{ secrets.GITHUB_TOKEN }}
