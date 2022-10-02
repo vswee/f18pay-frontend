@@ -37,7 +37,7 @@ jobs:
     - name: Install
       run: npm ci --legacy-peer-deps
     - name: Build
-      run: |
+      run:
         npm run build
     - name: Deploy
       if: success() && github.ref == 'refs/heads/master'
