@@ -1,3 +1,3 @@
 module.exports = {
-  publicPath: 'https://pay.flat18.co.uk/'
+  publicPath: 'pay.flat18.co.uk/'
 }
