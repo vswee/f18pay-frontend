@@ -25,7 +25,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [16]
+        node-version: [12]
 
     steps:
     - name: Checkout
@@ -38,7 +38,7 @@ jobs:
       run: npm ci
     - name: Build
       run: |
-        node build.js
+        node run build
     - name: Deploy
       if: success() && github.ref == 'refs/heads/master'
       uses: peaceiris/actions-gh-pages@v3
