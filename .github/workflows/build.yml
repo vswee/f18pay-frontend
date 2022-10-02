@@ -49,7 +49,7 @@ jobs:
         user_name: 'github-actions[bot]'
         user_email: 'github-actions[bot]@users.noreply.github.com'
     - name: Build Vue
-      steps:
+    steps:
       uses: actions/checkout@v2
     - name: Build-Vue
       uses: xRealNeon/VuePagesAction@1.0.0
