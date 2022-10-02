@@ -29,7 +29,7 @@ const routes = [
     }
   },
   {
-    path: '/login',
+    path: '/#login',
     name: 'login',
     component: Login,
     meta: {
@@ -47,7 +47,7 @@ const routes = [
     }
   },
   {
-    path: '/signup',
+    path: '/#signup',
     name: 'signup',
     component: Signup,
     meta: {
@@ -65,7 +65,7 @@ const routes = [
     }
   },
   {
-    path: '/verify-email',
+    path: '/#verify-email',
     name: 'verify-email',
     component: VerifyEmail,
     meta: {
@@ -83,7 +83,7 @@ const routes = [
     }
   },
   {
-    path: '/reset-password',
+    path: '/#reset-password',
     name: 'reset-password',
     component: ResetPassword,
     meta: {
@@ -101,7 +101,7 @@ const routes = [
     }
   },
   {
-    path: '/dashboard',
+    path: '/#dashboard',
     name: 'dashboard',
     component: Dashboard,
     meta: {
