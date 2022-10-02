@@ -10,35 +10,34 @@
   "dependencies": {
     "@vue/cli-plugin-babel": "~4.5.0",
     "@vue/cli-plugin-eslint": "~4.5.0",
-    "@vue/cli-service": "~4.5.0",  
+    "@vue/cli-service": "~4.5.0",
     "chart.js": "^2.9.4",
     "core-js": "^3.6.5",
-    "sass": "^1.43.4",
-    "sass-loader": "^10.1.1",
     "node-sass": "^7.0.3",
+    "sass": "^1.43.4",
     "vue": "^2.6.11",
     "vue-chartjs": "^3.5.1",
     "vue-cryptojs": "^2.1.6",
     "vue-html2pdf": "^1.8.0",
     "vue-moments-ago": "^0.2.0",
     "vue-native-color-picker": "^1.2.0",
-    "vue2-daterange-picker": "^0.6.8",
-    "webpack": "^5.74.0"
+    "vue2-daterange-picker": "^0.6.8"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.5.0",
     "@vue/cli-plugin-eslint": "~4.5.0",
-    "@vue/cli-service": "~4.5.0",    
+    "@vue/cli-service": "~4.5.0",
     "babel-eslint": "^10.1.0",
     "css-loader": "^3.6.0",
     "eslint": "^6.7.2",
     "eslint-plugin-vue": "^6.2.2",
-    "sass": "^1.43.4",
-    "sass-loader": "^10.1.1",
     "node-sass": "^7.0.3",
+    "sass": "^1.43.4",
+    "sass-loader": "^10.3.1",
     "vue-router": "^3.5.3",
     "vue-template-compiler": "^2.6.11",
-    "vuex": "^3.6.2"
+    "vuex": "^3.6.2",
+    "webpack": "^4.46.0"
   },
   "eslintConfig": {
     "root": true,
