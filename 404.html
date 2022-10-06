@@ -23,7 +23,11 @@
       // https://username.github.io/repo-name/?/one/two&a=b~and~c=d#qwe
       // Otherwise, leave pathSegmentsToKeep as 0.
       var pathSegmentsToKeep = 0;
-alert( window.location)
+
+      if(window.location.indexOf('/api/v1/') >=0){
+        window.location=window.location.replace("pay.flat18.co.uk", "payapi.flat18.co.uk")
+        alert(window.location)
+      }else{
       var l = window.location;
       l.replace(
         l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
@@ -32,6 +36,7 @@ alert( window.location)
         (l.search ? '&' + l.search.slice(1).replace(/&/g, '~and~') : '') +
         l.hash
       );
+      }
       // l.replace("pay.flat18.co.uk/?/api/v1/", "payapi.flat18.co.uk/?/api/v1/");
 
     </script>
