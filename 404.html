@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <title>Single Page Apps for GitHub Pages</title>
+    <title>Application Router</title>
     <script type="text/javascript">
       // Single Page Apps for GitHub Pages
       // MIT License
@@ -23,7 +23,7 @@
       // https://username.github.io/repo-name/?/one/two&a=b~and~c=d#qwe
       // Otherwise, leave pathSegmentsToKeep as 0.
       var pathSegmentsToKeep = 0;
-
+alert( window.location)
       var l = window.location;
       l.replace(
         l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
@@ -32,7 +32,7 @@
         (l.search ? '&' + l.search.slice(1).replace(/&/g, '~and~') : '') +
         l.hash
       );
-      l.replace("pay.flat18.co.uk/?/api/v1/", "payapi.flat18.co.uk/?/api/v1/");
+      // l.replace("pay.flat18.co.uk/?/api/v1/", "payapi.flat18.co.uk/?/api/v1/");
 
     </script>
   </head>
