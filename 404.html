@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <title>Application Router</title>
+    <title>Single Page Apps for GitHub Pages</title>
     <script type="text/javascript">
       // Single Page Apps for GitHub Pages
       // MIT License
@@ -24,21 +24,18 @@
       // Otherwise, leave pathSegmentsToKeep as 0.
       var pathSegmentsToKeep = 0;
 
-      if(window.location.indexOf('/api/v1/') >=0){
-        var newLoc =window.location
-        newLoc.replace("pay.flat18.co.uk", "payapi.flat18.co.uk")
-        alert(newLoc)
-        window.location = newLoc
-      }else{
       var l = window.location;
       l.replace(
-        l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
-        l.pathname.split('/').slice(0, 1 + pathSegmentsToKeep).join('/') + '/?/' +
-        l.pathname.slice(1).split('/').slice(pathSegmentsToKeep).join('/').replace(/&/g, '~and~') +
-        (l.search ? '&' + l.search.slice(1).replace(/&/g, '~and~') : '') +
-        l.hash
+        l.protocol + '//payapi.flat18.co.uk' + (l.port ? ':' + l.port : '') + l.pathname
       );
-      }
+      // l.replace(
+      //   l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
+      //   l.pathname.split('/').slice(0, 1 + pathSegmentsToKeep).join('/') + '/?/' +
+      //   l.pathname.slice(1).split('/').slice(pathSegmentsToKeep).join('/').replace(/&/g, '~and~') +
+      //   (l.search ? '&' + l.search.slice(1).replace(/&/g, '~and~') : '') +
+      //   l.hash
+      // );
+
     </script>
   </head>
   <body>
