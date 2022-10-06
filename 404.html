@@ -25,8 +25,9 @@
       var pathSegmentsToKeep = 0;
 
       if(window.location.indexOf('/api/v1/') >=0){
-        window.location=window.location.replace("pay.flat18.co.uk", "payapi.flat18.co.uk")
-        alert(window.location)
+        let newLoc =window.location.replace("pay.flat18.co.uk", "payapi.flat18.co.uk")
+        alert(newLoc)
+        window.location = newLoc
       }else{
       var l = window.location;
       l.replace(
