@@ -45,7 +45,7 @@
       <h1>Start Accepting Crypto Payments Online for FREE 🎉</h1>
       <p>F18 Pay is completely free to use.<br>We <b><u>NEVER</u></b> use KYC or cookies.</p>
       <div class="flex">
-        <a class="btn pri" href="signup">Get Started<i class="fas fa-arrow-right"></i></a>
+        <a class="btn pri" href="/#/signup">Get Started<i class="fas fa-arrow-right"></i></a>
         <a class="btn sec" href="#more">Learn More<i class="fas fa-arrow-down"></i></a>
       </div>
     </div>
