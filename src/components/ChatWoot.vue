@@ -1,9 +1,14 @@
+<template>
+  <div></div>
+</template>
+
 <script>
 window.chatwootSettings = {
   hideMessageBubble: false,
   position: "right",
   locale: "en",
   type: "expanded_bubble",
+  launcherTitle:"Get support"
 };
 
       (function(d,t) {
