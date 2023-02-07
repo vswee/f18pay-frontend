@@ -47,7 +47,7 @@
               </template>
             </div>
             <div></div>
-            <div class="sidebar-shortcuts" v-if="activeStore && activeStore!=='false'">
+            <div class="sidebar-shortcuts" v-if="activeStore && activeStore!=='false' && stores[0]?.store_id">
               <a :class="storeView=='overview'?'sidebar-shortcut active-bar':'sidebar-shortcut'" @click="summaryView()"><i class="fas fa-chart-area"></i><span class="collapsible">Store Overview</span></a>
 
               <a :class="storeView=='settings'?'sidebar-shortcut active-bar':'sidebar-shortcut'" @click="settingsView()"><i class="fas fa-sliders-h"></i><span class="collapsible">Manage Store</span></a>
@@ -62,7 +62,7 @@
             </div>
             <div></div>
             <div class="sidebar-shortcuts">
-              <a class="sidebar-shortcut" @click="newStore()"><i class="fas fa-plus"></i><span class="collapsible">Create New Store</span></a>
+              <a class="sidebar-shortcut" @click="newStore()"><i class="fas fa-plus"></i><span class="collapsible">Create {{stores.length==0?'First':'New'}} Store</span></a>
             </div>
           </div>
         </div>

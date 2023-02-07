@@ -15,6 +15,7 @@
   --red: #db1641;
   --red-2: #fad8df;
   --white: #c2c3da;
+  --input-background: #1f232b;
   --shadow-5: rgba(0, 0, 0, 0.05);
   --shadow-10: rgba(0, 0, 0, 0.1);
   --shadow-20: rgba(0, 0, 0, 0.2);
@@ -49,6 +50,7 @@
       --green-2: #4af3a4;
 
       --screen: #d3ddff;
+      --input-background: #e6e9ec;
       --shadow-5: rgba(0, 0, 0, 0.01);
       --shadow-10: rgba(0, 0, 0, 0.05);
       --shadow-20: rgba(0, 0, 0, 0.075);
@@ -192,7 +194,7 @@ a {
   gap: 10px;
   justify-content: center;
 }
-.dashboard-root{
+.dashboard-root {
   .flex {
     position: sticky;
     top: 10px;
@@ -216,6 +218,20 @@ a {
   }
 }
 
+.dark {
+  .btn {
+    &:not(.sec),
+    &:not(.severe),
+    &:not(.good) {
+      color: var(--white);
+    }
+    &.sec {
+      &:hover {
+        color: var(--white);
+      }
+    }
+  }
+}
 .btn {
   padding: 10px 15px;
   border-radius: 5px;
@@ -333,4 +349,9 @@ a {
 
 .mono {
   font-family: "IBM Plex Mono", "Courier", monospace;
+}
+.help-info-block {
+  display: grid;
+  justify-items: start;
+  padding: 10px 30px;
 }

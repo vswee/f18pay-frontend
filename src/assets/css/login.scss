@@ -2,12 +2,12 @@ input,
 .input-placeholder {
   font-size: 1.1rem;
   font-family: "Rubik", "Helvetica Neue", "Helvetica", "Arial", "Font Awesome 5 Brands", "Font Awesome 5", sans-serif;
-  padding: 15px 0px;
+  padding: 12px 12px;
   border: none;
-  border-radius: 0px;
-  background: transparent, var(--primary);
+  border-radius: 5px;
+  background: var(--input-background);
   color: var(--white);
-  box-shadow: 0 2px 0 0 var(--white);
+  // box-shadow: 0 2px 0 0 var(--white);
   line-break: anywhere;
   max-width: 500px;
 }

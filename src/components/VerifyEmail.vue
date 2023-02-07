@@ -65,6 +65,7 @@ export default {
       session: 'session',
       username: 'user',
       keyivId: 'keyivId',
+      keyivIfIDSet: 'keyiv',
     })
   },
   methods: {
@@ -199,12 +200,15 @@ export default {
         .then((data) => {
           this.serverMessage = data.debug ? data.debug : false;
           this.keyiv = data.keyiv
+          this.keyivId = data.keyivId
           this.$store.commit("setKeyivId", [data.keyivId, data.keyiv]);
         })
         .catch((error) => {
           this.message = this.message + ' \nError: ' + error + '\n';
           console.error("Error:", error);
         });
+    }else{
+      this.keyiv = this.keyivIfIDSet
     }
   },
 };

@@ -579,7 +579,7 @@ export default {
 
     &.active {
       td {
-        background: var(--black);
+        background: var(--dark);
       }
 
       .border-top-left {
