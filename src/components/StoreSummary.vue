@@ -13,7 +13,7 @@
 </template>
 
 <script>
-import BarChart from '@/components/BarGraph'
+import BarChart from '@/components/BarGraph.vue'
 import {
   mapGetters
 } from 'vuex';
@@ -75,10 +75,10 @@ export default {
         string: this.user,
         keyiv: this.keyiv
       });
-      await fetch("https://f18pay-api.flat18.co.uk/store-invoice-values", {
+      await fetch(import.meta.env.VITE_APPLICATION_ENDPOINT + "/store-invoice-values", {
           method: 'POST',
           headers: {
-            'Content-Type': 'multipart/form-data'
+            'Content-Type': 'application/json'
           },
           body: JSON.stringify({
             username: username,

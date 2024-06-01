@@ -33,13 +33,10 @@
 </template>
 
 <script>
-import Vue from "vue";
-import VueCryptojs from "vue-cryptojs";
 import {
   mapGetters
 } from 'vuex';
 
-Vue.use(VueCryptojs);
 
 export default {
   name: "Signup",
@@ -66,11 +63,11 @@ export default {
   methods: {
     encrypt(string) {
       let key = this.keyiv.substr(0, 32);
-      key = this.CryptoJS.SHA256(key).toString(this.CryptoJS.enc.Hex).substr(0, 32);
+      key = this.$CryptoJS.SHA256(key).toString(this.$CryptoJS.enc.Hex).substr(0, 32);
       let iv = this.keyiv.substr(33);
-      iv = this.CryptoJS.SHA256(iv).toString(this.CryptoJS.enc.Hex).substr(0, 16);
-      const encrypted = this.CryptoJS.AES.encrypt(string, this.CryptoJS.enc.Utf8.parse(key), {
-        iv: this.CryptoJS.enc.Utf8.parse(iv),
+      iv = this.$CryptoJS.SHA256(iv).toString(this.$CryptoJS.enc.Hex).substr(0, 16);
+      const encrypted = this.$CryptoJS.AES.encrypt(string, this.$CryptoJS.enc.Utf8.parse(key), {
+        iv: this.$CryptoJS.enc.Utf8.parse(iv),
       }).toString();
       return encrypted;
     },
@@ -81,10 +78,10 @@ export default {
         this.message = "Please enter your email address"
       } else {
         const username = this.encrypt(this.username);
-        fetch('https://f18pay-api.flat18.co.uk/check-username-for-password-reset', {
+        fetch(import.meta.env.VITE_APPLICATION_ENDPOINT + "/check-username-for-password-reset", {
             method: 'POST', // or 'PUT'
             headers: {
-              'Content-Type': 'multipart/form-data',
+              'Content-Type': 'application/json',
             },
             body: JSON.stringify({
               username: username,
@@ -112,10 +109,10 @@ export default {
         const encrypted = this.encrypt(this.password);
         const encrypted2 = this.encrypt(this.password2);
         const username = this.encrypt(this.username);
-        fetch('https://f18pay-api.flat18.co.uk/register-new-user', {
+        fetch(import.meta.env.VITE_APPLICATION_ENDPOINT + "/register-new-user", {
             method: 'POST',
             headers: {
-              'Content-Type': 'multipart/form-data',
+              'Content-Type': 'application/json',
             },
             body: JSON.stringify({
               username: username,
@@ -154,7 +151,7 @@ export default {
       this.$router.push('dashboard');
       return
     }
-    fetch("https://f18pay-api.flat18.co.uk/get-keyiv", {
+    fetch(import.meta.env.VITE_APPLICATION_ENDPOINT + "/get-keyiv", {
         headers: {
           "Content-Type": "multipart/form-data",
         },

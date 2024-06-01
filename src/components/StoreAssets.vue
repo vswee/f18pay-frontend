@@ -264,10 +264,10 @@ export default {
         string: encodeURIComponent(encodeURI(this.storeName)),
         keyiv: this.keyiv
       });
-      await fetch("https://f18pay-api.flat18.co.uk/store-settings-async", {
+      await fetch(import.meta.env.VITE_APPLICATION_ENDPOINT + "/store-settings-async", {
           method: 'POST',
           headers: {
-            'Content-Type': 'multipart/form-data'
+            'Content-Type': 'application/json'
           },
           body: JSON.stringify({
             username: username,

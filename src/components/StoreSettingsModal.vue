@@ -173,10 +173,10 @@ export default {
         string: this.code,
         keyiv: this.keyiv
       });
-      await fetch("https://f18pay-api.flat18.co.uk/store-management-request-keys-verify-code", {
+      await fetch(import.meta.env.VITE_APPLICATION_ENDPOINT + "/store-management-request-keys-verify-code", {
           method: 'POST',
           headers: {
-            'Content-Type': 'multipart/form-data'
+            'Content-Type': 'application/json'
           },
           body: JSON.stringify({
             username: username,
@@ -244,10 +244,10 @@ export default {
         string: this.email,
         keyiv: this.keyiv
       });
-      await fetch("https://f18pay-api.flat18.co.uk/store-settings-bulk", {
+      await fetch(import.meta.env.VITE_APPLICATION_ENDPOINT + "/store-settings-bulk", {
           method: 'POST',
           headers: {
-            'Content-Type': 'multipart/form-data'
+            'Content-Type': 'application/json'
           },
           body: JSON.stringify({
             username: username,

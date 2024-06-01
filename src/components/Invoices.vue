@@ -61,8 +61,7 @@
         <th>Value</th>
         <th>Status</th>
       </tr>
-      <template v-for="(invoice, key) of invoices">
-        <tr :class="active==key?'list-item active':'list-item'" @click="active=key" :key="key">
+        <tr v-for="(invoice, key) of invoices" :class="active==key?'list-item active':'list-item'" @click="active=key" :key="key">
           <td class="mono border-top-left">
             <div>
               <span>{{(key+range)}}</span>
@@ -76,7 +75,7 @@
           <td>
             <div>
               <span>
-                <vue-moments-ago prefix="" suffix="ago" :date="invoice.created" lang="en" /></span>
+                <timeago prefix="" suffix="ago" :datetime="invoice.created" lang="en" /></span>
               <span v-if="active==key"><small>{{(invoice.created)}} [UTC]</small></span>
             </div>
           </td>
@@ -92,7 +91,7 @@
             </div>
           </td>
         </tr>
-        <tr v-if="active==key" class="list-item active" :key="key+'ex'">
+        <tr v-for="(invoice, key) of invoices" v-if="active==key" class="list-item active" :key="key+'ex'">
           <td colSpan="5" class="border-bottom-right border-bottom-left">
             <div class="inline-table-notes">
               <label v-if="invoice.reqToken">Attached to Payment Request:</label><span v-if="invoice.reqToken">{{invoice.reqToken.substr(0,6)}}</span>
@@ -106,44 +105,52 @@
             </div>
           </td>
         </tr>
-      </template>
-    </table>
-  </div>
-  <div>
-    <vue-html2pdf :show-layout="false" :float-layout="true" :enable-download="true" :preview-modal="false" :filename="reportName" :pdf-quality="2" :manual-pagination="true" pdf-format="a4" pdf-orientation="portrait" pdf-content-width="800px" @progress="onProgress($event)" @hasStartedGeneration="working=true" @hasGenerated="working=false" ref="html2Pdf">
-      <section slot="pdf-content" class="pdf-content">
-        <div>
-          <h1><svg class="f18" clip-rule="evenodd" fill-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="2" viewBox="0 0 158 201" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-              <clipPath id="a">
-                <path clip-rule="evenodd" d="m100 10.547c49.37 0 89.453 40.083 89.453 89.453 0 93.284-109.752 139.496-157.332 155.146-5.028 1.597-10.516.699-14.774-2.416s-6.774-8.074-6.774-13.35c-.026-44.211-.026-139.38-.026-139.38 0-49.37 40.083-89.453 89.453-89.453z" />
-              </clipPath>
-              <g fill="none" transform="matrix(.783337 0 0 1 -354.093 -485.418639)">
-                <path d="m452.032 485.419h200.428v200.428h-200.428z" />
-                <g transform="matrix(.887335 0 0 .695083 463.512 491.096)">
-                  <path d="m100 10.547c49.37 0 89.453 40.083 89.453 89.453 0 93.284-109.752 139.496-157.332 155.146-5.028 1.597-10.516.699-14.774-2.416s-6.774-8.074-6.774-13.35c-.026-44.211-.026-139.38-.026-139.38 0-49.37 40.083-89.453 89.453-89.453z" />
-                  <g style="opacity:.4" clip-path="url(#a)" stroke="var(--accent)">
-                    <path d="m152.859 88.576c0 36.334-29.498 65.832-65.832 65.832-18.819 0-35.804-7.914-47.807-20.592" stroke-width="12.52" transform="matrix(1.8383 0 0 1.8383 -83.7675 -82.1042)" />
-                    <circle cx="87.027" cy="88.576" r="65.832" stroke-width="23.27" transform="matrix(.989007 0 0 .989007 -4.79082 -6.87718)" />
-                  </g>
-                  <path d="m100 10.547c49.37 0 89.453 40.083 89.453 89.453 0 93.284-109.752 139.496-157.332 155.146-5.028 1.597-10.516.699-14.774-2.416s-6.774-8.074-6.774-13.35c-.026-44.211-.026-139.38-.026-139.38 0-49.37 40.083-89.453 89.453-89.453z" stroke="var(--accent)" stroke-width="23.02" />
+</table>
+</div>
+<div>
+  <vue-html2pdf :show-layout="false" :float-layout="true" :enable-download="true" :preview-modal="false"
+    :filename="reportName" :pdf-quality="2" :manual-pagination="true" pdf-format="a4" pdf-orientation="portrait"
+    pdf-content-width="800px" @progress="onProgress($event)" @hasStartedGeneration="working=true"
+    @hasGenerated="working=false" ref="html2Pdf">
+    <section slot="pdf-content" class="pdf-content">
+      <div>
+        <h1><svg class="f18" clip-rule="evenodd" fill-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="2"
+            viewBox="0 0 158 201" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+            <clipPath id="a">
+              <path clip-rule="evenodd"
+                d="m100 10.547c49.37 0 89.453 40.083 89.453 89.453 0 93.284-109.752 139.496-157.332 155.146-5.028 1.597-10.516.699-14.774-2.416s-6.774-8.074-6.774-13.35c-.026-44.211-.026-139.38-.026-139.38 0-49.37 40.083-89.453 89.453-89.453z" />
+            </clipPath>
+            <g fill="none" transform="matrix(.783337 0 0 1 -354.093 -485.418639)">
+              <path d="m452.032 485.419h200.428v200.428h-200.428z" />
+              <g transform="matrix(.887335 0 0 .695083 463.512 491.096)">
+                <path
+                  d="m100 10.547c49.37 0 89.453 40.083 89.453 89.453 0 93.284-109.752 139.496-157.332 155.146-5.028 1.597-10.516.699-14.774-2.416s-6.774-8.074-6.774-13.35c-.026-44.211-.026-139.38-.026-139.38 0-49.37 40.083-89.453 89.453-89.453z" />
+                <g style="opacity:.4" clip-path="url(#a)" stroke="var(--accent)">
+                  <path d="m152.859 88.576c0 36.334-29.498 65.832-65.832 65.832-18.819 0-35.804-7.914-47.807-20.592"
+                    stroke-width="12.52" transform="matrix(1.8383 0 0 1.8383 -83.7675 -82.1042)" />
+                  <circle cx="87.027" cy="88.576" r="65.832" stroke-width="23.27"
+                    transform="matrix(.989007 0 0 .989007 -4.79082 -6.87718)" />
                 </g>
+                <path
+                  d="m100 10.547c49.37 0 89.453 40.083 89.453 89.453 0 93.284-109.752 139.496-157.332 155.146-5.028 1.597-10.516.699-14.774-2.416s-6.774-8.074-6.774-13.35c-.026-44.211-.026-139.38-.026-139.38 0-49.37 40.083-89.453 89.453-89.453z"
+                  stroke="var(--accent)" stroke-width="23.02" />
               </g>
-            </svg> F18Pay</h1>
-          Generated Report
-          <br><i>by: </i>{{user}}
-          <br><i>on: </i>{{dateTime()}}
-          <br><i>for store: </i>{{_decode(this.currentStore.store_name)}}
-          <br><br>
-          <table class="print-view">
-            <tr>
-              <th>#</th>
-              <th>ID</th>
-              <th>Created</th>
-              <th>Value</th>
-              <th>Status</th>
-            </tr>
-            <template v-for="(invoice, key) of invoices">
-              <tr :key="key" :class="key%6==5?'html2pdf__page-break':''">
+            </g>
+          </svg> F18Pay</h1>
+        Generated Report
+        <br><i>by: </i>{{user}}
+        <br><i>on: </i>{{dateTime()}}
+        <br><i>for store: </i>{{_decode(this.currentStore.store_name)}}
+        <br><br>
+        <table class="print-view">
+          <tr>
+            <th>#</th>
+            <th>ID</th>
+            <th>Created</th>
+            <th>Value</th>
+            <th>Status</th>
+          </tr>
+              <tr v-for="(invoice, key) of invoices" :key="key" :class="key%6==5?'html2pdf__page-break':''">
                 <td>
                   <div>
                     <span>{{(key+range)}}</span>
@@ -185,12 +192,11 @@
                   </div>
                 </td>
               </tr>
-            </template>
-          </table>
-        </div>
-      </section>
-    </vue-html2pdf>
-  </div>
+</table>
+</div>
+</section>
+</vue-html2pdf>
+</div>
 </div>
 </template>
 
@@ -198,13 +204,11 @@
 import {
   mapGetters
 } from 'vuex';
-import VueMomentsAgo from 'vue-moments-ago'
 import DateRangePicker from 'vue2-daterange-picker'
 import VueHtml2pdf from 'vue-html2pdf'
 export default {
   name: "StoreAssets",
   components: {
-    VueMomentsAgo,
     DateRangePicker,
     VueHtml2pdf,
   },
@@ -229,7 +233,7 @@ export default {
         open: false,
         selected: false,
         options: ['expired', 'confirmed', 'receiving', 'partial', '1 confirmation', '2 confirmations']
-      }, ],
+      },],
     }
   },
   computed: {
@@ -374,19 +378,19 @@ export default {
         string: encodeURIComponent(encodeURI(this.storeName)),
         keyiv: this.keyiv
       });
-      await fetch("https://f18pay-api.flat18.co.uk/store-invoice-statistics", {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'multipart/form-data'
-          },
-          body: JSON.stringify({
-            username: username,
-            storeName: storeName,
-            fingerprint: this.fingerprint,
-            keyivId: this.keyivId,
-            store_id: this.currentStore.store_id,
-          }),
-        })
+      await fetch(import.meta.env.VITE_APPLICATION_ENDPOINT + "/store-invoice-statistics", {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          username: username,
+          storeName: storeName,
+          fingerprint: this.fingerprint,
+          keyivId: this.keyivId,
+          store_id: this.currentStore.store_id,
+        }),
+      })
         .then((response) => response.json())
         .then(async (data) => {
           if (data.proceed == true) {
@@ -424,8 +428,8 @@ export default {
         var mm = this.getMonth() + 1; // getMonth() is zero-based
         var dd = this.getDate();
         return [this.getFullYear(),
-          (mm > 9 ? '-' : '-0') + mm,
-          (dd > 9 ? '-' : '-0') + dd
+        (mm > 9 ? '-' : '-0') + mm,
+        (dd > 9 ? '-' : '-0') + dd
         ].join('');
       };
       let rangeStart = this.dateRange.startDate instanceof Date ? this.dateRange.startDate.yyyymmdd() : String(this.dateRange.startDate);
@@ -433,31 +437,31 @@ export default {
       let rangeEnd = this.dateRange.endDate instanceof Date ? this.dateRange.endDate.yyyymmdd() : String(this.dateRange.endDate);
       rangeEnd = rangeEnd.indexOf("T") >= 0 ? rangeEnd.split('T')[0] : (rangeEnd.indexOf(" ") >= 0 ? rangeEnd.split(' ')[0] : rangeEnd);
       let viewing = this.viewing; //==this.count?this.range:this.viewing;
-      await fetch("https://f18pay-api.flat18.co.uk/store-invoices", {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'multipart/form-data'
-          },
-          body: JSON.stringify({
-            username: username,
-            storeName: storeName,
-            fingerprint: this.fingerprint,
-            keyivId: this.keyivId,
-            store_id: storeId,
-            viewing: viewing,
-            filter: this.filter,
-            rangeStart: rangeStart,
-            rangeEnd: rangeEnd,
-          }),
-        })
+      await fetch(import.meta.env.VITE_APPLICATION_ENDPOINT + "/store-invoices", {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          username: username,
+          storeName: storeName,
+          fingerprint: this.fingerprint,
+          keyivId: this.keyivId,
+          store_id: storeId,
+          viewing: viewing,
+          filter: this.filter,
+          rangeStart: rangeStart,
+          rangeEnd: rangeEnd,
+        }),
+      })
         .then((response) => response.json())
         .then(async (data) => {
           if (data.proceed == true) {
             this.count = data.count;
             this.invoices = JSON.parse(await this.$store.dispatch('decrypt', {
-                string: data.invoices,
-                keyiv: this.keyiv
-              })),
+              string: data.invoices,
+              keyiv: this.keyiv
+            })),
               this.dateRange.endDate = data.now;
             this.working = false;
             this.spinning = false;
@@ -510,23 +514,23 @@ export default {
         string: invoice.status,
         keyiv: this.keyiv
       });
-      await fetch("https://f18pay-api.flat18.co.uk/invoice-check-status", {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'multipart/form-data'
-          },
-          body: JSON.stringify({
-            username: username,
-            fingerprint: this.fingerprint,
-            keyivId: this.keyivId,
-            address: address,
-            created: created,
-            id: id,
-            crypto: crypto,
-            value: value,
-            status: status,
-          }),
-        })
+      await fetch(import.meta.env.VITE_APPLICATION_ENDPOINT + "/invoice-check-status", {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          username: username,
+          fingerprint: this.fingerprint,
+          keyivId: this.keyivId,
+          address: address,
+          created: created,
+          id: id,
+          crypto: crypto,
+          value: value,
+          status: status,
+        }),
+      })
         .then((response) => response.json())
         .then(async (data) => {
           if (data.proceed == true) {
@@ -600,7 +604,7 @@ export default {
     }
   }
 
-  .vue-moments-ago {
+  .timeago {
     font-size: inherit;
   }
 

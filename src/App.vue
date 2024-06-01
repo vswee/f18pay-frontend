@@ -16,7 +16,7 @@ import Footer from './components/Footer.vue'
 import Header from './components/Header.vue'
 import Sidebar from './components/Sidebar.vue'
 import ChatWoot from "./components/ChatWoot.vue";
-import NewStoreModal from '@/components/NewStoreModal'
+import NewStoreModal from '@/components/NewStoreModal.vue'
 import {
   mapGetters
 } from 'vuex';

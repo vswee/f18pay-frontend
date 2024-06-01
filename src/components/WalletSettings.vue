@@ -70,7 +70,7 @@
 import {
   mapGetters
 } from 'vuex';
-import WalletSettingsModal from './WalletSettingsModal'
+import WalletSettingsModal from './WalletSettingsModal.vue'
 export default {
   name: "WalletSettings",
   components: {
@@ -175,10 +175,10 @@ export default {
         string: this.currentStore.store_id,
         keyiv: this.keyiv
       });
-      await fetch("https://f18pay-api.flat18.co.uk/store-management-request-keys", {
+      await fetch(import.meta.env.VITE_APPLICATION_ENDPOINT + "/store-management-request-keys", {
           method: 'POST',
           headers: {
-            'Content-Type': 'multipart/form-data'
+            'Content-Type': 'application/json'
           },
           body: JSON.stringify({
             username: username,
@@ -229,10 +229,10 @@ export default {
         string: this.zpub,
         keyiv: this.keyiv
       });
-      await fetch("https://f18pay-api.flat18.co.uk/store-settings-change-zpub", {
+      await fetch(import.meta.env.VITE_APPLICATION_ENDPOINT + "/store-settings-change-zpub", {
           method: 'POST',
           headers: {
-            'Content-Type': 'multipart/form-data'
+            'Content-Type': 'application/json'
           },
           body: JSON.stringify({
             username: username,
@@ -280,10 +280,10 @@ export default {
         string: this.zpub,
         keyiv: this.keyiv
       });
-      await fetch("https://f18pay-api.flat18.co.uk/store-settings-confirm-zpub-addresses", {
+      await fetch(import.meta.env.VITE_APPLICATION_ENDPOINT + "/store-settings-confirm-zpub-addresses", {
           method: 'POST',
           headers: {
-            'Content-Type': 'multipart/form-data'
+            'Content-Type': 'application/json'
           },
           body: JSON.stringify({
             username: username,

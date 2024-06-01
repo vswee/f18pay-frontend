@@ -126,8 +126,7 @@
         <th>Value</th>
         <th>Status</th>
       </tr>
-      <template v-for="(request, key) of requests">
-        <tr :class="active==key?'list-item active':'list-item'" @click="active=key" :key="key">
+        <tr v-for="(request, key) of requests" :class="active==key?'list-item active':'list-item'" @click="active=key" :key="key">
           <td class="mono border-top-left">
             <div>
               <span>{{(key+range)}}</span>
@@ -141,7 +140,7 @@
           <td>
             <div>
               <span>
-                <vue-moments-ago prefix="" suffix="ago" :date="request.created" lang="en" /></span>
+                <timeago prefix="" suffix="ago" :datetime="request.created" lang="en" /></span>
               <span v-if="active==key"><small>{{(request.created)}} [UTC]</small></span>
             </div>
           </td>
@@ -156,7 +155,7 @@
             </div>
           </td>
         </tr>
-        <tr v-if="active==key" class="list-item active" :key="key+'ex'">
+        <tr v-for="(request, key) of requests" v-if="active==key" class="list-item active" :key="key+'ex'">
           <td colSpan="5" class="border-bottom-right border-bottom-left">
             <div class="inline-table-notes">
 
@@ -169,7 +168,6 @@
             </div>
           </td>
         </tr>
-      </template>
     </table>
   </div>
 
@@ -180,12 +178,10 @@
 import {
   mapGetters
 } from 'vuex';
-import VueMomentsAgo from 'vue-moments-ago'
 import DateRangePicker from 'vue2-daterange-picker'
 export default {
   name: "PaymentRequest",
   components: {
-    VueMomentsAgo,
     DateRangePicker,
   },
   data() {
@@ -420,10 +416,10 @@ export default {
           keyiv: this.keyiv
         });
 
-        await fetch("https://f18pay-api.flat18.co.uk/store-requests-create-new", {
+        await fetch(import.meta.env.VITE_APPLICATION_ENDPOINT + "/store-requests-create-new", {
             method: 'POST',
             headers: {
-              'Content-Type': 'multipart/form-data'
+              'Content-Type': 'application/json'
             },
             body: JSON.stringify({
               username: username,
@@ -498,10 +494,10 @@ export default {
         string: this.currentStore.store_id,
         keyiv: this.keyiv
       });
-      await fetch("https://f18pay-api.flat18.co.uk/store-requests-pre-populate", {
+      await fetch(import.meta.env.VITE_APPLICATION_ENDPOINT + "/store-requests-pre-populate", {
           method: 'POST',
           headers: {
-            'Content-Type': 'multipart/form-data'
+            'Content-Type': 'application/json'
           },
           body: JSON.stringify({
             username: username,
@@ -568,10 +564,10 @@ export default {
       let rangeEnd = this.dateRange.endDate instanceof Date ? this.dateRange.endDate.yyyymmdd() : String(this.dateRange.endDate);
       rangeEnd = rangeEnd.indexOf("T") >= 0 ? rangeEnd.split('T')[0] : (rangeEnd.indexOf(" ") >= 0 ? rangeEnd.split(' ')[0] : rangeEnd);
       let viewing = this.viewing; //==this.count?this.range:this.viewing;
-      await fetch("https://f18pay-api.flat18.co.uk/store-requests", {
+      await fetch(import.meta.env.VITE_APPLICATION_ENDPOINT + "/store-requests", {
           method: 'POST',
           headers: {
-            'Content-Type': 'multipart/form-data'
+            'Content-Type': 'application/json'
           },
           body: JSON.stringify({
             username: username,
@@ -641,10 +637,10 @@ export default {
         string: request.status,
         keyiv: this.keyiv
       });
-      await fetch("https://f18pay-api.flat18.co.uk/request-check-status", {
+      await fetch(import.meta.env.VITE_APPLICATION_ENDPOINT + "/request-check-status", {
           method: 'POST',
           headers: {
-            'Content-Type': 'multipart/form-data'
+            'Content-Type': 'application/json'
           },
           body: JSON.stringify({
             username: username,
@@ -730,7 +726,7 @@ export default {
     }
   }
 
-  .vue-moments-ago {
+  .timeago {
     font-size: inherit;
   }
 
