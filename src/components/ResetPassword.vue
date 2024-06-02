@@ -8,7 +8,7 @@
       <label for="username">email</label>
       <input v-model="username" type="email" placeholder="email@example.com" v-on:keyup.enter="checkUsername()" />
       <div class="flex">
-        <router-link :to="{name: 'login'}" title="Log in to your account" class="btn sec"><i class="fas fa-arrow-circle-left"></i>Log in</router-link>
+        <router-link :to="{name: 'Login'}" title="Log in to your account" class="btn sec"><i class="fas fa-arrow-circle-left"></i>Log in</router-link>
         <a class="btn" @click="checkUsername()">Next<i class="fas fa-arrow-right"></i></a>
       </div>
     </div>
@@ -172,5 +172,5 @@ export default {
 </script>
 
 <style lang="scss">
-@import "../assets/css/login.scss";
+@import "@/assets/css/login.scss";
 </style>

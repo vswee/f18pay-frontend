@@ -5,116 +5,25 @@ import Signup from '@/components/Signup.vue';
 import VerifyEmail from '@/components/VerifyEmail.vue';
 import ResetPassword from '@/components/ResetPassword.vue';
 import Dashboard from '@/components/Dashboard.vue';
+import StoreSummary from '@/components/stores-views/StoreSummary.vue';
+import StoreSettings from '@/components/stores-views/StoreSettings.vue';
+import WalletSettings from '@/components/stores-views/WalletSettings.vue';
+import StoreAssets from '@/components/stores-views/StoreAssets.vue';
+import Invoices from '@/components/stores-views/Invoices.vue';
+import PaymentRequest from '@/components/stores-views/PaymentRequest.vue';
 
 const routes = [
+  { path: '/', name: 'Home', component: Home, meta: { title: 'Home', description: 'Welcome to our application!' } },
   {
-    path: '/',
-    name: 'home',
-    component: Home,
-    meta: {
-      title: 'Home',
-      metaTags: [
-        {
-          name: 'description',
-          content: 'Placeholder'
-        },
-        {
-          property: 'og:description',
-          content: 'Placeholder'
-        }
-      ]
-    }
+    path: '/dashboard', name: 'Dashboard', component: Dashboard, children: [
+      { path: 'store-summary/:storeId10', name: 'StoreSummary', component: StoreSummary },
+      { path: 'manage-store/:storeId10', name: 'StoreSettings', component: StoreSettings },
+    ], meta: { title: 'Dashboard', description: 'Manage your dashboard efficiently!' }
   },
-  {
-    path: '/login',
-    name: 'login',
-    component: Login,
-    meta: {
-      title: 'Login',
-      metaTags: [
-        {
-          name: 'description',
-          content: 'Placeholder'
-        },
-        {
-          property: 'og:description',
-          content: 'Placeholder'
-        }
-      ]
-    }
-  },
-  {
-    path: '/signup',
-    name: 'signup',
-    component: Signup,
-    meta: {
-      title: 'Signup',
-      metaTags: [
-        {
-          name: 'description',
-          content: 'Placeholder'
-        },
-        {
-          property: 'og:description',
-          content: 'Placeholder'
-        }
-      ]
-    }
-  },
-  {
-    path: '/verify-email',
-    name: 'verify-email',
-    component: VerifyEmail,
-    meta: {
-      title: 'Verify Email',
-      metaTags: [
-        {
-          name: 'description',
-          content: 'Placeholder'
-        },
-        {
-          property: 'og:description',
-          content: 'Placeholder'
-        }
-      ]
-    }
-  },
-  {
-    path: '/reset-password',
-    name: 'reset-password',
-    component: ResetPassword,
-    meta: {
-      title: 'Verify Email',
-      metaTags: [
-        {
-          name: 'description',
-          content: 'Placeholder'
-        },
-        {
-          property: 'og:description',
-          content: 'Placeholder'
-        }
-      ]
-    }
-  },
-  {
-    path: '/dashboard',
-    name: 'dashboard',
-    component: Dashboard,
-    meta: {
-      title: 'Dashboard',
-      metaTags: [
-        {
-          name: 'description',
-          content: 'Placeholder'
-        },
-        {
-          property: 'og:description',
-          content: 'Placeholder'
-        }
-      ]
-    }
-  },
+  { path: '/login', name: 'Login', component: Login, meta: { title: 'Login', description: 'Login to access your account!' } },
+  { path: '/signup', name: 'Signup', component: Signup, meta: { title: 'Signup', description: 'Sign up and join our community!' } },
+  { path: '/verify-email', name: 'VerifyEmail', component: VerifyEmail, meta: { title: 'Verify Email', description: 'Verify your email address!' } },
+  { path: '/reset-password', name: 'ResetPassword', component: ResetPassword, meta: { title: 'Reset Password', description: 'Reset your password!' } },
 ];
 
 const router = createRouter({
@@ -122,7 +31,6 @@ const router = createRouter({
   routes,
 });
 
-// This callback runs before every route change, including on page load.
 router.beforeEach((to, from, next) => {
   // This goes through the matched routes from last to first, finding the closest route with a title.
   // eg. if we have /some/deep/nested/route and /some, /deep, and /nested have titles, nested's will be chosen.

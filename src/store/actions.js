@@ -1,5 +1,6 @@
 import crypto from 'crypto';
-import router from '@/router';
+import CryptoJS from 'crypto-js';
+// import router from '@/router';
 
 const actions = {
   headerUIAppend({ commit }, payload) {
@@ -20,21 +21,14 @@ const actions = {
   async encrypt({ commit }, payload) {
     let string = payload.string;
     let keyiv = payload.keyiv;
+    const key = CryptoJS.SHA256(keyiv.substring(0, 32)).toString(CryptoJS.enc.Hex).substring(0, 32);
+    const iv = CryptoJS.SHA256(keyiv.substring(33)).toString(CryptoJS.enc.Hex).substring(0, 16);
 
-    // Extract and hash the key
-    let key = String(keyiv).trim().substring(0, 32);
-    key = crypto.createHash('sha256').update(key).digest().slice(0, 32);
-
-    // Extract and hash the IV
-    let iv = String(keyiv).trim().substring(33);
-    iv = crypto.createHash('sha256').update(iv).digest().slice(0, 16);
-
-    // Create the cipher object
-    const cipher = crypto.createCipheriv('aes-256-cbc', key, iv);
-
-    // Encrypt the data
-    let encrypted = cipher.update(string, 'utf8', 'base64');
-    encrypted += cipher.final('base64');
+    const encrypted = CryptoJS.AES.encrypt(string, CryptoJS.enc.Utf8.parse(key), {
+      iv: CryptoJS.enc.Utf8.parse(iv),
+      mode: CryptoJS.mode.CBC,
+      padding: CryptoJS.pad.Pkcs7
+    }).toString();
 
     return encrypted;
   },
@@ -42,13 +36,16 @@ const actions = {
   async decrypt({ commit }, payload) {
     let string = payload.string;
     let keyiv = payload.keyiv;
-    const key = crypto.createHash('sha256').update(keyiv.slice(0, 32)).digest('hex').slice(0, 32);
-    const iv = crypto.createHash('sha256').update(keyiv.slice(33)).digest('hex').slice(0, 16);
+    const key = CryptoJS.SHA256(keyiv.substring(0, 32)).toString(CryptoJS.enc.Hex).substring(0, 32);
+    const iv = CryptoJS.SHA256(keyiv.substring(33)).toString(CryptoJS.enc.Hex).substring(0, 16);
 
-    const decipher = crypto.createDecipheriv('aes-256-cbc', key, iv);
-    let decrypted = decipher.update(string, 'base64', 'utf8');
-    decrypted += decipher.final('utf8');
-    return decrypted;
+    const decrypted = CryptoJS.AES.decrypt(string, CryptoJS.enc.Utf8.parse(key), {
+      iv: CryptoJS.enc.Utf8.parse(iv),
+      mode: CryptoJS.mode.CBC,
+      padding: CryptoJS.pad.Pkcs7
+    });
+
+    return CryptoJS.enc.Utf8.stringify(decrypted);
   },
 
   async init({ commit }) {
@@ -94,7 +91,7 @@ const actions = {
       commit("setSession", false);
       session = false;
       console.warn("No session. Missing parameters.");
-      if (!payload) { return session; }
+      if (!payload.flag) { return session; }
     }
 
     const username = await dispatch('encrypt', { string: user, keyiv: keyiv });
@@ -113,14 +110,17 @@ const actions = {
           commit("setSession", false);
           session = false;
         }
-        let route = router.currentRoute.name;
+        
+        const routeName = payload.route
+
         if (!session) {
-          switch (route) {
+          switch (routeName) {
             case 'login':
             case 'signup':
             case 'verify-email':
             case 'reset-password':
             case undefined:
+              console.log("ex expect to be here", routeName)
               break;
             case 'dashboard':
               commit("setAuthFailure", "Session expired. Please re-authenticate to continue.");
@@ -128,18 +128,18 @@ const actions = {
             case 'home':
               break;
             default:
-              router.push({ name: 'home' });
+              payload.router.push({ name: 'Home' });
           }
         }
         if (session) {
-          switch (route) {
+          switch (routeName) {
             case 'home':
             case 'login':
             case 'signup':
             case 'verify-email':
             case 'reset-password':
             case undefined:
-              router.push({ name: 'dashboard' });
+              payload.router.push({ name: 'Dashboard' });
               break;
             default:
           }
@@ -150,7 +150,7 @@ const actions = {
         console.error("Error:", error);
         session = false;
       });
-    if (!payload) { return session; }
+    if (!payload.flag) { return session; }
   },
 
   async getStores({ commit, getters, dispatch }) {

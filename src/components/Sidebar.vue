@@ -1,24 +1,25 @@
 <template>
-  <div id="sidebar" :style="'width:' + sidebarWidth + 'px'" v-if="session">
+  <div :id="'sidebar'" :style="'width:' + sidebarWidth + 'px'" v-if="session">
     <div class="sidebar-outer-wrapper-outer">
       <div class="sidebar-outer-wrapper">
         <div class="sidebar-inner-wrapper">
           <div class="sidebar-inner-wrapper-inner">
-            <div :class="sidebarCollapse ? 'sidebar' : 'sidebar collapse'">
-              <a :class="sidebarCollapse ? 'collapse-sidebar collapsed' : 'collapse-sidebar'" @click="toggleCollapse"
-                 :title="!sidebarCollapse ? 'Expand sidebar.' : 'Collapse sidebar.'"></a>
+            <div :class="[sidebarCollapse ? 'sidebar' : 'sidebar collapse']">
+              <a :class="[sidebarCollapse ? 'collapse-sidebar collapsed' : 'collapse-sidebar']"
+                @click="toggleCollapse()" :title="!sidebarCollapse ? 'Expand sidebar.' : 'Collapse sidebar.'"></a>
               <div
-                :class="storesDropdown ? 'sidebar-shortcuts dropdown open store-length-' + stores.length : 'sidebar-shortcuts dropdown store-length-' + stores.length"
-                @click="toggleStoresDropdown">
+                :class="[storesDropdown ? 'sidebar-shortcuts dropdown open store-length-' + stores.length : 'sidebar-shortcuts dropdown store-length-' + stores.length]"
+                @click="storesDropdown = !storesDropdown">
                 <template v-if="(!activeStore || activeStore === 'false') && stores.length > 1">
                   <div class="sidebar-shortcut active">
                     <i class="fas fa-hand-pointer"></i>
                     <span class="collapsible"><span class="text"> Select Store </span></span>
                   </div>
                 </template>
-                <div class="sidebar-shortcut active" v-for="store in stores" :key="store.store_id">
+                <template v-for="store in stores">
                   <template v-if="activeStore == store.store_id">
-                    <div @click="openStore(store.store_id)">
+                    <div class="sidebar-shortcut active" :key="store.store_id"
+                      @click="activeStore != store.store_id && (openStore(store.store_id))">
                       <span class="store-flag">
                         <i :style="'background: #' + store.store_colour"></i>
                         <i :style="'background: #' + store.store_accent_colour"></i>
@@ -29,38 +30,44 @@
                       </span>
                     </div>
                   </template>
-                  <div class="sidebar-shortcut" @click="openStore(store.store_id)"
-                       v-if="activeStore != store.store_id && storesDropdown">
-                    <span class="store-flag">
-                      <i :style="'background: #' + store.store_colour"></i>
-                      <i :style="'background: #' + store.store_accent_colour"></i>
-                    </span>
-                    <span class="collapsible">
-                      <span class="text">{{ decodedString(store.store_name) }}</span>
-                      <span :class="'badge ' + store.network">{{ store.network }}</span>
-                    </span>
-                  </div>
-                </div>
+                  <template v-if="activeStore != store.store_id && storesDropdown">
+                    <div class="sidebar-shortcut" :key="store.store_id"
+                      @click="activeStore != store.store_id && (openStore(store.store_id))">
+                      <span class="store-flag">
+                        <i :style="'background: #' + store.store_colour"></i>
+                        <i :style="'background: #' + store.store_accent_colour"></i>
+                      </span>
+                      <span class="collapsible">
+                        <span class="text">{{ decodedString(store.store_name) }}</span>
+                        <span :class="'badge ' + store.network">{{ store.network }}</span>
+                      </span>
+                    </div>
+                  </template>
+                </template>
               </div>
-              <div></div>
-              <div class="sidebar-shortcuts" v-if="activeStore && activeStore !== 'false' && stores[0]?.store_id">
-                <a :class="storeView === 'overview' ? 'sidebar-shortcut active-bar' : 'sidebar-shortcut'"
-                   @click="summaryView"><i class="fas fa-chart-area"></i><span class="collapsible">Store Overview</span></a>
-                <a :class="storeView === 'settings' ? 'sidebar-shortcut active-bar' : 'sidebar-shortcut'"
-                   @click="settingsView"><i class="fas fa-sliders-h"></i><span class="collapsible">Manage Store</span></a>
-                <a :class="storeView === 'wallet' ? 'sidebar-shortcut active-bar' : 'sidebar-shortcut'"
-                   @click="walletView"><i class="fas fa-wallet"></i><span class="collapsible">Wallet</span></a>
-                <a :class="storeView === 'buttons' ? 'sidebar-shortcut active-bar' : 'sidebar-shortcut'"
-                   @click="assetsView"><i class="fas fa-code"></i><span class="collapsible">Payment Assets</span></a>
-                <a :class="storeView === 'invoices' ? 'sidebar-shortcut active-bar' : 'sidebar-shortcut'"
-                   @click="invoicesView"><i class="fas fa-file-invoice"></i><span class="collapsible">Invoices</span></a>
-                <a :class="storeView === 'requests' ? 'sidebar-shortcut active-bar' : 'sidebar-shortcut'"
-                   @click="requestsView"><i class="fas fa-inbox"></i><span class="collapsible">Payment Requests</span></a>
+              <div class="sidebar-shortcuts" v-if="$route.params.storeId10 && stores[0]?.store_id">
+                <a :class="`${currentRouteName == 'StoreSummary' ? 'active-bar' : ''} sidebar-shortcut`"
+                  @click="openStore($route.params.storeId10)"><i class="fas fa-chart-area"></i><span
+                    class="collapsible">Store
+                    Overview</span></a>
+                <a :class="`${currentRouteName == 'StoreSettings' ? 'active-bar' : ''} sidebar-shortcut`"
+                  @click="settingsView()"><i class="fas fa-sliders-h"></i><span class="collapsible">Manage
+                    Store</span></a>
+                <a :class="`${currentRouteName == 'xxx' ? 'active-bar' : ''} sidebar-shortcut`"
+                  @click="walletView()"><i class="fas fa-wallet"></i><span class="collapsible">Wallet</span></a>
+                <a :class="`${currentRouteName=='xxx' ? 'active-bar':''} sidebar-shortcut`"
+                  @click="assetsView()"><i class="fas fa-code"></i><span class="collapsible">Payment Assets</span></a>
+                <a :class="`${currentRouteName=='xxx' ? 'active-bar':''} sidebar-shortcut`"
+                  @click="invoicesView()"><i class="fas fa-file-invoice"></i><span
+                    class="collapsible">Invoices</span></a>
+                <a :class="`${currentRouteName=='xxx' ? 'active-bar':''} sidebar-shortcut`"
+                  @click="requestsView()"><i class="fas fa-inbox"></i><span class="collapsible">Payment
+                    Requests</span></a>
               </div>
-              <div></div>
               <div class="sidebar-shortcuts">
-                <a class="sidebar-shortcut" @click="newStore"><i class="fas fa-plus"></i><span
-                  class="collapsible">Create {{ stores.length == 0 ? 'First' : 'New' }} Store</span></a>
+                <a class="sidebar-shortcut" @click="newStore()"><i class="fas fa-plus"></i><span
+                    class="collapsible">Create
+                    {{ stores.length == 0 ? 'First' : 'New' }} Store</span></a>
               </div>
             </div>
           </div>
@@ -71,8 +78,11 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted, onBeforeMount } from 'vue';
+import { ref, computed, watch, onMounted, onBeforeMount, reactive } from 'vue';
 import { useStore } from 'vuex';
+import { useRoute, useRouter } from 'vue-router';
+const route = useRoute();
+const router = useRouter()
 
 const store = useStore();
 const storesDropdown = ref(false);
@@ -83,6 +93,7 @@ const stores = computed(() => store.getters.stores);
 const sidebarCollapse = computed(() => store.getters.sidebarCollapse);
 const activeStore = computed(() => store.getters.activeStore);
 const storeView = computed(() => store.getters.storeView);
+const currentRouteName = computed(() => route.name);
 
 const toggleStoresDropdown = () => {
   storesDropdown.value = !storesDropdown.value;
@@ -109,20 +120,21 @@ const toggleCollapse = () => {
   }
 };
 
-const openStore = (id) => {
-  store.commit("setActiveStore", id);
-  store.commit("setStoreView", 'overview');
-  store.commit("setViewTitle", 'Store Overview');
-};
+const state = reactive({
+  storeId10: String,
+})
 
-const summaryView = () => {
+const openStore = (id) => {
+  state.storeId10 = id.substring(0, 5) + id.substring(id.length - 5)
   store.commit("setStoreView", 'overview');
   store.commit("setViewTitle", 'Store Overview');
+  router.push({ name: 'StoreSummary', params: { storeId10: state.storeId10 } })
 };
 
 const settingsView = () => {
   store.commit("setStoreView", 'settings');
   store.commit("setViewTitle", 'Manage Store');
+  router.push({ name: 'StoreSettings', params: { storeId10: state.storeId10 } })
 };
 
 const walletView = () => {
@@ -150,7 +162,7 @@ const newStore = () => {
 };
 
 onBeforeMount(async () => {
-  let session = await store.dispatch('verifySession');
+  let session = await store.dispatch('verifySession', { flag: false, route: route.name, router: router });
   if (!session) {
     console.log("NO SESSION");
     store.commit("setStores", false);
@@ -173,6 +185,7 @@ watch([storesDropdown, sidebarCollapse], () => {
   setSidebarWidth();
 });
 </script>
+
 <style lang="scss" scoped>
 #sidebar {
   transition: 0.05s linear;
@@ -323,7 +336,7 @@ watch([storesDropdown, sidebarCollapse], () => {
 </style>
 
 <style lang="scss">
-@import "../assets/css/dashboard.scss";
+@import "@/assets/css/dashboard.scss";
 
 .sidebar {
   >div {

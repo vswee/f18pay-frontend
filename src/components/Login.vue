@@ -13,10 +13,10 @@
 
       </div>
       <div class="centre">
-        <router-link :to="{name: 'reset-password'}" title="Reset your password" class="link">Password reset</router-link>
+        <router-link :to="{name: 'ResetPassword'}" title="Reset your password" class="link">Password reset</router-link>
       </div>
       <div class="centre">
-        <router-link :to="{name: 'signup'}" title="Signup for F18 Pay" class="link">Sign up</router-link>
+        <router-link :to="{name: 'Signup'}" title="Signup for F18 Pay" class="link">Sign up</router-link>
       </div>
     </div>
     <div class="form-section" v-if="usernameConfirmed">
@@ -171,5 +171,5 @@ export default {
 </script>
 
 <style lang="scss">
-@import "../assets/css/login.scss";
+@import "@/assets/css/login.scss";
 </style>

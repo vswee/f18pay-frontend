@@ -10,9 +10,11 @@
   --accent-5: #c9cfdb;
   --green-0: #075311;
   --green: #19d87f;
+  --green-bg:#19d87f17;
   --green-2: #47ff8d;
   --red-0: #3f0713;
   --red: #db1641;
+  --red-bg: #db164117;
   --red-2: #fad8df;
   --white: #dcdce3;
   --input-background: #1f232b;
@@ -157,6 +159,7 @@ a {
   position: relative;
   padding: 5px 10px;
   z-index: 1;
+  width: max-content;
   &::before {
     content: "";
     height: 100%;
@@ -186,6 +189,14 @@ a {
       background: var(--red);
     }
   }
+  &.good{
+    border-radius: 100px;
+    background-color: var(--green-bg);
+  }
+  &.bad{
+    border-radius: 100px;
+    background-color: var(--red-bg);
+  }
 }
 .flex {
   display: flex;
@@ -195,6 +206,7 @@ a {
   justify-content: center;
 }
 .dashboard-root {
+  padding: 2vw 5vw;
   .flex {
     position: sticky;
     top: 10px;

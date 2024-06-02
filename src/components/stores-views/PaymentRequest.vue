@@ -822,5 +822,5 @@ export default {
 }
 </style>
 <style lang="css">
-@import "../assets/css/fonts-mono.css";
+@import "@/assets/css/fonts-mono.css";
 </style>

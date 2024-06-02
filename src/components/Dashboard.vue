@@ -1,49 +1,48 @@
 <template>
   <div class="dashboard-root">
-    <template v-if="stores.length > 0 && stores[0].store_id">
-      <div class="stores" v-if="!activeStore">
-        <div v-for="(store, index) in stores" :key="store.store_id" :class="store.deleted == 1 ? 'store-tile disabled' : 'store-tile active'" :style="'animation-delay:' + (index + 1) / 10 + 's;'" @click="openStore(store.store_id)">
+    <template v-if="stores[0]?.store_id">
+      <div class="stores" v-if="!$route.params.storeId10">
+        <router-link v-for="(store, index) in stores" :key="store.store_id"
+          :class="store.deleted == 1 ? 'store-tile disabled' : 'store-tile active'"
+          :style="'animation-delay:' + (index + 1) / 10 + 's;'"
+          :to="{ name: 'StoreSummary', params: { storeId10: store.store_id.substring(0, 5) + store.store_id.substring(store.store_id.length - 5) } }">
           <h2>
-            <img class="store-icon" v-if="store.store_logo" :src="store.store_logo" />
-            <span class="store-name-title-text">{{ decodeURIComponent(decodeURI(store.store_name)) }} <i class="fab fa-bitcoin" v-if="store.network === 'btc'"></i> <i class="fab fa-ethereum" v-if="store.network === 'eth'"></i></span>
+            <img class="store-icon" v-if="store.store_logo" :src="parseImgSrc(store.store_logo)">
+            <span class="store-name-title-text">{{ decodeURIComponent(decodeURI(store.store_name)) }} <i
+                class="fab fa-bitcoin" v-if="store.network === 'btc'"></i> <i class="fab fa-ethereum"
+                v-if="store.network === 'eth'"></i></span>
             <span class="store-flag">
               <i :style="'background: #' + store.store_colour"></i>
               <i :style="'background: #' + store.store_accent_colour"></i>
             </span>
           </h2>
-          <span class="store-value"><span class="mono">{{ store.sum ? store.sum : '0.00' }}</span><small v-if="store.network" :class="'badge ' + store.network">{{ store.network.toUpperCase() }}</small></span>
+          <span class="store-value"><span class="mono">{{ store.sum ? store.sum : "0.00" }}</span><small v-if="store.network"
+              :class="'badge ' + store.network">{{ store.network.toUpperCase() }}</small></span>
           <span>{{ store.zpub ? 'External' : 'Internal' }} wallet</span>
           <span :class="'badge active-' + store.deleted">{{ store.deleted == 1 ? 'Disabled' : 'Active' }}</span>
-        </div>
+        </router-link>
       </div>
     </template>
     <template v-else>
       <div class="help-info-block">
         <h1>Let's get you started 🚀</h1>
         <p>To start receiving payments you'll need to create a Store</p>
-        <a class="btn" @click="newStore"><i class="fas fa-plus"></i><span class="collapsible">Create Your First Store</span></a>
+        <a class="btn" @click="newStore"><i class="fas fa-plus"></i><span class="collapsible">Create Your First
+            Store</span></a>
       </div>
     </template>
-    <StoreSummary v-if="activeStore && storeView === 'overview'"></StoreSummary>
-    <StoreSettings v-if="activeStore && storeView === 'settings'"></StoreSettings>
-    <WalletSettings v-if="activeStore && storeView === 'wallet'"></WalletSettings>
-    <StoreAssets v-if="activeStore && storeView === 'buttons'"></StoreAssets>
-    <Invoices v-if="activeStore && storeView === 'invoices'"></Invoices>
-    <PaymentRequest v-if="activeStore && storeView === 'requests'"></PaymentRequest>
+    <router-view></router-view>
   </div>
 </template>
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import { useStore } from 'vuex';
-import StoreSummary from '@/components/StoreSummary.vue';
-import StoreSettings from '@/components/StoreSettings.vue';
-import WalletSettings from '@/components/WalletSettings.vue';
-import StoreAssets from '@/components/StoreAssets.vue';
-import Invoices from '@/components/Invoices.vue';
-import PaymentRequest from '@/components/PaymentRequest.vue';
+import { useRoute, useRouter } from 'vue-router';
 
 const store = useStore();
+const route = useRoute()
+const router = useRouter()
 
 const stores = ref([]);
 const invoiceValues = ref(false);
@@ -94,10 +93,18 @@ const fetchStores = async () => {
     });
 };
 
-const openStore = (id) => {
-  store.commit('setStoreView', 'overview');
-  store.commit('setActiveStore', id);
-};
+const parseImgSrc = (logo) => {
+  let bufferArray = new Uint8Array(logo.data)
+  let binary = '';
+  const bytes = new Uint8Array(bufferArray);
+  const len = bytes.byteLength;
+  for (let i = 0; i < len; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  let base64String = btoa(binary)
+  let storeLogo = `data:image/png;base64,${base64String}`
+  return storeLogo
+}
 
 const newStore = () => {
   store.commit('setStoreModalView', 'new');
@@ -113,18 +120,18 @@ onMounted(() => {
     fetchStores();
   } else {
     console.log('NO SESSION');
-    if (store.router.currentRoute.name !== 'home') {
-      store.router.push({ name: 'home' });
+    if (route.name !== 'home') {
+      router.push({ name: 'Home' });
     }
   }
 });
 </script>
 
 <style lang="scss">
-@import "../assets/css/dashboard.scss";
+@import "@/assets/css/dashboard.scss";
 </style>
 <style lang="css">
-@import "../assets/css/fonts-mono.css";
+@import "@/assets/css/fonts-mono.css";
 </style>
 
 <style lang="scss">
