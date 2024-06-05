@@ -24,12 +24,14 @@
       <a class="btn" @click="newStore()"><i class="fas fa-plus"></i><span class="collapsible">Create Your First Store</span></a>
     </div>
   </template>
-  <StoreSummary v-if="activeStore && storeView=='overview'"></StoreSummary>
+  <router-view></router-view>
+
+  <!-- <StoreSummary v-if="activeStore && storeView=='overview'"></StoreSummary>
   <StoreSettings v-if="activeStore && storeView=='settings'"></StoreSettings>
   <WalletSettings v-if="activeStore && storeView=='wallet'"></WalletSettings>
   <StoreAssets v-if="activeStore && storeView=='buttons'"></StoreAssets>
   <Invoices v-if="activeStore && storeView=='invoices'"></Invoices>
-  <PaymentRequest v-if="activeStore && storeView=='requests'"></PaymentRequest>
+  <PaymentRequest v-if="activeStore && storeView=='requests'"></PaymentRequest> -->
 </div>
 </template>
 
@@ -37,22 +39,22 @@
 import {
   mapGetters
 } from 'vuex';
-import StoreSummary from '@/components/StoreSummary'
-import StoreSettings from '@/components/StoreSettings'
-import WalletSettings from '@/components/WalletSettings'
-import StoreAssets from '@/components/StoreAssets'
-import Invoices from '@/components/Invoices'
-import PaymentRequest from '@/components/PaymentRequest'
+// import StoreSummary from '@/components/StoreSummary'
+// import StoreSettings from '@/components/StoreSettings'
+// import WalletSettings from '@/components/WalletSettings'
+// import StoreAssets from '@/components/StoreAssets'
+// import Invoices from '@/components/Invoices'
+// import PaymentRequest from '@/components/PaymentRequest'
 import { parseImgSrc} from '@/utils/fn.js'
 export default {
   name: "Dashboard",
   components: {
-    StoreSummary,
-    StoreSettings,
-    WalletSettings,
-    StoreAssets,
-    Invoices,
-    PaymentRequest,
+    // StoreSummary,
+    // StoreSettings,
+    // WalletSettings,
+    // StoreAssets,
+    // Invoices,
+    // PaymentRequest,
   },
   data() {
     return {

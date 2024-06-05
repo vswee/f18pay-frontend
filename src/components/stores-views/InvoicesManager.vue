@@ -202,7 +202,7 @@ import VueMomentsAgo from 'vue-moments-ago'
 import DateRangePicker from 'vue2-daterange-picker'
 import VueHtml2pdf from 'vue-html2pdf'
 export default {
-  name: "StoreAssets",
+  name: "InvoicesManager",
   components: {
     VueMomentsAgo,
     DateRangePicker,
