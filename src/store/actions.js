@@ -34,19 +34,18 @@ const actions = {
   },
 
   async decrypt({ commit }, payload) {
-    let encryptedString = payload.string;
+    let string = payload.string.trim();
     let keyiv = payload.keyiv;
     if (keyiv) {
       const key = CryptoJS.SHA256(keyiv.substring(0, 32)).toString(CryptoJS.enc.Hex).substring(0, 32);
       const iv = CryptoJS.SHA256(keyiv.substring(33)).toString(CryptoJS.enc.Hex).substring(0, 16);
-  
-      const decrypted = CryptoJS.AES.decrypt(encryptedString, CryptoJS.enc.Utf8.parse(key), {
+
+      const decrypted = CryptoJS.enc.Utf8.stringify(CryptoJS.AES.decrypt(string, CryptoJS.enc.Utf8.parse(key), {
         iv: CryptoJS.enc.Utf8.parse(iv),
         mode: CryptoJS.mode.CBC,
         padding: CryptoJS.pad.Pkcs7
-      });
-  
-      return CryptoJS.enc.Utf8.stringify(decrypted).trim();
+      })).toString();
+      return decrypted
     }
   
     return false;
