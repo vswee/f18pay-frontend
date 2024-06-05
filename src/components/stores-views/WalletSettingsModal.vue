@@ -104,13 +104,17 @@ export default {
       stores: 'stores',
     }),
     currentStore() {
-      let current = false
-      for (const store of this.stores) {
-        if (store.store_id == this.activeStore) {
-          current = store;
+      let current = false;
+      if (this.stores) {
+        for (const sto of this.stores) {
+          if (`${sto.store_id.substring(0, 5)}${sto.store_id.substring(sto.store_id.length - 5)}` === this.$route.params.storeId10) {
+            current = sto;
+            break;
+          }
         }
+        return current;
       }
-      return current;
+      return false
     },
     storeName: {
       get() {

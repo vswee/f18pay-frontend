@@ -299,17 +299,17 @@ export default {
       return random;
     },
     currentStore() {
-    let current = false;
-      if (this.$route.name && this.stores) {
-    for (const sto of this.stores) {
-      if (`${sto.store_id.substring(0, 5)}${sto.store_id.substring(sto.store_id.length - 5)}` === this.$route.params.storeId10) {
-        current = sto;
-        break;
+      let current = false;
+      if (this.stores) {
+        for (const sto of this.stores) {
+          if (`${sto.store_id.substring(0, 5)}${sto.store_id.substring(sto.store_id.length - 5)}` === this.$route.params.storeId10) {
+            current = sto;
+            break;
+          }
+        }
+        return current;
       }
-    }
-    return current;
-  }
-  return false
+      return false
     },
     storeName: {
       get() {

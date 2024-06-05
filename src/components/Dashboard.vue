@@ -1,8 +1,8 @@
 <template lang="">
 <div class="dashboard-root">
   <template v-if="stores[0]?.store_id">
-    <div class="stores" v-if="!activeStore || activeStore==='false'">
-      <div v-for="(store, index) in stores" :key="store.store_id" :class="store.deleted==1?'store-tile disabled':'store-tile active'" :style="'animation-delay:'+(index+1)/10+'s;'" @click="openStore(store.store_id)">
+    <div class="stores" v-if="!$route.params.storeId10">
+      <router-link v-for="(store, index) in stores" :key="store.store_id" :class="store.deleted==1?'store-tile disabled':'store-tile active'" :style="'animation-delay:'+(index+1)/10+'s;'" :to="{ name: 'StoreSummary', params: { storeId10: store.store_id.substring(0, 5) + store.store_id.substring(store.store_id.length - 5) } }">
         <h2>
           <img class="store-icon" v-if="store.store_logo" :src="parseImgSrc(store.store_logo)">
           <span class="store-name-title-text">{{decodeURIComponent(decodeURI(store.store_name))}} <i class="fab fa-bitcoin" v-if="store.network==='btc'"></i> <i class="fab fa-ethereum" v-if="store.network==='eth'"></i></span>
@@ -14,7 +14,7 @@
         <span class="store-value"><span class="mono">{{store.sum?store.sum:"0.00"}}</span><small v-if="store.network" :class="'badge ' + store.network">{{store.network.toUpperCase()}}</small></span>
         <span>{{store.zpub?'External':'Internal'}} wallet</span>
         <span :class="'badge active-' + store.deleted">{{store.deleted==1?'Disabled':'Active'}}</span>
-      </div>
+      </router-link>
     </div>
   </template>
   <template v-else>

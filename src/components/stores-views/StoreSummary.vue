@@ -14,7 +14,7 @@
 
 <script>
 import BarChart from '@/components/BarGraph'
-import { parseImgSrc} from '@/utils/fn.js'
+import { parseImgSrc } from '@/utils/fn.js'
 import {
   mapGetters
 } from 'vuex';
@@ -43,13 +43,17 @@ export default {
       stores: 'stores',
     }),
     currentStore() {
-      let current = false
-      for (const store of this.stores) {
-        if (store.store_id == this.activeStore) {
-          current = store;
+      let current = false;
+      if (this.stores) {
+        for (const sto of this.stores) {
+          if (`${sto.store_id.substring(0, 5)}${sto.store_id.substring(sto.store_id.length - 5)}` === this.$route.params.storeId10) {
+            current = sto;
+            break;
+          }
         }
+        return current;
       }
-      return current;
+      return false
     },
   },
   watch: {
@@ -58,7 +62,7 @@ export default {
     },
   },
   mounted() {
-    document.querySelector('.dynamic-cta-header-space')&&(document.querySelector('.dynamic-cta-header-space').innerHTML = '')
+    document.querySelector('.dynamic-cta-header-space') && (document.querySelector('.dynamic-cta-header-space').innerHTML = '')
     this.fetchInvoiceValues(this.activeStore)
   },
   methods: {
@@ -78,17 +82,17 @@ export default {
         keyiv: this.keyiv
       });
       await fetch(process.env.VUE_APP_APPLICATION_ENDPOINT + "/store-invoice-values", {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            username: username,
-            fingerprint: this.fingerprint,
-            keyivId: this.keyivId,
-            storeId: id,
-          }),
-        })
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          username: username,
+          fingerprint: this.fingerprint,
+          keyivId: this.keyivId,
+          storeId: id,
+        }),
+      })
         .then((response) => response.json())
         .then((data) => {
           this.message = data.debug ? data.debug : false
@@ -114,15 +118,15 @@ export default {
                 chartData: {
                   labels: this.invoice_dates,
                   datasets: [{
-                      data: this.invoice_values,
-                      label: "Paid Invoices",
-                      backgroundColor: "#19d87f"
-                    },
-                    {
-                      data: this.invoice_values2,
-                      label: "Total Invoices",
-                      backgroundColor: "#4780fa"
-                    },
+                    data: this.invoice_values,
+                    label: "Paid Invoices",
+                    backgroundColor: "#19d87f"
+                  },
+                  {
+                    data: this.invoice_values2,
+                    label: "Total Invoices",
+                    backgroundColor: "#4780fa"
+                  },
                   ]
                 },
                 options: {
@@ -165,5 +169,5 @@ export default {
 </script>
 
 <style lang="">
-  
+
 </style>
