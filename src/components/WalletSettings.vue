@@ -175,10 +175,10 @@ export default {
         string: this.currentStore.store_id,
         keyiv: this.keyiv
       });
-      await fetch("https://f18pay-api.flat18.co.uk/store-management-request-keys", {
+      await fetch("http://localhost:3000/store-management-request-keys", {
           method: 'POST',
           headers: {
-            'Content-Type': 'multipart/form-data'
+            'Content-Type': 'application/json'
           },
           body: JSON.stringify({
             username: username,
@@ -229,10 +229,10 @@ export default {
         string: this.zpub,
         keyiv: this.keyiv
       });
-      await fetch("https://f18pay-api.flat18.co.uk/store-settings-change-zpub", {
+      await fetch("http://localhost:3000/store-settings-change-zpub", {
           method: 'POST',
           headers: {
-            'Content-Type': 'multipart/form-data'
+            'Content-Type': 'application/json'
           },
           body: JSON.stringify({
             username: username,
@@ -280,10 +280,10 @@ export default {
         string: this.zpub,
         keyiv: this.keyiv
       });
-      await fetch("https://f18pay-api.flat18.co.uk/store-settings-confirm-zpub-addresses", {
+      await fetch("http://localhost:3000/store-settings-confirm-zpub-addresses", {
           method: 'POST',
           headers: {
-            'Content-Type': 'multipart/form-data'
+            'Content-Type': 'application/json'
           },
           body: JSON.stringify({
             username: username,

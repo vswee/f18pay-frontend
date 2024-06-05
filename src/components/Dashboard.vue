@@ -102,10 +102,10 @@ export default {
         string: this.user,
         keyiv: this.keyiv
       });
-      await fetch("https://f18pay-api.flat18.co.uk/stores", {
+      await fetch("http://localhost:3000/stores", {
           method: 'POST',
           headers: {
-            'Content-Type': 'multipart/form-data'
+            'Content-Type': 'application/json'
           },
           body: JSON.stringify({
             username: username,

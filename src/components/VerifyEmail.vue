@@ -86,10 +86,10 @@ export default {
         this.message = "Please enter your email address"
       } else {
         const username = this.encrypt(this.usernameManual);
-        fetch('https://f18pay-api.flat18.co.uk/check-username-for-activation', {
+        fetch('http://localhost:3000/check-username-for-activation', {
             method: 'POST', // or 'PUT'
             headers: {
-              'Content-Type': 'multipart/form-data',
+              'Content-Type': 'application/json',
             },
             body: JSON.stringify({
               username: username,
@@ -117,10 +117,10 @@ export default {
       this.working = true;
       if (this.code.length >= 6 && (this.username || this.usernameManual)) {
         const username = this.encrypt(this.username);
-        fetch('https://f18pay-api.flat18.co.uk/code-verify', {
+        fetch('http://localhost:3000/code-verify', {
             method: 'POST',
             headers: {
-              'Content-Type': 'multipart/form-data',
+              'Content-Type': 'application/json',
             },
             body: JSON.stringify({
               username: username,
@@ -155,10 +155,10 @@ export default {
       this.working = true;
       if (this.username || this.usernameManual) {
         const username = this.username ? this.encrypt(this.username) : this.encrypt(this.usernameManual);
-        fetch('https://f18pay-api.flat18.co.uk/request-new-code', {
+        fetch('http://localhost:3000/request-new-code', {
             method: 'POST',
             headers: {
-              'Content-Type': 'multipart/form-data',
+              'Content-Type': 'application/json',
             },
             body: JSON.stringify({
               username: username,
@@ -191,7 +191,7 @@ export default {
       return
     }
     if (!this.keyivId) {
-      fetch("https://f18pay-api.flat18.co.uk/get-keyiv", {
+      fetch("http://localhost:3000/get-keyiv", {
           headers: {
             "Content-Type": "multipart/form-data",
           },

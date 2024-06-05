@@ -80,10 +80,10 @@ export default {
         this.message = "Please enter your email address"
       } else {
         const username = this.encrypt(this.username);
-        fetch('https://f18pay-api.flat18.co.uk/check-username-pre-exist', {
+        fetch('http://localhost:3000/check-username-pre-exist', {
             method: 'POST', // or 'PUT'
             headers: {
-              'Content-Type': 'multipart/form-data',
+              'Content-Type': 'application/json',
             },
             body: JSON.stringify({
               username: username,
@@ -111,10 +111,10 @@ export default {
         const encrypted = this.encrypt(this.password);
         const encrypted2 = this.encrypt(this.password2);
         const username = this.encrypt(this.username);
-        fetch('https://f18pay-api.flat18.co.uk/register-new-user', {
+        fetch('http://localhost:3000/register-new-user', {
             method: 'POST',
             headers: {
-              'Content-Type': 'multipart/form-data',
+              'Content-Type': 'application/json',
             },
             body: JSON.stringify({
               username: username,
@@ -153,7 +153,7 @@ export default {
       this.$router.push('dashboard');
       return
     }
-    fetch("https://f18pay-api.flat18.co.uk/get-keyiv", {
+    fetch("http://localhost:3000/get-keyiv", {
         headers: {
           "Content-Type": "multipart/form-data",
         },

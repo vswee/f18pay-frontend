@@ -136,10 +136,10 @@ export default {
         string: encodeURI(this.storeName),
         keyiv: this.keyiv
       });
-      await fetch("https://f18pay-api.flat18.co.uk/new-store-type-name-check", {
+      await fetch("http://localhost:3000/new-store-type-name-check", {
           method: 'POST',
           headers: {
-            'Content-Type': 'multipart/form-data'
+            'Content-Type': 'application/json'
           },
           body: JSON.stringify({
             username: username,
@@ -201,10 +201,10 @@ export default {
           string: this.storeName,
           keyiv: this.keyiv
         });
-        await fetch("https://f18pay-api.flat18.co.uk/new-store-derivation-internal", {
+        await fetch("http://localhost:3000/new-store-derivation-internal", {
             method: 'POST',
             headers: {
-              'Content-Type': 'multipart/form-data'
+              'Content-Type': 'application/json'
             },
             body: JSON.stringify({
               username: username,
@@ -258,10 +258,10 @@ export default {
         string: this.zpub,
         keyiv: this.keyiv
       });
-      await fetch("https://f18pay-api.flat18.co.uk/new-store-query-zpub", {
+      await fetch("http://localhost:3000/new-store-query-zpub", {
           method: 'POST',
           headers: {
-            'Content-Type': 'multipart/form-data'
+            'Content-Type': 'application/json'
           },
           body: JSON.stringify({
             username: username,
@@ -306,10 +306,10 @@ export default {
         string: this.zpub,
         keyiv: this.keyiv
       });
-      await fetch("https://f18pay-api.flat18.co.uk/new-store-confirm-bitcoin-zpub-addresses-match", {
+      await fetch("http://localhost:3000/new-store-confirm-bitcoin-zpub-addresses-match", {
           method: 'POST',
           headers: {
-            'Content-Type': 'multipart/form-data'
+            'Content-Type': 'application/json'
           },
           body: JSON.stringify({
             username: username,
