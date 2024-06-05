@@ -175,7 +175,7 @@ export default {
         string: this.currentStore.store_id,
         keyiv: this.keyiv
       });
-      await fetch("http://localhost:3000/store-management-request-keys", {
+      await fetch(process.env.VUE_APP_APPLICATION_ENDPOINT + "/store-management-request-keys", {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -229,7 +229,7 @@ export default {
         string: this.zpub,
         keyiv: this.keyiv
       });
-      await fetch("http://localhost:3000/store-settings-change-zpub", {
+      await fetch(process.env.VUE_APP_APPLICATION_ENDPOINT + "/store-settings-change-zpub", {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -280,7 +280,7 @@ export default {
         string: this.zpub,
         keyiv: this.keyiv
       });
-      await fetch("http://localhost:3000/store-settings-confirm-zpub-addresses", {
+      await fetch(process.env.VUE_APP_APPLICATION_ENDPOINT + "/store-settings-confirm-zpub-addresses", {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'

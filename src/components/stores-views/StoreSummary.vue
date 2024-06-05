@@ -77,7 +77,7 @@ export default {
         string: this.user,
         keyiv: this.keyiv
       });
-      await fetch("http://localhost:3000/store-invoice-values", {
+      await fetch(process.env.VUE_APP_APPLICATION_ENDPOINT + "/store-invoice-values", {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'

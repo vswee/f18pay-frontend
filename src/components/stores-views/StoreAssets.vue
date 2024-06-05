@@ -264,7 +264,7 @@ export default {
         string: encodeURIComponent(encodeURI(this.storeName)),
         keyiv: this.keyiv
       });
-      await fetch("http://localhost:3000/store-settings-async", {
+      await fetch(process.env.VUE_APP_APPLICATION_ENDPOINT + "/store-settings-async", {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'

@@ -95,7 +95,7 @@ let actions = {
     }
 
     const username = await dispatch('encrypt', { string: user, keyiv: keyiv });
-    await fetch("http://localhost:3000/validate-fingerprint-check-username", {
+    await fetch(process.env.VUE_APP_APPLICATION_ENDPOINT + "/validate-fingerprint-check-username", {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', },
       body: JSON.stringify({ fingerprint: fingerprint, username: username, keyivId: keyivId }),
@@ -162,7 +162,7 @@ let actions = {
       string: getters.user,
       keyiv: getters.keyiv
     });
-    await fetch("http://localhost:3000/stores", {
+    await fetch(process.env.VUE_APP_APPLICATION_ENDPOINT + "/stores", {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'

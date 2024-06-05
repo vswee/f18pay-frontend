@@ -12,11 +12,11 @@ import WalletSettings from '@/components/stores-views/WalletSettings.vue';
 import StoreAssets from '@/components/stores-views/StoreAssets.vue';
 import InvoicesManager from '@/components/stores-views/InvoicesManager.vue';
 import PaymentRequest from '@/components/stores-views/PaymentRequest.vue';
-
+Vue.use(VueRouter)
 const routes = [
-  { path: '/', name: 'Home', component: Home, meta: { title: 'Home', description: 'Welcome to our application!' } },
+  { path: '/', name: 'home', component: Home, meta: { title: 'Home', description: 'Welcome to our application!' } },
   {
-    path: '/dashboard', name: 'Dashboard', component: Dashboard, children: [
+    path: '/dashboard', name: 'dashboard', component: Dashboard, children: [
       { path: 'store-summary/:storeId10', name: 'StoreSummary', component: StoreSummary },
       { path: 'manage-store/:storeId10', name: 'StoreSettings', component: StoreSettings },
       { path: 'manage-store-wallet/:storeId10', name: 'WalletSettings', component: WalletSettings },
@@ -25,12 +25,12 @@ const routes = [
       { path: 'store-payment-requests/:storeId10', name: 'PaymentRequest', component: PaymentRequest },
     ], meta: { title: 'Dashboard', description: 'Manage your dashboard efficiently!' }
   },
-  { path: '/login', name: 'Login', component: Login, meta: { title: 'Login', description: 'Login to access your account!' } },
-  { path: '/signup', name: 'Signup', component: Signup, meta: { title: 'Signup', description: 'Sign up and join our community!' } },
-  { path: '/verify-email', name: 'VerifyEmail', component: VerifyEmail, meta: { title: 'Verify Email', description: 'Verify your email address!' } },
-  { path: '/reset-password', name: 'ResetPassword', component: ResetPassword, meta: { title: 'Reset Password', description: 'Reset your password!' } },
+  { path: '/login', name: 'login', component: Login, meta: { title: 'Login', description: 'Login to access your account!' } },
+  { path: '/signup', name: 'signup', component: Signup, meta: { title: 'Signup', description: 'Sign up and join our community!' } },
+  { path: '/verify-email', name: 'verify-email', component: VerifyEmail, meta: { title: 'Verify Email', description: 'Verify your email address!' } },
+  { path: '/reset-password', name: 'reset-password', component: ResetPassword, meta: { title: 'Reset Password', description: 'Reset your password!' } },
 ];
-// Vue.use(VueRouter)
+// 
 
 // const routes = [
 //   {

@@ -170,7 +170,7 @@ export default {
         string: this.code,
         keyiv: this.keyiv
       });
-      await fetch("http://localhost:3000/store-management-request-keys-verify-code", {
+      await fetch(process.env.VUE_APP_APPLICATION_ENDPOINT + "/store-management-request-keys-verify-code", {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -244,7 +244,7 @@ export default {
         string: this.email,
         keyiv: this.keyiv
       });
-      await fetch("http://localhost:3000/store-settings-bulk", {
+      await fetch(process.env.VUE_APP_APPLICATION_ENDPOINT + "/store-settings-bulk", {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'

@@ -105,7 +105,7 @@ export default {
         string: this.user,
         keyiv: this.keyiv
       });
-      await fetch("http://localhost:3000/stores", {
+      await fetch(process.env.VUE_APP_APPLICATION_ENDPOINT + "/stores", {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -147,10 +147,8 @@ export default {
 </script>
 
 <style lang="scss">
-@import "../assets/css/dashboard.scss";
-</style>
-<style lang="css">
-@import "../assets/css/fonts-mono.css";
+@import "@/assets/css/dashboard.scss";
+@import "@/assets/css/fonts-mono.scss";
 </style>
 
 <style lang="scss">

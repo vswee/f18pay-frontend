@@ -154,7 +154,7 @@ export default {
       this.$router.push('dashboard');
       return
     }
-    fetch("http://localhost:3000/get-keyiv", {
+    fetch(process.env.VUE_APP_APPLICATION_ENDPOINT + "/get-keyiv", {
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -175,5 +175,5 @@ export default {
 </script>
 
 <style lang="scss">
-@import "../assets/css/login.scss";
+@import "@/assets/css/login.scss";
 </style>

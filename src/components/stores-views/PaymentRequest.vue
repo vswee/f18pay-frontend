@@ -420,7 +420,7 @@ export default {
           keyiv: this.keyiv
         });
 
-        await fetch("http://localhost:3000/store-requests-create-new", {
+        await fetch(process.env.VUE_APP_APPLICATION_ENDPOINT + "/store-requests-create-new", {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json'
@@ -498,7 +498,7 @@ export default {
         string: this.currentStore.store_id,
         keyiv: this.keyiv
       });
-      await fetch("http://localhost:3000/store-requests-pre-populate", {
+      await fetch(process.env.VUE_APP_APPLICATION_ENDPOINT + "/store-requests-pre-populate", {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -568,7 +568,7 @@ export default {
       let rangeEnd = this.dateRange.endDate instanceof Date ? this.dateRange.endDate.yyyymmdd() : String(this.dateRange.endDate);
       rangeEnd = rangeEnd.indexOf("T") >= 0 ? rangeEnd.split('T')[0] : (rangeEnd.indexOf(" ") >= 0 ? rangeEnd.split(' ')[0] : rangeEnd);
       let viewing = this.viewing; //==this.count?this.range:this.viewing;
-      await fetch("http://localhost:3000/store-requests", {
+      await fetch(process.env.VUE_APP_APPLICATION_ENDPOINT + "/store-requests", {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -641,7 +641,7 @@ export default {
         string: request.status,
         keyiv: this.keyiv
       });
-      await fetch("http://localhost:3000/request-check-status", {
+      await fetch(process.env.VUE_APP_APPLICATION_ENDPOINT + "/request-check-status", {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -694,6 +694,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import "@/assets/css/fonts-mono.scss";
 .request-list {
   min-height: 500px;
   border-collapse: collapse;
@@ -824,7 +825,4 @@ export default {
     }
   }
 }
-</style>
-<style lang="css">
-@import "../assets/css/fonts-mono.css";
 </style>

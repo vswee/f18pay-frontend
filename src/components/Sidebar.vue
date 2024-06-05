@@ -320,7 +320,7 @@ export default {
 </style>
 
 <style lang="scss">
-@import "../assets/css/dashboard.scss";
+@import "@/assets/css/dashboard.scss";
 
 .sidebar {
   >div {

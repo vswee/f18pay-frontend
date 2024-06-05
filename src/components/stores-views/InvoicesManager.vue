@@ -374,7 +374,7 @@ export default {
         string: encodeURIComponent(encodeURI(this.storeName)),
         keyiv: this.keyiv
       });
-      await fetch("http://localhost:3000/store-invoice-statistics", {
+      await fetch(process.env.VUE_APP_APPLICATION_ENDPOINT + "/store-invoice-statistics", {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -433,7 +433,7 @@ export default {
       let rangeEnd = this.dateRange.endDate instanceof Date ? this.dateRange.endDate.yyyymmdd() : String(this.dateRange.endDate);
       rangeEnd = rangeEnd.indexOf("T") >= 0 ? rangeEnd.split('T')[0] : (rangeEnd.indexOf(" ") >= 0 ? rangeEnd.split(' ')[0] : rangeEnd);
       let viewing = this.viewing; //==this.count?this.range:this.viewing;
-      await fetch("http://localhost:3000/store-invoices", {
+      await fetch(process.env.VUE_APP_APPLICATION_ENDPOINT + "/store-invoices", {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -510,7 +510,7 @@ export default {
         string: invoice.status,
         keyiv: this.keyiv
       });
-      await fetch("http://localhost:3000/invoice-check-status", {
+      await fetch(process.env.VUE_APP_APPLICATION_ENDPOINT + "/invoice-check-status", {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -563,6 +563,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import "@/assets/css/fonts-mono.scss";
 .invoice-list {
   min-height: 500px;
   border-collapse: collapse;
@@ -694,7 +695,4 @@ export default {
     }
   }
 }
-</style>
-<style lang="css">
-@import "../assets/css/fonts-mono.css";
 </style>
