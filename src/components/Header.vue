@@ -24,21 +24,21 @@
       <div @click="clearAuthFailure" class="notification foot bad error">{{authFailure}}</div>
     </template></div>
 
-  <div class="links">
-    <div class="links" v-if="!session">
-      <router-link :to="{name: 'login'}" title="Log in to your account or sign up" class="link" v-if="currentRouteName!=='login'">log in</router-link>
+    <div class="links">
+      <div class="links" v-if="!session">
+        <router-link :to="{name: 'login'}" title="Log in to your account or sign up" class="link" v-if="currentRouteName !== 'Login'">log in</router-link>
+      </div>
+      <a class="link" @click="toggleTheme()">
+        <i v-if="theme === 'dark'" class="fas fa-sun"></i>
+        <i v-if="theme === 'light'" class="fas fa-moon"></i>
+      </a>
+      <a class="link" href="https://github.com/vswee/f18pay-frontend" target="_blank" title="F18 Pay Github"><i class="fab fa-github"></i></a>
+      <a class="link" href="https://twitter.com/f18micro" target="_blank" title="Flat18 Twitter"><i class="fab fa-twitter"></i></a>
+      <div class="links" v-if="session && currentRouteName">
+        <router-link v-if="currentRouteName !== 'Dashboard'" :to="{name: 'dashboard'}" title="Access your dashboard" class="link"><i class="fas fa-th"></i></router-link>
+        <a class="link" @click="logout()">Log Out</a>
+      </div>
     </div>
-    <a class="link" @click="toggleTheme()">
-      <i v-if="theme==='dark'" class="fas fa-sun"></i>
-      <i v-if="theme==='light'" class="fas fa-moon"></i>
-    </a>
-    <a class="link" href="https://github.com/vswee/f18pay-frontend" target="_blank" title="F18 Pay Github"><i class="fab fa-github"></i></a>
-    <a class="link" href="https://twitter.com/f18micro" target="_blank" title="Flat18 Twitter"><i class="fab fa-twitter"></i></a>
-    <div class="links" v-if="session && currentRouteName">
-      <router-link v-if="currentRouteName!=='dashboard'" :to="{name: 'dashboard'}" title="Access your dashboard" class="link">Dashboard</router-link>
-      <a class="link" @click="logout()">Log Out</a>
-    </div>
-  </div>
 </div>
 </template>
 
