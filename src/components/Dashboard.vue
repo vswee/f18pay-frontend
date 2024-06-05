@@ -4,7 +4,7 @@
     <div class="stores" v-if="!activeStore || activeStore==='false'">
       <div v-for="(store, index) in stores" :key="store.store_id" :class="store.deleted==1?'store-tile disabled':'store-tile active'" :style="'animation-delay:'+(index+1)/10+'s;'" @click="openStore(store.store_id)">
         <h2>
-          <img class="store-icon" v-if="store.store_logo" :src="store.store_logo">
+          <img class="store-icon" v-if="store.store_logo" :src="parseImgSrc(store.store_logo)">
           <span class="store-name-title-text">{{decodeURIComponent(decodeURI(store.store_name))}} <i class="fab fa-bitcoin" v-if="store.network==='btc'"></i> <i class="fab fa-ethereum" v-if="store.network==='eth'"></i></span>
           <span class="store-flag">
             <i :style="'background: #' + store.store_colour"></i>
@@ -43,6 +43,7 @@ import WalletSettings from '@/components/WalletSettings'
 import StoreAssets from '@/components/StoreAssets'
 import Invoices from '@/components/Invoices'
 import PaymentRequest from '@/components/PaymentRequest'
+import { parseImgSrc} from '@/utils/fn.js'
 export default {
   name: "Dashboard",
   components: {
@@ -96,7 +97,7 @@ export default {
     }
   },
   methods: {
-
+    parseImgSrc,
     async fetchStores() {
       const username = await this.$store.dispatch('encrypt', {
         string: this.user,

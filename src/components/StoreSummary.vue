@@ -1,6 +1,6 @@
 <template lang="">
 <div class="store-management" v-if="currentStore">
-  <h1><img class="store-icon" v-if="currentStore.store_logo" :src="currentStore.store_logo"><span>{{_decode(currentStore.store_name)}}</span><span :class="'badge ' + currentStore.network">{{currentStore.network}}</span></h1>
+  <h1><img class="store-icon" v-if="currentStore.store_logo" :src="parseImgSrc(currentStore.store_logo)"><span>{{_decode(currentStore.store_name)}}</span><span :class="'badge ' + currentStore.network">{{currentStore.network}}</span></h1>
   <h2>{{currentStore.sum || '0.00'}} {{currentStore.network.toUpperCase()}}</h2>
   <small :class="currentStore.deleted==1?'status bad':'status good'">{{currentStore.deleted==1?'Disabled':'Active'}}</small>
   <p class="help-text"><i class="fas fa-info-circle"></i> F18Pay only monitors incoming transactions on addresses generated on the platform.<br>Your store balance will not reflect any outgoing transactions (sweeps, spends).</p>
@@ -14,6 +14,7 @@
 
 <script>
 import BarChart from '@/components/BarGraph'
+import { parseImgSrc} from '@/utils/fn.js'
 import {
   mapGetters
 } from 'vuex';
@@ -61,6 +62,7 @@ export default {
     this.fetchInvoiceValues(this.activeStore)
   },
   methods: {
+    parseImgSrc,
     _decode(string) {
       let decoded = decodeURIComponent(decodeURI(string));
       return decoded
