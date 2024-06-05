@@ -75,7 +75,8 @@ export default {
       activeStore: 'activeStore',
       storeView: 'storeView',
       storeModalView: 'storeModalView',
-    })
+    }),
+    currentRouteName(){return this.$route.name},
   },
   async created() {
     let session = await this.$store.dispatch('verifySession')
