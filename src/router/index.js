@@ -9,7 +9,7 @@ import StoreSummary from '@/components/stores-views/StoreSummary.vue';
 import StoreSettings from '@/components/stores-views/StoreSettings.vue';
 import WalletSettings from '@/components/stores-views/WalletSettings.vue';
 import StoreAssets from '@/components/stores-views/StoreAssets.vue';
-import Invoices from '@/components/stores-views/Invoices.vue';
+import InvoicesManager from '@/components/stores-views/InvoicesManager.vue';
 import PaymentRequest from '@/components/stores-views/PaymentRequest.vue';
 
 const routes = [
@@ -18,6 +18,10 @@ const routes = [
     path: '/dashboard', name: 'Dashboard', component: Dashboard, children: [
       { path: 'store-summary/:storeId10', name: 'StoreSummary', component: StoreSummary },
       { path: 'manage-store/:storeId10', name: 'StoreSettings', component: StoreSettings },
+      { path: 'manage-store-wallet/:storeId10', name: 'WalletSettings', component: WalletSettings },
+      { path: 'store-assets/:storeId10', name: 'StoreAssets', component: StoreAssets },
+      { path: 'store-invoices/:storeId10', name: 'Invoices', component: InvoicesManager },
+      { path: 'store-payment-requests/:storeId10', name: 'PaymentRequest', component: PaymentRequest },
     ], meta: { title: 'Dashboard', description: 'Manage your dashboard efficiently!' }
   },
   { path: '/login', name: 'Login', component: Login, meta: { title: 'Login', description: 'Login to access your account!' } },
@@ -43,7 +47,7 @@ router.beforeEach((to, from, next) => {
   if (nearestWithTitle) document.title = nearestWithTitle.meta.title;
 
   // Remove any stale meta tags from the document using the key attribute we set below.
-  Array.from(document.querySelectorAll('[data-vue-router-controlled]')).map(el => el.parentNode.removeChild(el));
+  try { Array.from(document.querySelectorAll('[data-vue-router-controlled]')).map(el => el.parentNode.removeChild(el)); }catch(e){console.log("Error with vue router")}
 
   // Skip rendering meta tags if there are none.
   if (!nearestWithMeta) return next();

@@ -83,8 +83,8 @@
         <div class="sub-sect">
           <label for="">Override Default Store Colours</label>
           <div class="flex colour-pickers">
-            <v-input-colorpicker v-model="storePrimaryColour" :style="'box-shadow: var(--dark) 0px 0px 0px 3px, #' + currentStore.store_colour + ' -2rem 0px 0px -3px, #' + currentStore.store_colour + ' -1rem 0px 0px -3px'"></v-input-colorpicker>
-            <v-input-colorpicker v-model="storeSecondaryColour" :style="'margin-left:3rem;box-shadow: var(--dark) 0px 0px 0px 3px, #' + currentStore.store_accent_colour + ' -2rem 0px 0px -3px, #' + currentStore.store_accent_colour + ' -1rem 0px 0px -3px'"></v-input-colorpicker>
+            <InputColorPicker v-model="storePrimaryColour" :style="'box-shadow: var(--dark) 0px 0px 0px 3px, #' + currentStore.store_colour + ' -2rem 0px 0px -3px, #' + currentStore.store_colour + ' -1rem 0px 0px -3px'"/>
+            <v-input-colorpicker v-model="storeSecondaryColour" :style="'margin-left:3rem;box-shadow: var(--dark) 0px 0px 0px 3px, #' + currentStore.store_accent_colour + ' -2rem 0px 0px -3px, #' + currentStore.store_accent_colour + ' -1rem 0px 0px -3px'"/>
           </div>
           <span class="help-text flex">Primary and Secondary / Accent Store colours.</span>
         </div>
@@ -140,12 +140,8 @@
 import {
   mapGetters
 } from 'vuex';
-import InputColorPicker from 'vue-native-color-picker'
 export default {
   name: "StoreAssets",
-  components: {
-    "v-input-colorpicker": InputColorPicker
-  },
   data() {
     return {
       modal: {
@@ -197,13 +193,14 @@ export default {
       return random;
     },
     currentStore() {
-      let current = false
-      for (const store of this.stores) {
-        if (store.store_id == this.activeStore) {
-          current = store;
-        }
-      }
-      return current;
+      let current = false;
+  for (const store of this.stores) {
+    if (`${store.store_id.substring(0,5)}${store.store_id.substring(store.store_id.length-5)}` === this.$route.params.storeId10) {
+      current = store;
+      break;
+    }
+  }
+  return current;
     },
     storeName: {
       get() {

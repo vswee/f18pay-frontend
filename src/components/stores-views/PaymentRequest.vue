@@ -20,7 +20,7 @@
         <input id="copy_to_clipboard_workspace" class="transparent">
 
       </template>
-      <template v-if="!confirmedCreatedAddress">
+<template v-if="!confirmedCreatedAddress">
         <div class="form-section">
           <div class="sub-sect">
             <label for="">Description</label>
@@ -89,87 +89,102 @@
           </div>
         </div>
       </template>
+</div>
+</div>
+<!-- MODAL -->
+<div :class="working?'form page working':'form page'" @click.stop="_null()">
+  <h1><span>Payment Requests</span><span :class="'badge ' + currentStore.network">{{currentStore.network}}</span></h1>
+
+  <div class="message" v-if="message"><i class="fas fa-exclamation-circle"></i> {{message}}</div>
+  <div class="flex">
+    <div class="button-cluster">
+      <a class="btn refresh-button" @click="getPaymentRequests" title="Refresh"><i class="fas fa-sync"></i></a>
     </div>
-  </div>
-  <!-- MODAL -->
-  <div :class="working?'form page working':'form page'" @click.stop="_null()">
-    <h1><span>Payment Requests</span><span :class="'badge ' + currentStore.network">{{currentStore.network}}</span></h1>
-
-    <div class="message" v-if="message"><i class="fas fa-exclamation-circle"></i> {{message}}</div>
-    <div class="flex">
-      <div class="button-cluster">
-        <a class="btn refresh-button" @click="getPaymentRequests" title="Refresh"><i class="fas fa-sync"></i></a>
-      </div>
-      <div class="button-cluster">
-        <a class="btn" id="newRequests" @click="newRequest()" title="Create Payment Request"><i class="fas fa-plus"></i> <span>New Request</span></a>
-      </div>
-      <div class="button-cluster">
-        <a class="btn" @click="viewing=20"><i><i class="fas fa-chevron-left"></i><i class="fas fa-chevron-left"></i></i></a>
-        <a class="btn list-back" @click="viewing=viewing-20<20?20:viewing=viewing-20"><i class="fas fa-chevron-left"></i></a>
-        <a class="">{{range}} to {{viewing>=count?count:viewing}} of {{count}}</a>
-        <a class="btn" @click="viewing=viewing+20>count?count:viewing+20"><i class="fas fa-chevron-right"></i></a>
-        <a class="btn" @click="viewing=count"><i><i class="fas fa-chevron-right"></i><i class="fas fa-chevron-right"></i></i></a>
-      </div>
-
-      <div class="date-range-parent">
-        <date-range-picker ref="picker" :locale-data="{ firstDay: 1, format: 'dd-mm-yyyy' }" :minDate="null" :maxDate="null" :singleDatePicker="false" :timePicker="false" :timePicker24Hour="false" :showWeekNumbers="true" :showDropdowns="false" :autoApply="true" v-model="dateRange" @update="getPaymentRequests" :linkedCalendars="false">
-
-        </date-range-picker>
-      </div>
-
+    <div class="button-cluster">
+      <a class="btn" id="newRequests" @click="newRequest()" title="Create Payment Request"><i class="fas fa-plus"></i>
+        <span>New Request</span></a>
     </div>
-    <table class="request-list">
-      <tr>
-        <th>#</th>
-        <th>ID</th>
-        <th>Created</th>
-        <th>Value</th>
-        <th>Status</th>
-      </tr>
-        <tr v-for="(request, key) of requests" :class="active==key?'list-item active':'list-item'" @click="active=key" :key="key">
-          <td class="mono border-top-left">
-            <div>
-              <span>{{(key+range)}}</span>
-            </div>
-          </td>
-          <td class="mono">
-            <div>
-              <span>{{request.token.substr(0,6)}}</span>
-            </div>
-          </td>
-          <td>
-            <div>
-              <span>
-                <timeago prefix="" suffix="ago" :datetime="request.created" lang="en" /></span>
-              <span v-if="active==key"><small>{{(request.created)}} [UTC]</small></span>
-            </div>
-          </td>
-          <td>
-            <div>
-              <span>{{Number(request.invoice_value).toFixed(2)}} <span class="badge">{{request.currency}}</span></span>
-            </div>
-          </td>
-          <td class="border-top-right">
-            <div>
-              <span :class="'status ' + request._status"><i v-if="!request._status" class="fas fa-asterisk spin"></i>{{request._status || ''}}</span>
-            </div>
-          </td>
-        </tr>
-        <tr v-for="(request, key) of requests" v-if="active==key" class="list-item active" :key="key+'ex'">
-          <td colSpan="5" class="border-bottom-right border-bottom-left">
-            <div class="inline-table-notes">
+    <div class="button-cluster">
+      <a class="btn" @click="viewing=20"><i><i class="fas fa-chevron-left"></i><i
+            class="fas fa-chevron-left"></i></i></a>
+      <a class="btn list-back" @click="viewing=viewing-20<20?20:viewing=viewing-20"><i
+          class="fas fa-chevron-left"></i></a>
+      <a class="">{{range}} to {{viewing>=count?count:viewing}} of {{count}}</a>
+      <a class="btn" @click="viewing=viewing+20>count?count:viewing+20"><i class="fas fa-chevron-right"></i></a>
+      <a class="btn" @click="viewing=count"><i><i class="fas fa-chevron-right"></i><i
+            class="fas fa-chevron-right"></i></i></a>
+    </div>
 
-              <label v-if="request.token">Link:</label><span v-if="request.token"><a :href="'https://pay.flat18.co.uk/api/v1/payment-requests/'+request.token" target="_blank">Payment Link {{request.token.substr(0,6)}} <i class="fas fa-external-link-square-alt"></i></a></span>
-              <label v-if="request.description">Description:</label><span v-if="request.description">{{_decode(request.description)}}</span>
-              <label v-if="request.payee_email">Payee:</label><span v-if="request.payee_email">{{request.payee_email}}</span>
-              <label>Received:</label><span>{{request.assocReceived}} {{request.crypto}} </span>
-              <label v-if="request.invCount>0">Invoices<br>generated:</label><span v-if="request.invCount>0">{{request.invCount}} </span>
+    <div class="date-range-parent">
+      <date-range-picker ref="picker" :locale-data="{ firstDay: 1, format: 'dd-mm-yyyy' }" :minDate="null"
+        :maxDate="null" :singleDatePicker="false" :timePicker="false" :timePicker24Hour="false" :showWeekNumbers="true"
+        :showDropdowns="false" :autoApply="true" v-model="dateRange" @update="getPaymentRequests"
+        :linkedCalendars="false">
 
-            </div>
-          </td>
-        </tr>
-    </table>
+      </date-range-picker>
+    </div>
+
   </div>
+  <table class="request-list">
+    <tr>
+      <th>#</th>
+      <th>ID</th>
+      <th>Created</th>
+      <th>Value</th>
+      <th>Status</th>
+    </tr>
+    <tr v-for="(request, key) of requests" :class="active==key?'list-item active':'list-item'" @click="active=key"
+      :key="key">
+      <td class="mono border-top-left">
+        <div>
+          <span>{{(key+range)}}</span>
+        </div>
+      </td>
+      <td class="mono">
+        <div>
+          <span>{{request.token.substr(0,6)}}</span>
+        </div>
+      </td>
+      <td>
+        <div>
+          <span>
+            <timeago prefix="" suffix="ago" :datetime="request.created" lang="en" />
+          </span>
+          <span v-if="active==key"><small>{{(request.created)}} [UTC]</small></span>
+        </div>
+      </td>
+      <td>
+        <div>
+          <span>{{Number(request.invoice_value).toFixed(2)}} <span class="badge">{{request.currency}}</span></span>
+        </div>
+      </td>
+      <td class="border-top-right">
+        <div>
+          <span :class="'status ' + request._status"><i v-if="!request._status"
+              class="fas fa-asterisk spin"></i>{{request._status || ''}}</span>
+        </div>
+      </td>
+    </tr>
+    <tr v-for="(request, key) of requests" v-if="active==key" class="list-item active" :key="key+'ex'">
+      <td colSpan="5" class="border-bottom-right border-bottom-left">
+        <div class="inline-table-notes">
+
+          <label v-if="request.token">Link:</label><span v-if="request.token"><a
+              :href="'https://pay.flat18.co.uk/api/v1/payment-requests/'+request.token" target="_blank">Payment Link
+              {{request.token.substr(0,6)}} <i class="fas fa-external-link-square-alt"></i></a></span>
+          <label v-if="request.description">Description:</label><span
+            v-if="request.description">{{_decode(request.description)}}</span>
+          <label v-if="request.payee_email">Payee:</label><span
+            v-if="request.payee_email">{{request.payee_email}}</span>
+          <label>Received:</label><span>{{request.assocReceived}} {{request.crypto}} </span>
+          <label v-if="request.invCount>0">Invoices<br>generated:</label><span
+            v-if="request.invCount>0">{{request.invCount}} </span>
+
+        </div>
+      </td>
+    </tr>
+  </table>
+</div>
 
 </div>
 </template>
@@ -178,7 +193,7 @@
 import {
   mapGetters
 } from 'vuex';
-import DateRangePicker from 'vue2-daterange-picker'
+import DateRangePicker from 'vue3-daterange-picker'
 export default {
   name: "PaymentRequest",
   components: {
@@ -319,10 +334,11 @@ export default {
       return random;
     },
     currentStore() {
-      let current = false
+      let current = false;
       for (const store of this.stores) {
-        if (store.store_id == this.activeStore) {
+        if (`${store.store_id.substring(0, 5)}${store.store_id.substring(store.store_id.length - 5)}` === this.$route.params.storeId10) {
           current = store;
+          break;
         }
       }
       return current;
@@ -374,7 +390,7 @@ export default {
 
       let workspace = document.getElementById("copy_to_clipboard_workspace");
       (workspace.value = copied),
-      workspace.focus(),
+        workspace.focus(),
         workspace.select();
       try {
         if (document.execCommand("copy")) {
@@ -417,22 +433,22 @@ export default {
         });
 
         await fetch(import.meta.env.VITE_APPLICATION_ENDPOINT + "/store-requests-create-new", {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-              username: username,
-              fingerprint: this.fingerprint,
-              keyivId: this.keyivId,
-              store_id: storeId,
-              description: description,
-              email: email,
-              value: value,
-              currency: currency,
-              notify: this.sendEmail,
-            }),
-          })
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            username: username,
+            fingerprint: this.fingerprint,
+            keyivId: this.keyivId,
+            store_id: storeId,
+            description: description,
+            email: email,
+            value: value,
+            currency: currency,
+            notify: this.sendEmail,
+          }),
+        })
           .then((response) => response.json())
           .then(async (data) => {
             if (data.proceed == true) {
@@ -495,17 +511,17 @@ export default {
         keyiv: this.keyiv
       });
       await fetch(import.meta.env.VITE_APPLICATION_ENDPOINT + "/store-requests-pre-populate", {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            username: username,
-            fingerprint: this.fingerprint,
-            keyivId: this.keyivId,
-            store_id: storeId,
-          }),
-        })
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          username: username,
+          fingerprint: this.fingerprint,
+          keyivId: this.keyivId,
+          store_id: storeId,
+        }),
+      })
         .then((response) => response.json())
         .then(async (data) => {
           if (data.proceed == true) {
@@ -555,8 +571,8 @@ export default {
         var mm = this.getMonth() + 1; // getMonth() is zero-based
         var dd = this.getDate();
         return [this.getFullYear(),
-          (mm > 9 ? '-' : '-0') + mm,
-          (dd > 9 ? '-' : '-0') + dd
+        (mm > 9 ? '-' : '-0') + mm,
+        (dd > 9 ? '-' : '-0') + dd
         ].join('');
       };
       let rangeStart = this.dateRange.startDate instanceof Date ? this.dateRange.startDate.yyyymmdd() : String(this.dateRange.startDate);
@@ -565,30 +581,30 @@ export default {
       rangeEnd = rangeEnd.indexOf("T") >= 0 ? rangeEnd.split('T')[0] : (rangeEnd.indexOf(" ") >= 0 ? rangeEnd.split(' ')[0] : rangeEnd);
       let viewing = this.viewing; //==this.count?this.range:this.viewing;
       await fetch(import.meta.env.VITE_APPLICATION_ENDPOINT + "/store-requests", {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            username: username,
-            storeName: storeName,
-            fingerprint: this.fingerprint,
-            keyivId: this.keyivId,
-            store_id: storeId,
-            viewing: viewing,
-            filter: this.filter,
-            rangeStart: rangeStart,
-            rangeEnd: rangeEnd,
-          }),
-        })
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          username: username,
+          storeName: storeName,
+          fingerprint: this.fingerprint,
+          keyivId: this.keyivId,
+          store_id: storeId,
+          viewing: viewing,
+          filter: this.filter,
+          rangeStart: rangeStart,
+          rangeEnd: rangeEnd,
+        }),
+      })
         .then((response) => response.json())
         .then(async (data) => {
           if (data.proceed == true) {
             this.count = data.count;
             this.requests = JSON.parse(await this.$store.dispatch('decrypt', {
-                string: data.requests,
-                keyiv: this.keyiv
-              })),
+              string: data.requests,
+              keyiv: this.keyiv
+            })),
               this.dateRange.endDate = data.now;
             this.working = false;
             this.spinning = false;
@@ -638,22 +654,22 @@ export default {
         keyiv: this.keyiv
       });
       await fetch(import.meta.env.VITE_APPLICATION_ENDPOINT + "/request-check-status", {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            username: username,
-            fingerprint: this.fingerprint,
-            keyivId: this.keyivId,
-            address: address,
-            created: created,
-            id: id,
-            crypto: crypto,
-            value: value,
-            status: status,
-          }),
-        })
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          username: username,
+          fingerprint: this.fingerprint,
+          keyivId: this.keyivId,
+          address: address,
+          created: created,
+          id: id,
+          crypto: crypto,
+          value: value,
+          status: status,
+        }),
+      })
         .then((response) => response.json())
         .then(async (data) => {
           if (data.proceed == true) {

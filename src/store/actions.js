@@ -34,18 +34,22 @@ const actions = {
   },
 
   async decrypt({ commit }, payload) {
-    let string = payload.string;
+    let encryptedString = payload.string;
     let keyiv = payload.keyiv;
-    const key = CryptoJS.SHA256(keyiv.substring(0, 32)).toString(CryptoJS.enc.Hex).substring(0, 32);
-    const iv = CryptoJS.SHA256(keyiv.substring(33)).toString(CryptoJS.enc.Hex).substring(0, 16);
-
-    const decrypted = CryptoJS.AES.decrypt(string, CryptoJS.enc.Utf8.parse(key), {
-      iv: CryptoJS.enc.Utf8.parse(iv),
-      mode: CryptoJS.mode.CBC,
-      padding: CryptoJS.pad.Pkcs7
-    });
-
-    return CryptoJS.enc.Utf8.stringify(decrypted);
+    if (keyiv) {
+      const key = CryptoJS.SHA256(keyiv.substring(0, 32)).toString(CryptoJS.enc.Hex).substring(0, 32);
+      const iv = CryptoJS.SHA256(keyiv.substring(33)).toString(CryptoJS.enc.Hex).substring(0, 16);
+  
+      const decrypted = CryptoJS.AES.decrypt(encryptedString, CryptoJS.enc.Utf8.parse(key), {
+        iv: CryptoJS.enc.Utf8.parse(iv),
+        mode: CryptoJS.mode.CBC,
+        padding: CryptoJS.pad.Pkcs7
+      });
+  
+      return CryptoJS.enc.Utf8.stringify(decrypted).trim();
+    }
+  
+    return false;
   },
 
   async init({ commit }) {
@@ -110,7 +114,7 @@ const actions = {
           commit("setSession", false);
           session = false;
         }
-        
+
         const routeName = payload.route
 
         if (!session) {
@@ -186,7 +190,48 @@ const actions = {
     if (localStorage && localStorage.getItem("theme")) {
       commit("setTheme", localStorage.getItem("theme"));
     }
+  },
+
+  async fetchStores({ commit, getters, dispatch }) {
+    const user = getters.user;
+    const fingerprint = getters.fingerprint;
+    const keyivId = getters.keyivId;
+    const keyiv = getters.keyiv;
+    const username = await dispatch('encrypt', {string: user,keyiv: keyiv});
+
+  try {
+    const response = await fetch(import.meta.env.VITE_APPLICATION_ENDPOINT + "/stores", {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        username,
+        fingerprint: fingerprint,
+        keyivId: keyivId,
+      }),
+    });
+    const data = await response.json();
+    if (data.proceed) {
+      const stores = []
+      for (const item of data.stores) {
+        let inst = item
+        let logo = parseImgSrc(inst.store_logo)
+        inst.storeLogo = logo
+        stores.push(inst)
+      }
+      state.stores = stores;
+      commit('setStores', data.stores);
+      if (!storeView) {
+        commit('setStoreView', 'overview');
+      }
+    } else {
+      console.error('Failed to fetch stores');
+    }
+  } catch (error) {
+    console.error('Error:', error);
   }
-};
+},
+}
 
 export default actions;

@@ -37,7 +37,7 @@
     color: var(--white);
     transition: background-color 0.3s linear;
     * {
-      transition: color 0.3s linear;
+      // transition: color 0.3s linear;
     }
     &.light {
       --black: #fff;

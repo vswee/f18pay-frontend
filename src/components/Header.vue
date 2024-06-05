@@ -59,6 +59,7 @@ const theme = computed(() => store.getters['theme']);
 const working = computed(() => store.getters['working']);
 const authFailure = computed(() => store.getters['authFailure']);
 const currentRouteName = computed(() => route.name);
+const currentRoutePath = computed(() => route.path);
 
 const headerClasses = computed(() => ({
   'header': true,
@@ -77,7 +78,10 @@ function clearAuthFailure() {
 
 function clearToHome() {
   if (session.value) {
-    if (currentRouteName.value !== 'Dashboard') {
+    if (currentRoutePath.value.indexOf('dashboard') >-1) {
+      store.dispatch('fetchStores');
+    }
+    else{
       store.dispatch('routerPush', { name: 'Dashboard' });
     }
     store.commit('setActiveStore', false);
@@ -100,6 +104,8 @@ function logout() {
 function toggleTheme() {
   store.commit('setTheme', theme.value === 'dark' ? 'light' : 'dark');
 }
+
+clearToHome()
 </script>
 
 

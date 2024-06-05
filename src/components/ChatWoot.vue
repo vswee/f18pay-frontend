@@ -8,24 +8,26 @@ window.chatwootSettings = {
   position: "right",
   locale: "en",
   type: "expanded_bubble",
-  launcherTitle:"Get support"
+  launcherTitle: "Get support"
 };
 
-      (function(d,t) {
-        var BASE_URL="https://chatwoot.flat18.co.uk";
-        var g=d.createElement(t),s=d.getElementsByTagName(t)[0];
-        g.src=BASE_URL+"/packs/js/sdk.js";
-        g.defer = true;
-        g.async = true;
-        s.parentNode.insertBefore(g,s);
-        g.onload=function(){
-          window.chatwootSDK.run({
-            websiteToken: 'ANNVbgEzAvFv7Ai5rLTPBfmw',
-            baseUrl: BASE_URL
-          })
-        }
-      })(document,"script");
-    
+(function (d, t) {
+  try {
+    var BASE_URL = "https://chatwoot.flat18.co.uk";
+    var g = d.createElement(t), s = d.getElementsByTagName(t)[0];
+    g.src = BASE_URL + "/packs/js/sdk.js";
+    g.defer = true;
+    g.async = true;
+    s.parentNode.insertBefore(g, s);
+    g.onload = function () {
+      window.chatwootSDK.run({
+        websiteToken: 'ANNVbgEzAvFv7Ai5rLTPBfmw',
+        baseUrl: BASE_URL
+      })
+    }
+  } catch (e) { console.log("Error setting up chatwoot") }
+})(document, "script");
+
 
 export default {
   name: "ChatWoot",

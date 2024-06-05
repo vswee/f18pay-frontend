@@ -1,7 +1,7 @@
 <template>
   <div class="store-management" v-if="currentStore">
     <h1>
-      <div class="store-icon" v-if="currentStore.store_logo" :style="`background-image: url(${currentStore.storeLogo});`" ></div>
+      <div class="store-icon" :style="`background-image: url(${currentStore.storeLogo});`" ></div>
       <span>{{ _decode(currentStore.store_name) }}</span>
       <span :class="'badge ' + currentStore.network">{{ currentStore.network }}</span>
     </h1>
@@ -46,13 +46,8 @@ const stores = computed(() => store.getters.stores);
 const currentStore = computed(() => {
   let current = false;
   for (const store of stores.value) {
-    console.log(`${store.store_id.substring(0,5)}${store.store_id.substring(store.store_id.length-5)}`, route.params.storeId10)
     if (`${store.store_id.substring(0,5)}${store.store_id.substring(store.store_id.length-5)}` === route.params.storeId10) {
       current = store;
-      let bufferArray = new Uint8Array(current.store_logo.data)
-      let base64String = arrayBufferToBase64(bufferArray)
-      let storeLogo = `data:image/png;base64,${base64String}`
-      current.storeLogo = storeLogo
       break;
     }
   }
