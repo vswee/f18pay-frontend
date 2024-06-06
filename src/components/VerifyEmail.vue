@@ -82,7 +82,7 @@ export default {
         this.message = "Please enter your email address"
       } else {
         const username = this.encrypt(this.usernameManual);
-        fetch('http://localhost:3000/check-username-for-activation', {
+        fetch(process.env.VUE_APP_APPLICATION_ENDPOINT + '/check-username-for-activation', {
             method: 'POST', // or 'PUT'
             headers: {
               'Content-Type': 'application/json',
@@ -113,7 +113,7 @@ export default {
       this.working = true;
       if (this.code.length >= 6 && (this.username || this.usernameManual)) {
         const username = this.encrypt(this.username);
-        fetch('http://localhost:3000/code-verify', {
+        fetch(process.env.VUE_APP_APPLICATION_ENDPOINT + '/code-verify', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -151,7 +151,7 @@ export default {
       this.working = true;
       if (this.username || this.usernameManual) {
         const username = this.username ? this.encrypt(this.username) : this.encrypt(this.usernameManual);
-        fetch('http://localhost:3000/request-new-code', {
+        fetch(process.env.VUE_APP_APPLICATION_ENDPOINT + '/request-new-code', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',

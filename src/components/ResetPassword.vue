@@ -77,7 +77,7 @@ export default {
         this.message = "Please enter your email address"
       } else {
         const username = this.encrypt(this.username);
-        fetch('http://localhost:3000/check-username-for-password-reset', {
+        fetch(process.env.VUE_APP_APPLICATION_ENDPOINT + '/check-username-for-password-reset', {
             method: 'POST', // or 'PUT'
             headers: {
               'Content-Type': 'application/json',
@@ -108,7 +108,7 @@ export default {
         const encrypted = this.encrypt(this.password);
         const encrypted2 = this.encrypt(this.password2);
         const username = this.encrypt(this.username);
-        fetch('http://localhost:3000/register-new-user', {
+        fetch(process.env.VUE_APP_APPLICATION_ENDPOINT + '/register-new-user', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',

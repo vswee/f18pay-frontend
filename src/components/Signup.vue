@@ -76,7 +76,7 @@ export default {
         this.message = "Please enter your email address"
       } else {
         const username = this.encrypt(this.username);
-        fetch('http://localhost:3000/check-username-pre-exist', {
+        fetch(process.env.VUE_APP_APPLICATION_ENDPOINT + '/check-username-pre-exist', {
             method: 'POST', // or 'PUT'
             headers: {
               'Content-Type': 'application/json',
@@ -107,7 +107,7 @@ export default {
         const encrypted = this.encrypt(this.password);
         const encrypted2 = this.encrypt(this.password2);
         const username = this.encrypt(this.username);
-        fetch('http://localhost:3000/register-new-user', {
+        fetch(process.env.VUE_APP_APPLICATION_ENDPOINT + '/register-new-user', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
