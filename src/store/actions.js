@@ -22,18 +22,24 @@ let actions = {
   },
 
   async encrypt(context, payload) {
-    let string = payload.string, keyiv = payload.keyiv;
-    let key = keyiv.substr(0, 32);
-    key = Vue.CryptoJS.SHA256(key).toString(Vue.CryptoJS.enc.Hex).substr(0, 32);
-    let iv = keyiv.substr(33);
-    iv = Vue.CryptoJS.SHA256(iv).toString(Vue.CryptoJS.enc.Hex).substr(0, 16);
-    const encrypted = Vue.CryptoJS.AES.encrypt(string, Vue.CryptoJS.enc.Utf8.parse(key), {
-      iv: Vue.CryptoJS.enc.Utf8.parse(iv),
-    }).toString();
-    return encrypted;
+    try {
+      let string = payload.string, keyiv = payload.keyiv;
+      let key = keyiv.substr(0, 32);
+      key = Vue.CryptoJS.SHA256(key).toString(Vue.CryptoJS.enc.Hex).substr(0, 32);
+      let iv = keyiv.substr(33);
+      iv = Vue.CryptoJS.SHA256(iv).toString(Vue.CryptoJS.enc.Hex).substr(0, 16);
+      const encrypted = Vue.CryptoJS.AES.encrypt(string, Vue.CryptoJS.enc.Utf8.parse(key), {
+        iv: Vue.CryptoJS.enc.Utf8.parse(iv),
+      }).toString();
+      return encrypted;
+    } catch (e) {
+      console.log("Encryption process error:", e, payload)
+      return false
+    }
   },
 
   async decrypt(context, payload) {
+    try{
     let string = payload.string, keyiv = payload.keyiv;
     let key = keyiv.substr(0, 32);
     key = Vue.CryptoJS.SHA256(key).toString(Vue.CryptoJS.enc.Hex).substr(0, 32);
@@ -43,7 +49,11 @@ let actions = {
       iv: Vue.CryptoJS.enc.Utf8.parse(iv),
       mode: Vue.CryptoJS.mode.CBC
     })).toString();
-    return decrypted;
+      return decrypted;
+    } catch (e) {
+      console.log("Decryption process error:", e)
+      return false
+    }
   },
 
   async init(context) {

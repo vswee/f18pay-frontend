@@ -35,7 +35,7 @@
       </div>
 
       <div class="button-cluster">
-        <a class="btn" @click="filter=false" title="Clear filters"><i class="fas fa-filter"></i></a>
+        <a class="btn" @click="queryFilter=false" title="Clear filters"><i class="fas fa-filter"></i></a>
         <!-- <select v-model="filter">
           <option value="false">No Filter</option>
           <option v-for="filter_ of filters" :key="filter_" v-bind:value="filter_">{{capitalise(filter_)}}</option>
@@ -43,7 +43,7 @@
         <div class="modern-select" @click.stop="select[0].open=!select[0].open">
           <span class="selected">{{select[0].selected || 'Filter'}} <i v-if="select[0].open" class="fas fa-caret-up"></i><i v-else class="fas fa-caret-down"></i></span>
           <ul v-if="select[0].open">
-            <li v-for="(value, key) of select[0].options" :key="key" @click.stop="modernSelect(0,value);filter=value">{{value}}</li>
+            <li v-for="(value, key) of select[0].options" :key="key" @click.stop="modernSelect(0,value);queryFilter=value">{{value}}</li>
           </ul>
         </div>
       </div>
@@ -107,42 +107,52 @@
           </td>
         </tr>
       </template>
-    </table>
-  </div>
-  <div>
-    <vue-html2pdf :show-layout="false" :float-layout="true" :enable-download="true" :preview-modal="false" :filename="reportName" :pdf-quality="2" :manual-pagination="true" pdf-format="a4" pdf-orientation="portrait" pdf-content-width="800px" @progress="onProgress($event)" @hasStartedGeneration="working=true" @hasGenerated="working=false" ref="html2Pdf">
-      <section slot="pdf-content" class="pdf-content">
-        <div>
-          <h1><svg class="f18" clip-rule="evenodd" fill-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="2" viewBox="0 0 158 201" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-              <clipPath id="a">
-                <path clip-rule="evenodd" d="m100 10.547c49.37 0 89.453 40.083 89.453 89.453 0 93.284-109.752 139.496-157.332 155.146-5.028 1.597-10.516.699-14.774-2.416s-6.774-8.074-6.774-13.35c-.026-44.211-.026-139.38-.026-139.38 0-49.37 40.083-89.453 89.453-89.453z" />
-              </clipPath>
-              <g fill="none" transform="matrix(.783337 0 0 1 -354.093 -485.418639)">
-                <path d="m452.032 485.419h200.428v200.428h-200.428z" />
-                <g transform="matrix(.887335 0 0 .695083 463.512 491.096)">
-                  <path d="m100 10.547c49.37 0 89.453 40.083 89.453 89.453 0 93.284-109.752 139.496-157.332 155.146-5.028 1.597-10.516.699-14.774-2.416s-6.774-8.074-6.774-13.35c-.026-44.211-.026-139.38-.026-139.38 0-49.37 40.083-89.453 89.453-89.453z" />
-                  <g style="opacity:.4" clip-path="url(#a)" stroke="var(--accent)">
-                    <path d="m152.859 88.576c0 36.334-29.498 65.832-65.832 65.832-18.819 0-35.804-7.914-47.807-20.592" stroke-width="12.52" transform="matrix(1.8383 0 0 1.8383 -83.7675 -82.1042)" />
-                    <circle cx="87.027" cy="88.576" r="65.832" stroke-width="23.27" transform="matrix(.989007 0 0 .989007 -4.79082 -6.87718)" />
-                  </g>
-                  <path d="m100 10.547c49.37 0 89.453 40.083 89.453 89.453 0 93.284-109.752 139.496-157.332 155.146-5.028 1.597-10.516.699-14.774-2.416s-6.774-8.074-6.774-13.35c-.026-44.211-.026-139.38-.026-139.38 0-49.37 40.083-89.453 89.453-89.453z" stroke="var(--accent)" stroke-width="23.02" />
+</table>
+</div>
+<div>
+  <vue-html2pdf :show-layout="false" :float-layout="true" :enable-download="true" :preview-modal="false"
+    :filename="reportName" :pdf-quality="2" :manual-pagination="true" pdf-format="a4" pdf-orientation="portrait"
+    pdf-content-width="800px" @progress="onProgress($event)" @hasStartedGeneration="working=true"
+    @hasGenerated="working=false" ref="html2Pdf">
+    <section slot="pdf-content" class="pdf-content">
+      <div>
+        <h1><svg class="f18" clip-rule="evenodd" fill-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="2"
+            viewBox="0 0 158 201" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+            <clipPath id="a">
+              <path clip-rule="evenodd"
+                d="m100 10.547c49.37 0 89.453 40.083 89.453 89.453 0 93.284-109.752 139.496-157.332 155.146-5.028 1.597-10.516.699-14.774-2.416s-6.774-8.074-6.774-13.35c-.026-44.211-.026-139.38-.026-139.38 0-49.37 40.083-89.453 89.453-89.453z" />
+            </clipPath>
+            <g fill="none" transform="matrix(.783337 0 0 1 -354.093 -485.418639)">
+              <path d="m452.032 485.419h200.428v200.428h-200.428z" />
+              <g transform="matrix(.887335 0 0 .695083 463.512 491.096)">
+                <path
+                  d="m100 10.547c49.37 0 89.453 40.083 89.453 89.453 0 93.284-109.752 139.496-157.332 155.146-5.028 1.597-10.516.699-14.774-2.416s-6.774-8.074-6.774-13.35c-.026-44.211-.026-139.38-.026-139.38 0-49.37 40.083-89.453 89.453-89.453z" />
+                <g style="opacity:.4" clip-path="url(#a)" stroke="var(--accent)">
+                  <path d="m152.859 88.576c0 36.334-29.498 65.832-65.832 65.832-18.819 0-35.804-7.914-47.807-20.592"
+                    stroke-width="12.52" transform="matrix(1.8383 0 0 1.8383 -83.7675 -82.1042)" />
+                  <circle cx="87.027" cy="88.576" r="65.832" stroke-width="23.27"
+                    transform="matrix(.989007 0 0 .989007 -4.79082 -6.87718)" />
                 </g>
+                <path
+                  d="m100 10.547c49.37 0 89.453 40.083 89.453 89.453 0 93.284-109.752 139.496-157.332 155.146-5.028 1.597-10.516.699-14.774-2.416s-6.774-8.074-6.774-13.35c-.026-44.211-.026-139.38-.026-139.38 0-49.37 40.083-89.453 89.453-89.453z"
+                  stroke="var(--accent)" stroke-width="23.02" />
               </g>
-            </svg> F18Pay</h1>
-          Generated Report
-          <br><i>by: </i>{{user}}
-          <br><i>on: </i>{{dateTime()}}
-          <br><i>for store: </i>{{_decode(this.currentStore.store_name)}}
-          <br><br>
-          <table class="print-view">
-            <tr>
-              <th>#</th>
-              <th>ID</th>
-              <th>Created</th>
-              <th>Value</th>
-              <th>Status</th>
-            </tr>
-            <template v-for="(invoice, key) of invoices">
+            </g>
+          </svg> F18Pay</h1>
+        Generated Report
+        <br><i>by: </i>{{user}}
+        <br><i>on: </i>{{dateTime()}}
+        <br><i>for store: </i>{{_decode(this.currentStore.store_name)}}
+        <br><br>
+        <table class="print-view">
+          <tr>
+            <th>#</th>
+            <th>ID</th>
+            <th>Created</th>
+            <th>Value</th>
+            <th>Status</th>
+          </tr>
+          <template v-for="(invoice, key) of invoices">
               <tr :key="key" :class="key%6==5?'html2pdf__page-break':''">
                 <td>
                   <div>
@@ -186,11 +196,11 @@
                 </td>
               </tr>
             </template>
-          </table>
-        </div>
-      </section>
-    </vue-html2pdf>
-  </div>
+        </table>
+      </div>
+    </section>
+  </vue-html2pdf>
+</div>
 </div>
 </template>
 
@@ -215,7 +225,7 @@ export default {
       spinning: true,
       viewing: 20,
       total: false,
-      filter: false,
+      queryFilter: false,
       // filters: ['expired', 'confirmed', 'receiving', 'partial', '1 conf.', '2 confs'],
       invoices: false,
       count: 0,
@@ -229,7 +239,7 @@ export default {
         open: false,
         selected: false,
         options: ['expired', 'confirmed', 'receiving', 'partial', '1 confirmation', '2 confirmations']
-      }, ],
+      },],
     }
   },
   computed: {
@@ -242,9 +252,10 @@ export default {
       activeStore: 'activeStore',
       stores: 'stores',
       time: 'time',
+      epoch: 'epoch',
     }),
     reportName() {
-      return 'F18Pay Report for Store: ' + this._decode(this.currentStore.store_name) + ' ::' + this.dateRange.startDate + ' to ' + this.dateRange.endDate + ' ::' + (this.filter ? this.filter : 'unfiltered')
+      return 'F18Pay Report for Store: ' + this._decode(this.currentStore.store_name) + ' ::' + this.dateRange.startDate + ' to ' + this.dateRange.endDate + ' ::' + (this.queryFilter ? this.queryFilter : 'unfiltered')
     },
     computedDateRange() {
       return new Date();
@@ -324,12 +335,16 @@ export default {
     viewing: function () {
       this.getInvoices()
     },
-    filter: function () {
+    queryFilter: function () {
       this.viewing = 20;
       this.getInvoices()
     },
     working() {
       this.$store.commit("setWorking", this.working);
+    },
+    currentStore() {
+      this.getInvoiceStatistics();
+      this.getInvoices();
     },
   },
   mounted() {
@@ -346,7 +361,11 @@ export default {
     }]);
   },
   created() {
-    this.dateRange.startDate = this.currentStore.created.indexOf(' ') >= 0 ? this.currentStore.created.split(' ')[0] : this.currentStore.created;
+    if (this.currentStore) {
+      this.dateRange.startDate = this.currentStore.created.indexOf(' ') >= 0 ? this.currentStore.created.split(' ')[0] : this.currentStore.created;
+    } else {
+      this.dateRange.startDate = this.epoch
+    }
     this.dateRange.endDate = this.time;
   },
   methods: {
@@ -379,18 +398,18 @@ export default {
         keyiv: this.keyiv
       });
       await fetch(process.env.VUE_APP_APPLICATION_ENDPOINT + "/store-invoice-statistics", {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            username: username,
-            storeName: storeName,
-            fingerprint: this.fingerprint,
-            keyivId: this.keyivId,
-            store_id: this.currentStore.store_id,
-          }),
-        })
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          username: username,
+          storeName: storeName,
+          fingerprint: this.fingerprint,
+          keyivId: this.keyivId,
+          store_id: this.currentStore.store_id,
+        }),
+      })
         .then((response) => response.json())
         .then(async (data) => {
           if (data.proceed == true) {
@@ -428,8 +447,8 @@ export default {
         var mm = this.getMonth() + 1; // getMonth() is zero-based
         var dd = this.getDate();
         return [this.getFullYear(),
-          (mm > 9 ? '-' : '-0') + mm,
-          (dd > 9 ? '-' : '-0') + dd
+        (mm > 9 ? '-' : '-0') + mm,
+        (dd > 9 ? '-' : '-0') + dd
         ].join('');
       };
       let rangeStart = this.dateRange.startDate instanceof Date ? this.dateRange.startDate.yyyymmdd() : String(this.dateRange.startDate);
@@ -437,31 +456,32 @@ export default {
       let rangeEnd = this.dateRange.endDate instanceof Date ? this.dateRange.endDate.yyyymmdd() : String(this.dateRange.endDate);
       rangeEnd = rangeEnd.indexOf("T") >= 0 ? rangeEnd.split('T')[0] : (rangeEnd.indexOf(" ") >= 0 ? rangeEnd.split(' ')[0] : rangeEnd);
       let viewing = this.viewing; //==this.count?this.range:this.viewing;
+      const invoicesFetchBody = {
+        username: username,
+        storeName: storeName,
+        fingerprint: this.fingerprint,
+        keyivId: this.keyivId,
+        store_id: storeId,
+        viewing: viewing,
+        rangeStart: rangeStart,
+        rangeEnd: rangeEnd,
+      }
+      if (this.queryFilter) { invoicesFetchBody.filter = this.queryFilter }
       await fetch(process.env.VUE_APP_APPLICATION_ENDPOINT + "/store-invoices", {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            username: username,
-            storeName: storeName,
-            fingerprint: this.fingerprint,
-            keyivId: this.keyivId,
-            store_id: storeId,
-            viewing: viewing,
-            filter: this.filter,
-            rangeStart: rangeStart,
-            rangeEnd: rangeEnd,
-          }),
-        })
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(invoicesFetchBody),
+      })
         .then((response) => response.json())
         .then(async (data) => {
           if (data.proceed == true) {
             this.count = data.count;
             this.invoices = JSON.parse(await this.$store.dispatch('decrypt', {
-                string: data.invoices,
-                keyiv: this.keyiv
-              })),
+              string: data.invoices,
+              keyiv: this.keyiv
+            })),
               this.dateRange.endDate = data.now;
             this.working = false;
             this.spinning = false;
@@ -485,6 +505,7 @@ export default {
         });
     },
     async getStatus(invoice) {
+      if (!invoice.id) { return }
       this.working = true;
       const username = await this.$store.dispatch('encrypt', {
         string: this.user,
@@ -499,7 +520,7 @@ export default {
         keyiv: this.keyiv
       });
       const id = await this.$store.dispatch('encrypt', {
-        string: invoice.id,
+        string: String(invoice.id).trim(),
         keyiv: this.keyiv
       });
       const crypto = await this.$store.dispatch('encrypt', {
@@ -515,22 +536,22 @@ export default {
         keyiv: this.keyiv
       });
       await fetch(process.env.VUE_APP_APPLICATION_ENDPOINT + "/invoice-check-status", {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            username: username,
-            fingerprint: this.fingerprint,
-            keyivId: this.keyivId,
-            address: address,
-            created: created,
-            id: id,
-            crypto: crypto,
-            value: value,
-            status: status,
-          }),
-        })
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          username: username,
+          fingerprint: this.fingerprint,
+          keyivId: this.keyivId,
+          address: address,
+          created: created,
+          id: id,
+          crypto: crypto,
+          value: value,
+          status: status,
+        }),
+      })
         .then((response) => response.json())
         .then(async (data) => {
           if (data.proceed == true) {
@@ -568,6 +589,7 @@ export default {
 
 <style lang="scss" scoped>
 @import "@/assets/css/fonts-mono.scss";
+
 .invoice-list {
   min-height: 500px;
   border-collapse: collapse;

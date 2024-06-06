@@ -358,6 +358,10 @@ export default {
     modal: function () {
       this.getPaymentRequests()
     },
+    currentStore() {
+      this.getPrePopulate();
+    this.getPaymentRequests();
+    },
   },
   mounted() {
     // let t = this;
