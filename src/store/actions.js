@@ -1,11 +1,3 @@
-<<<<<<< HEAD
-import crypto from 'crypto';
-import CryptoJS from 'crypto-js';
-// import router from '@/router';
-
-const actions = {
-  headerUIAppend({ commit }, payload) {
-=======
 import CryptoJS from 'crypto-js'
 import router from '../router'
 
@@ -13,7 +5,6 @@ import router from '../router'
 let actions = {
 
   headerUIAppend(context, payload) {
->>>>>>> upgrade-from-v1-vue2-to-v1-vue3
     for (const item of payload) {
       let fn = item.fn ? item.fn : false;
       let id = item.id;
@@ -28,39 +19,6 @@ let actions = {
     }
   },
 
-<<<<<<< HEAD
-  async encrypt({ commit }, payload) {
-    let string = payload.string;
-    let keyiv = payload.keyiv;
-    const key = CryptoJS.SHA256(keyiv.substring(0, 32)).toString(CryptoJS.enc.Hex).substring(0, 32);
-    const iv = CryptoJS.SHA256(keyiv.substring(33)).toString(CryptoJS.enc.Hex).substring(0, 16);
-
-    const encrypted = CryptoJS.AES.encrypt(string, CryptoJS.enc.Utf8.parse(key), {
-      iv: CryptoJS.enc.Utf8.parse(iv),
-      mode: CryptoJS.mode.CBC,
-      padding: CryptoJS.pad.Pkcs7
-    }).toString();
-
-    return encrypted;
-  },
-
-  async decrypt({ commit }, payload) {
-    let string = payload.string.trim();
-    let keyiv = payload.keyiv;
-    if (keyiv) {
-      const key = CryptoJS.SHA256(keyiv.substring(0, 32)).toString(CryptoJS.enc.Hex).substring(0, 32);
-      const iv = CryptoJS.SHA256(keyiv.substring(33)).toString(CryptoJS.enc.Hex).substring(0, 16);
-
-      const decrypted = CryptoJS.enc.Utf8.stringify(CryptoJS.AES.decrypt(string, CryptoJS.enc.Utf8.parse(key), {
-        iv: CryptoJS.enc.Utf8.parse(iv),
-        mode: CryptoJS.mode.CBC,
-        padding: CryptoJS.pad.Pkcs7
-      })).toString();
-      return decrypted
-    }
-  
-    return false;
-=======
   async encrypt(context, payload) {
     try {
       let string = payload.string, keyiv = payload.keyiv;
@@ -94,7 +52,6 @@ let actions = {
       console.log("Decryption process error:", e)
       return false
     }
->>>>>>> upgrade-from-v1-vue2-to-v1-vue3
   },
 
   async init({ commit }) {
@@ -131,19 +88,11 @@ let actions = {
 
   async verifySession({ commit, getters, dispatch }, payload) {
     let session = false;
-<<<<<<< HEAD
-    const user = getters.user;
-    const fingerprint = getters.fingerprint;
-    const keyivId = getters.keyivId;
-    const keyiv = getters.keyiv;
-
-=======
     const user = getters.user
     const fingerprint = getters.fingerprint
     const keyivId = getters.keyivId
     const keyiv = getters.keyiv
     const route = router.currentRoute.name || router.currentRoute.value.name;
->>>>>>> upgrade-from-v1-vue2-to-v1-vue3
     if (!user || !fingerprint || !keyivId || !keyiv) {
       commit("setSession", false);
       session = false;
@@ -152,15 +101,9 @@ let actions = {
     }
 
     const username = await dispatch('encrypt', { string: user, keyiv: keyiv });
-<<<<<<< HEAD
     await fetch(import.meta.env.VITE_APPLICATION_ENDPOINT + "/validate-fingerprint-check-username", {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-=======
-    await fetch(process.env.VUE_APP_APPLICATION_ENDPOINT + "/validate-fingerprint-check-username", {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', },
->>>>>>> upgrade-from-v1-vue2-to-v1-vue3
       body: JSON.stringify({ fingerprint: fingerprint, username: username, keyivId: keyivId }),
     })
       .then((response) => response.json())
@@ -173,12 +116,6 @@ let actions = {
           commit("setSession", false);
           session = false;
         }
-<<<<<<< HEAD
-
-        const routeName = payload.route
-
-=======
->>>>>>> upgrade-from-v1-vue2-to-v1-vue3
         if (!session) {
           switch (routeName) {
             case 'login':
@@ -189,10 +126,7 @@ let actions = {
               console.log("ex expect to be here", routeName)
               break;
             case 'dashboard':
-<<<<<<< HEAD
-=======
               // console.log("throw error")
->>>>>>> upgrade-from-v1-vue2-to-v1-vue3
               commit("setAuthFailure", "Session expired. Please re-authenticate to continue.");
               break;
             case 'home':
@@ -202,18 +136,6 @@ let actions = {
           }
         }
         if (session) {
-<<<<<<< HEAD
-          switch (routeName) {
-            case 'home':
-            case 'login':
-            case 'signup':
-            case 'verify-email':
-            case 'reset-password':
-            case undefined:
-              payload.router.push({ name: 'Dashboard' });
-              break;
-            default:
-=======
           if (route&&route.indexOf('/dashboard') < 0) {
             switch (route) {
               case 'home':
@@ -228,7 +150,6 @@ let actions = {
                 break;
               default:
             }
->>>>>>> upgrade-from-v1-vue2-to-v1-vue3
           }
           commit("setAuthFailure", false);
         }
@@ -245,17 +166,9 @@ let actions = {
       string: getters.user,
       keyiv: getters.keyiv
     });
-<<<<<<< HEAD
     await fetch(import.meta.env.VITE_APPLICATION_ENDPOINT + "/stores", {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-=======
-    await fetch(process.env.VUE_APP_APPLICATION_ENDPOINT + "/stores", {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
->>>>>>> upgrade-from-v1-vue2-to-v1-vue3
       body: JSON.stringify({
         username: username,
         fingerprint: getters.fingerprint,

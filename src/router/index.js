@@ -1,12 +1,12 @@
 /* eslint-disable no-unused-vars */
 import { createApp } from 'vue'
 import { createRouter, createWebHistory } from 'vue-router'
-import Home from '@/components/Home'
-import Login from '@/components/Login'
-import Signup from '@/components/Signup'
-import VerifyEmail from '@/components/VerifyEmail'
-import ResetPassword from '@/components/ResetPassword'
-import Dashboard from '@/components/Dashboard'
+import Home from '@/components/Home.vue'
+import Login from '@/components/Login.vue'
+import Signup from '@/components/Signup.vue'
+import VerifyEmail from '@/components/VerifyEmail.vue'
+import ResetPassword from '@/components/ResetPassword.vue'
+import Dashboard from '@/components/Dashboard.vue'
 import StoreSummary from '@/components/stores-views/StoreSummary.vue';
 import StoreSettings from '@/components/stores-views/StoreSettings.vue';
 import WalletSettings from '@/components/stores-views/WalletSettings.vue';

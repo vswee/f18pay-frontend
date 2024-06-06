@@ -83,15 +83,9 @@
         <div class="sub-sect">
           <label for="">Override Default Store Colours</label>
           <div class="flex colour-pickers">
-<<<<<<< HEAD
-            <InputColorPicker v-model="storePrimaryColour" :style="'box-shadow: var(--dark) 0px 0px 0px 3px, #' + currentStore.store_colour + ' -2rem 0px 0px -3px, #' + currentStore.store_colour + ' -1rem 0px 0px -3px'"/>
-            <v-input-colorpicker v-model="storeSecondaryColour" :style="'margin-left:3rem;box-shadow: var(--dark) 0px 0px 0px 3px, #' + currentStore.store_accent_colour + ' -2rem 0px 0px -3px, #' + currentStore.store_accent_colour + ' -1rem 0px 0px -3px'"/>
-          </div>
-=======
               <input type="color" v-model="storePrimaryProxy" :style="'box-shadow: var(--dark) 0px 0px 0px 3px, #' + currentStore.store_colour + ' -1.75rem 0px 0px -3px, ' + storePrimaryProxy+ ' -3rem 0px 0px -3px'"/>
               <input v-model="storeSecondaryProxy" type="color" :style="'margin-left:3rem;box-shadow: var(--dark) 0px 0px 0px 3px, #' + currentStore.store_accent_colour + ' -1.75rem 0px 0px -3px, ' + storeSecondaryProxy + ' -3rem 0px 0px -3px'"/>
             </div>
->>>>>>> upgrade-from-v1-vue2-to-v1-vue3
           <span class="help-text flex">Primary and Secondary / Accent Store colours.</span>
         </div>
       </div>
@@ -148,11 +142,8 @@ import {
 } from 'vuex';
 export default {
   name: "StoreAssets",
-<<<<<<< HEAD
-=======
   components: {
   },
->>>>>>> upgrade-from-v1-vue2-to-v1-vue3
   data() {
     return {
       modal: {
@@ -210,15 +201,6 @@ export default {
     },
     currentStore() {
       let current = false;
-<<<<<<< HEAD
-  for (const store of this.stores) {
-    if (`${store.store_id.substring(0,5)}${store.store_id.substring(store.store_id.length-5)}` === this.$route.params.storeId10) {
-      current = store;
-      break;
-    }
-  }
-  return current;
-=======
       if (this.stores) {
         for (const sto of this.stores) {
           if (`${sto.store_id.substring(0, 5)}${sto.store_id.substring(sto.store_id.length - 5)}` === this.$route.params.storeId10) {
@@ -229,7 +211,6 @@ export default {
         return current;
       }
       return false
->>>>>>> upgrade-from-v1-vue2-to-v1-vue3
     },
     storeName: {
       get() {
@@ -279,23 +260,6 @@ export default {
         string: encodeURIComponent(encodeURI(this.storeName)),
         keyiv: this.keyiv
       });
-<<<<<<< HEAD
-      await fetch(import.meta.env.VITE_APPLICATION_ENDPOINT + "/store-settings-async", {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            username: username,
-            storeName: storeName,
-            fingerprint: this.fingerprint,
-            keyivId: this.keyivId,
-            store_id: this.currentStore.store_id,
-            property: parameter,
-            value: value,
-          }),
-        })
-=======
       await fetch(process.env.VUE_APP_APPLICATION_ENDPOINT + "/store-settings-async", {
         method: 'POST',
         headers: {
@@ -311,7 +275,6 @@ export default {
           value: value,
         }),
       })
->>>>>>> upgrade-from-v1-vue2-to-v1-vue3
         .then((response) => response.json())
         .then((data) => {
           if (data.proceed == true) {

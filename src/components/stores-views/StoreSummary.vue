@@ -13,7 +13,7 @@
 </template>
 
 <script>
-import BarChart from '@/components/BarGraph'
+import BarChart from '@/components/BarGraph.vue'
 import { parseImgSrc } from '@/utils/fn.js'
 import {
   mapGetters

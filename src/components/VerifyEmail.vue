@@ -82,11 +82,7 @@ export default {
         this.message = "Please enter your email address"
       } else {
         const username = this.encrypt(this.usernameManual);
-<<<<<<< HEAD
-        fetch(import.meta.env.VITE_APPLICATION_ENDPOINT + "/check-username-for-activation", {
-=======
         fetch('http://localhost:3000/check-username-for-activation', {
->>>>>>> upgrade-from-v1-vue2-to-v1-vue3
             method: 'POST', // or 'PUT'
             headers: {
               'Content-Type': 'application/json',
@@ -117,11 +113,7 @@ export default {
       this.working = true;
       if (this.code.length >= 6 && (this.username || this.usernameManual)) {
         const username = this.encrypt(this.username);
-<<<<<<< HEAD
-        fetch(import.meta.env.VITE_APPLICATION_ENDPOINT + "/code-verify", {
-=======
         fetch('http://localhost:3000/code-verify', {
->>>>>>> upgrade-from-v1-vue2-to-v1-vue3
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -159,11 +151,7 @@ export default {
       this.working = true;
       if (this.username || this.usernameManual) {
         const username = this.username ? this.encrypt(this.username) : this.encrypt(this.usernameManual);
-<<<<<<< HEAD
-        fetch(import.meta.env.VITE_APPLICATION_ENDPOINT + "/request-new-code", {
-=======
         fetch('http://localhost:3000/request-new-code', {
->>>>>>> upgrade-from-v1-vue2-to-v1-vue3
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -199,11 +187,7 @@ export default {
       return
     }
     if (!this.keyivId) {
-<<<<<<< HEAD
-      fetch(import.meta.env.VITE_APPLICATION_ENDPOINT + "/get-keyiv", {
-=======
       fetch(process.env.VUE_APP_APPLICATION_ENDPOINT + "/get-keyiv", {
->>>>>>> upgrade-from-v1-vue2-to-v1-vue3
           headers: {
             "Content-Type": "multipart/form-data",
           },

@@ -146,25 +146,6 @@ export default {
   return storeLogo
 }
 
-const newStore = () => {
-  store.commit('setStoreModalView', 'new');
-};
-
-onMounted(() => {
-  store.dispatch('getStores');
-  if (!activeStore.value) {
-    store.commit('setViewTitle', 'Dashboard');
-  }
-
-  if (session.value) {
-    fetchStores();
-  } else {
-    console.log('NO SESSION');
-    if (route.name !== 'home') {
-      router.push({ name: 'Home' });
-    }
-  }
-});
 </script>
 
 <style lang="scss">
