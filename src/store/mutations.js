@@ -17,7 +17,7 @@ let mutations = {
     state.sidebarCollapse = payload
     localStorage.setItem("sidebarCollapse", payload)
   },
-  
+
   setStores(state, payload) {
     state.stores = payload
   },
@@ -26,7 +26,7 @@ let mutations = {
     state.activeStore = payload
     localStorage.setItem("activeStore", payload)
   },
-  
+
   setKeyivId(state, payload) {
     state.keyivId = payload[0]
     state.keyiv = payload[1]

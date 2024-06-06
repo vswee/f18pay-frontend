@@ -1,11 +1,11 @@
 <template>
-  <div :id="'sidebar'" :style="'width:' + sidebarWidth + 'px'" v-if="session">
+  <div id="sidebar" :style="'width:' + sidebarWidth + 'px'" v-if="session">
     <div class="sidebar-outer-wrapper-outer">
       <div class="sidebar-outer-wrapper">
         <div class="sidebar-inner-wrapper">
           <div class="sidebar-inner-wrapper-inner">
             <div :class="`${sidebarCollapse ? 'sidebar' : ''}' sidebar collapse'`">
-              <a :class="`${sidebarCollapse ? 'collapse-sidebar collapsed' : '' }' collapse-sidebar'`"
+              <a :class="`${sidebarCollapse ? 'collapse-sidebar collapsed' : ''}' collapse-sidebar'`"
                 @click="toggleCollapse()" :title="!sidebarCollapse ? 'Expand sidebar.' : 'Collapse sidebar.'"></a>
               <div
                 :class="[storesDropdown ? 'sidebar-shortcuts dropdown open store-length-' + stores.length : 'sidebar-shortcuts dropdown store-length-' + stores.length]"
@@ -18,15 +18,15 @@
                 </template>
                 <template v-else>
                   <div class="sidebar-shortcut active">
-                      <span class="store-flag">
-                        <i :style="'background: #' + activeStore.store_colour"></i>
-                        <i :style="'background: #' + activeStore.store_accent_colour"></i>
-                      </span>
-                      <span class="collapsible">
-                        <span class="text">{{ decodedString(activeStore.store_name) }}</span>
-                        <span :class="'badge ' + activeStore.network">{{ activeStore.network }}</span>
-                      </span>
-                    </div>
+                    <span class="store-flag">
+                      <i :style="'background: #' + activeStore.store_colour"></i>
+                      <i :style="'background: #' + activeStore.store_accent_colour"></i>
+                    </span>
+                    <span class="collapsible">
+                      <span class="text">{{ decodedString(activeStore.store_name) }}</span>
+                      <span :class="'badge ' + activeStore.network">{{ activeStore.network }}</span>
+                    </span>
+                  </div>
                 </template>
                 <template v-for="store in stores">
                   <template v-if="activeStore == store.store_id">
@@ -65,14 +65,15 @@
                 <a :class="`${currentRouteName == 'StoreSettings' ? 'active-bar' : ''} sidebar-shortcut`"
                   @click="settingsView()"><i class="fas fa-sliders-h"></i><span class="collapsible">Manage
                     Store</span></a>
-                <a :class="`${currentRouteName == 'WalletSettings' ? 'active-bar' : ''} sidebar-shortcut`" @click="walletView()"><i
-                    class="fas fa-wallet"></i><span class="collapsible">Wallet</span></a>
-                <a :class="`${currentRouteName == 'StoreAssets' ? 'active-bar' : ''} sidebar-shortcut`" @click="assetsView()"><i
-                    class="fas fa-code"></i><span class="collapsible">Payment Assets</span></a>
-                <a :class="`${currentRouteName == 'Invoices' ? 'active-bar' : ''} sidebar-shortcut`" @click="invoicesView()"><i
-                    class="fas fa-file-invoice"></i><span class="collapsible">Invoices</span></a>
-                <a :class="`${currentRouteName == 'PaymentRequest' ? 'active-bar' : ''} sidebar-shortcut`" @click="requestsView()"><i
-                    class="fas fa-inbox"></i><span class="collapsible">Payment
+                <a :class="`${currentRouteName == 'WalletSettings' ? 'active-bar' : ''} sidebar-shortcut`"
+                  @click="walletView()"><i class="fas fa-wallet"></i><span class="collapsible">Wallet</span></a>
+                <a :class="`${currentRouteName == 'StoreAssets' ? 'active-bar' : ''} sidebar-shortcut`"
+                  @click="assetsView()"><i class="fas fa-code"></i><span class="collapsible">Payment Assets</span></a>
+                <a :class="`${currentRouteName == 'Invoices' ? 'active-bar' : ''} sidebar-shortcut`"
+                  @click="invoicesView()"><i class="fas fa-file-invoice"></i><span
+                    class="collapsible">Invoices</span></a>
+                <a :class="`${currentRouteName == 'PaymentRequest' ? 'active-bar' : ''} sidebar-shortcut`"
+                  @click="requestsView()"><i class="fas fa-inbox"></i><span class="collapsible">Payment
                     Requests</span></a>
               </div>
               <div class="sidebar-shortcuts">
@@ -88,31 +89,117 @@
   </div>
 </template>
 
-<script setup>
-import { ref, computed, watch, onMounted, onBeforeMount, reactive } from 'vue';
-import { useStore } from 'vuex';
-import { useRoute, useRouter } from 'vue-router';
-const route = useRoute();
-const router = useRouter()
-
-const store = useStore();
-const storesDropdown = ref(false);
-const sidebarWidth = ref(false);
-
-const session = computed(() => store.getters.session);
-const stores = computed(() => store.getters.stores);
-const sidebarCollapse = computed(() => store.getters.sidebarCollapse);
-const currentRouteName = computed(() => route.name);
-const activeStore = computed(() => {
-  if (currentRouteName.value && stores.value) {
-    let current = false;
-    for (const sto of stores.value) {
-      if (`${sto.store_id.substring(0, 5)}${sto.store_id.substring(sto.store_id.length - 5)}` === route.params.storeId10) {
-        current = sto;
-        break;
-      }
+<script>
+import {
+  mapGetters
+} from 'vuex';
+import router from '@/router'
+export default {
+  name: "Sidebar",
+  data() {
+    return {
+      storesDropdown: false,
+      sidebarWidth: false,
+      storeId10: false,
     }
-    return current;
+  },
+  computed: {
+    ...mapGetters({
+      session: 'session',
+      stores: 'stores',
+      sidebarCollapse: 'sidebarCollapse',
+      // activeStore: 'activeStore',
+      storeView: 'storeView',
+    }),
+    currentRouteName() { return this.$route.name },
+    activeStore() {
+      let current = false;
+      if (this.currentRouteName && this.stores) {
+        for (const sto of this.stores) {
+          if (`${sto.store_id.substring(0, 5)}${sto.store_id.substring(sto.store_id.length - 5)}` === this.$route.params.storeId10) {
+            current = sto;
+            break;
+          }
+        }
+        return current;
+      }
+      return false
+    },
+  },
+  watch: {
+    activeStore(newVal) {
+      if (newVal.store_id) {
+        this.storeId10 = newVal.store_id.substring(0, 5) + newVal.store_id.substring(newVal.store_id.length - 5)
+      }
+    },
+    storesDropdown() {
+      // this.setSidebarWidth()
+    },
+    sidebarCollapse() {
+      // this.setSidebarWidth()
+    },
+  },
+  async created() {
+    // let session = await this.$store.dispatch('verifySession')
+    // if (!session) {
+    //   console.log("NO SESSION")
+    //   this.$store.commit("setStores", false);
+    // }
+    // this.setSidebarWidth()
+  },
+  mounted() {
+    if (document.getElementById("main")) {
+      document.documentElement.style.setProperty('--main', document.getElementById("main").getBoundingClientRect().width + "px")
+    }
+    if (!this.activeStore && this.activeStore !== 'false') {
+      this.$store.commit('setActiveStore', false)
+      this.$store.commit('setStoreView', false);
+      this.$store.commit('setViewTitle', false);
+    }
+  },
+  methods: {
+    setSidebarWidth() {
+      setTimeout(() => {
+        this.sidebarWidth = document.querySelector('.sidebar').getBoundingClientRect().width;
+      }, 20)
+    },
+    decodedString(string) {
+      return decodeURIComponent(decodeURI(string));
+    },
+    toggleCollapse() {
+      this.$store.commit("setSidebarCollapse", !this.sidebarCollapse);
+      if (document.getElementById("main")) {
+        document.documentElement.style.setProperty('--main', document.getElementById("main").getBoundingClientRect().width + "px")
+      }
+    },
+    openStore(id) {
+      this.storeId10 = id.substring(0, 5) + id.substring(id.length - 5)
+      this.$store.commit("setViewTitle", 'Store Overview');
+      router.push({ name: 'StoreSummary', params: { storeId10: this.storeId10 } })
+    },
+    settingsView() {
+      this.$store.commit("setViewTitle", 'Manage Store');
+      router.push({ name: 'StoreSettings', params: { storeId10: this.$route.params.storeId10 } })
+    },
+    walletView() {
+      this.$store.commit("setViewTitle", 'Wallet');
+      router.push({ name: 'WalletSettings', params: { storeId10: this.$route.params.storeId10 } })
+    },
+    assetsView() {
+      this.$store.commit("setViewTitle", 'Payment Assets');
+      router.push({ name: 'StoreAssets', params: { storeId10: this.$route.params.storeId10 } })
+    },
+    invoicesView() {
+      this.$store.commit("setViewTitle", 'Invoices');
+      router.push({ name: 'Invoices', params: { storeId10: this.$route.params.storeId10 } })
+    },
+    requestsView() {
+      this.$store.commit("setViewTitle", 'Payment Requests');
+      router.push({ name: 'PaymentRequest', params: { storeId10: this.$route.params.storeId10 } })
+    },
+    newStore() {
+      this.$store.commit("setStoreModalView", 'new');
+    },
   }
   return false
 });

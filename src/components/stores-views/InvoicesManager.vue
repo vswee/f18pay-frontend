@@ -1,11 +1,10 @@
-<template>
+<!-- eslint-disable vue/require-v-for-key -->
+<!-- eslint-disable vue/no-template-key -->
+<template lang="html">
   <div
     :class="working && spinning ? 'store-management no-click spin-fresco' : (working && !spinning ? 'store-management no-click' : 'store-management')">
-    <div :class="working ? 'form page working' : 'form page'" @click.stop="handleClickStop">
-      <h1>
-        <span>Invoices</span>
-        <span :class="'badge ' + currentStore.network">{{ currentStore.network }}</span>
-      </h1>
+    <div :class="working ? 'form page working' : 'form page'" @click.stop="_null()">
+      <h1><span>Invoices</span><span :class="'badge ' + currentStore.network">{{ currentStore.network }}</span></h1>
 
       <div class="message" v-if="message"><i class="fas fa-exclamation-circle"></i> {{ message }}</div>
 
@@ -13,7 +12,7 @@
         <div class="sub-sect compact">
           <label for="">Invoice Statistics</label>
           <div class="flex info-combo-parent">
-            <div class="info-combo" v-for="(stat, key) in statisticsOrganised" :key="key">
+            <div class="info-combo" v-for="(stat, key) of statisticsOrganised" :key="key">
               <span class="mono">{{ stat.value }}</span>
               <span>{{ stat.name }}</span>
             </div>
@@ -28,30 +27,31 @@
         <div class="button-cluster">
           <a class="btn" @click="viewing = 20"><i><i class="fas fa-chevron-left"></i><i
                 class="fas fa-chevron-left"></i></i></a>
-          <a class="btn" @click="viewing = viewing - 20 < 20 ? 20 : viewing - 20"><i
-              class="fas fa-chevron-left"></i></a>
+          <a class="btn" @click="viewing = viewing - 20 < 20 ? 20 : viewing = viewing - 20"><i class="fas fa-chevron-left"></i></a>
           <a class="">{{ range }} to {{ viewing >= count ? count : viewing }} of {{ count }}</a>
-          <a class="btn" @click="viewing = viewing + 20 > count ? count : viewing + 20"><i
-              class="fas fa-chevron-right"></i></a>
+          <a class="btn" @click="viewing = viewing + 20 > count ? count : viewing + 20"><i class="fas fa-chevron-right"></i></a>
           <a class="btn" @click="viewing = count"><i><i class="fas fa-chevron-right"></i><i
                 class="fas fa-chevron-right"></i></i></a>
         </div>
         <div class="date-range-parent">
-          <!-- <date-range-picker ref="picker" v-if="dateRange.startDate" :locale-data="{ firstDay: 1, format: 'dd-mm-yyyy' }" :singleDatePicker="false"
-            :timePicker="false" :timePicker24Hour="false" :showWeekNumbers="true" :showDropdowns="false"
-            :autoApply="true" v-model="dateRange" @update="getInvoices" :linkedCalendars="false">
-          </date-range-picker> -->
-          {{ dateRange.startDate }}
+          <DateRangePicker ref="picker" :locale-data="{ firstDay: 1, format: 'dd-mm-yyyy' }" :minDate="null"
+            :maxDate="null" :singleDatePicker="false" :timePicker="false" :timePicker24Hour="false"
+            :showWeekNumbers="true" :showDropdowns="false" :autoApply="true" v-model="dateRange" :dateRange="dateRange"
+            @update="getInvoices" :linkedCalendars="false" />
         </div>
 
         <div class="button-cluster">
-          <a class="btn" @click="filter = false" title="Clear filters"><i class="fas fa-filter"></i></a>
+          <a class="btn" @click="queryFilter = false" title="Clear filters"><i class="fas fa-filter"></i></a>
+          <!-- <select v-model="filter">
+          <option value="false">No Filter</option>
+          <option v-for="filter_ of filters" :key="filter_" v-bind:value="filter_">{{capitalise(filter_)}}</option>
+        </select> -->
           <div class="modern-select" @click.stop="select[0].open = !select[0].open">
             <span class="selected">{{ select[0].selected || 'Filter' }} <i v-if="select[0].open"
                 class="fas fa-caret-up"></i><i v-else class="fas fa-caret-down"></i></span>
             <ul v-if="select[0].open">
-              <li v-for="(value, key) in select[0].options" :key="key"
-                @click.stop="modernSelect(0, value); filter = value">{{ value }}</li>
+              <li v-for="(value, key) of select[0].options" :key="key"
+                @click.stop="modernSelect(0, value); queryFilter = value">{{ value }}</li>
             </ul>
           </div>
         </div>
@@ -69,67 +69,69 @@
           <th>Value</th>
           <th>Status</th>
         </tr>
-        <tr v-for="(invoice, key) in invoices" :class="active == key ? 'list-item active' : 'list-item'"
-          @click="active = key" :key="key">
-          <td class="mono border-top-left">
-            <div>
-              <span>{{ key + range }}</span>
-            </div>
-          </td>
-          <td class="mono">
-            <div>
-              <span>{{ invoice.invoice_id.substr(0, 6) }}</span>
-            </div>
-          </td>
-          <td>
-            <div>
-              <span>
-                <timeago prefix="" suffix="ago" :datetime="invoice.created" lang="en" />
-              </span>
-              <span v-if="active == key"><small>{{ invoice.created }} [UTC]</small></span>
-            </div>
-          </td>
-          <td>
-            <div>
-              <span>{{ Number(invoice.invoice_value).toFixed(2) }} <span class="badge">{{ invoice.currency
-                  }}</span></span>
-              <span v-if="active == key"><small>@{{ invoice.exchange }}</small></span>
-            </div>
-          </td>
-          <td class="border-top-right">
-            <div>
-              <span :class="'status ' + invoice._status"><i v-if="!invoice._status" class="fas fa-asterisk spin"></i>{{
-                invoice._status || '' }}</span>
-            </div>
-          </td>
-        </tr>
-        <tr v-for="(invoice, key) in invoices" v-if="active == key" class="list-item active" :key="key + 'ex'">
+        <template v-for="(invoice, key) of invoices" :key="key">
+          <tr :class="active == key ? 'list-item active' : 'list-item'" @click="active = key">
+            <td class="mono border-top-left">
+              <div>
+                <span>{{ (key + range) }}</span>
+              </div>
+            </td>
+            <td class="mono">
+              <div>
+                <span>{{ invoice.invoice_id.substr(0, 6) }}</span>
+              </div>
+            </td>
+            <td>
+              <div>
+                <span>
+                  <timeago prefix="" suffix="ago" :datetime="invoice.created" lang="en" />
+                </span>
+                <span v-if="active == key"><small>{{ (invoice.created) }} [UTC]</small></span>
+              </div>
+            </td>
+            <td>
+              <div>
+                <span>{{ Number(invoice.invoice_value).toFixed(2) }} <span
+                    class="badge">{{ invoice.currency }}</span></span>
+                <span v-if="active == key"><small>@{{ invoice.exchange }}</small></span>
+              </div>
+            </td>
+            <td class="border-top-right">
+              <div>
+                <span :class="'status ' + invoice._status"><i v-if="!invoice._status"
+                    class="fas fa-asterisk spin"></i>{{ invoice._status || '' }}</span>
+              </div>
+            </td>
+          </tr>
+          <tr v-if="active==key" class="list-item active" :key="key+'ex'">
           <td colSpan="5" class="border-bottom-right border-bottom-left">
             <div class="inline-table-notes">
-              <label v-if="invoice.reqToken">Attached to Payment Request:</label><span v-if="invoice.reqToken">{{
-                invoice.reqToken.substr(0, 6) }}</span>
-              <label v-if="invoice.reqEmail">Payment Request Email:</label><span v-if="invoice.reqEmail">{{
-                invoice.reqEmail }}</span>
-              <label v-if="invoice.reqDesc">Payment Request Description:</label><span v-if="invoice.reqDesc">{{
-                invoice.reqDesc }}</span>
-              <label v-if="invoice.tx2">Item:</label><span v-if="invoice.tx2">{{ decode(invoice.tx2) }}</span>
-              <label v-if="invoice.payee_email">Payee:</label><span v-if="invoice.payee_email">{{ invoice.payee_email
-                }}</span>
-              <label>Crypto:</label><span>{{ invoice.btc_value }} {{ invoice.crypto }}</span>
-              <label>Address:</label><a target="_blank"
-                :href="'https://www.blockchain.com/btc/address/' + invoice.address">{{ invoice.address }} <i
-                  class="fas fa-external-link-square-alt"></i></a>
-              <label>Received:</label><span>{{ invoice.tx3 }} {{ invoice.crypto }}<br>{{ ((invoice.tx3 /
-                invoice.btc_value) * 100).toFixed(2) }} <i class="fas fa-percent"></i></span>
-            </div>
-          </td>
-        </tr>
+                  <label v-if="invoice.reqToken">Attached to Payment Request:</label><span
+                    v-if="invoice.reqToken">{{ invoice.reqToken.substr(0, 6) }}</span>
+                  <label v-if="invoice.reqEmail">Payment Request Email:</label><span
+                    v-if="invoice.reqEmail">{{ invoice.reqEmail }}</span>
+                  <label v-if="invoice.reqDesc">Payment Request Description:</label><span
+                    v-if="invoice.reqDesc">{{ invoice.reqDesc }}</span>
+                  <label v-if="invoice.tx2">Item:</label><span v-if="invoice.tx2">{{ _decode(invoice.tx2) }}</span>
+                  <label v-if="invoice.payee_email">Payee:</label><span
+                    v-if="invoice.payee_email">{{ invoice.payee_email }}</span>
+                  <label>Crypto:</label><span>{{ invoice.btc_value }} {{ invoice.crypto }}</span>
+                  <label>Address:</label><a target="_blank"
+                    :href="'https://www.blockchain.com/btc/address/' + invoice.address">{{ invoice.address }} <i
+                      class="fas fa-external-link-square-alt"></i></a>
+                  <label>Received:</label><span>{{ invoice.tx3 | 0 }}
+                    {{ invoice.crypto }}<br>{{ ((invoice.tx3 / invoice.btc_value) * 100).toFixed(2) }} <i
+                      class="fas fa-percent"></i></span>
+                </div>
+              </td>
+            </tr>
+        </template>
       </table>
     </div>
     <div>
-      <!-- <vue-html2pdf :show-layout="false" :float-layout="true" :enable-download="true" :preview-modal="false"
+      <vue3-html2pdf :show-layout="false" :float-layout="true" :enable-download="true" :preview-modal="false"
         :filename="reportName" :pdf-quality="2" :manual-pagination="true" pdf-format="a4" pdf-orientation="portrait"
-        pdf-content-width="800px" @progress="onProgress" @hasStartedGeneration="working = true"
+        pdf-content-width="800px" @progress="onProgress($event)" @hasStartedGeneration="working = true"
         @hasGenerated="working = false" ref="html2Pdf">
         <section slot="pdf-content" class="pdf-content">
           <div>
@@ -159,7 +161,7 @@
             Generated Report
             <br><i>by: </i>{{ user }}
             <br><i>on: </i>{{ dateTime() }}
-            <br><i>for store: </i>{{ decode(currentStore.store_name) }}
+            <br><i>for store: </i>{{ _decode(this.currentStore.store_name) }}
             <br><br>
             <table class="print-view">
               <tr>
@@ -169,421 +171,460 @@
                 <th>Value</th>
                 <th>Status</th>
               </tr>
-              <tr v-for="(invoice, key) in invoices" :key="key" :class="key % 6 == 5 ? 'html2pdf__page-break' : ''">
-                <td>
-                  <div>
-                    <span>{{ key + range }}</span>
-                  </div>
-                </td>
-                <td class="mono">
-                  <div>
-                    <span>{{ invoice.invoice_id.substr(0, 6) }}</span>
-                  </div>
-                </td>
-                <td>
-                  <div>
-                    <span>
-                      {{ invoice.created }} [UTC]</span>
-                  </div>
-                </td>
-                <td>
-                  <div>
-                    <span>{{ Number(invoice.invoice_value).toFixed(2) }} <span class="badge">{{ invoice.currency
-                        }}</span></span>
-                    <span><small>@{{ invoice.exchange }}</small></span>
-                  </div>
-                </td>
-                <td>
-                  <div>
-                    <span :class="'status ' + invoice._status">{{ invoice._status || '' }}</span>
-                  </div>
-                </td>
-              </tr>
-              <tr :key="key + 'ex'">
-                <td></td>
-                <td><b>Details:</b></td>
-                <td colSpan="3" class="border-bottom-right border-bottom-left">
-                  <div class="inline-table-notes">
-                    <label v-if="invoice.tx2">Item:</label><span v-if="invoice.tx2">{{ decode(invoice.tx2) }}<br></span>
-                    <label v-if="invoice.payee_email">Payee:</label><span v-if="invoice.payee_email">{{
-                      invoice.payee_email }}<br></span>
-                    <label>Crypto:</label><span>{{ invoice.btc_value }} {{ invoice.crypto }}</span><br>
-                    <label>Address:</label><span>{{ invoice.address }}</span><br>
-                    <label>Received:</label><span>{{ invoice.received }} {{ invoice.crypto }}<br>{{ ((invoice.received /
-                      invoice.btc_value) * 100).toFixed(2) }} %</span>
-                  </div>
-                </td>
-              </tr>
+              <template v-for="(invoice, key) of invoices" :key="key" >
+                <tr :class="key % 6 == 5 ? 'html2pdf__page-break' : ''">
+                  <td>
+                    <div>
+                      <span>{{ (key + range) }}</span>
+                    </div>
+                  </td>
+                  <td class="mono">
+                    <div>
+                      <span>{{ invoice.invoice_id.substr(0, 6) }}</span>
+                    </div>
+                  </td>
+                  <td>
+                    <div>
+                      <span>
+                        {{ (invoice.created) }} [UTC]</span>
+                    </div>
+                  </td>
+                  <td>
+                    <div>
+                      <span>{{ Number(invoice.invoice_value).toFixed(2) }} <span
+                          class="badge">{{ invoice.currency }}</span></span>
+                      <span><small>@{{ invoice.exchange }}</small></span>
+                    </div>
+                  </td>
+                  <td>
+                    <div>
+                      <span :class="'status ' + invoice._status">{{ invoice._status || '' }}</span>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td></td>
+                  <td><b>Details:</b></td>
+                  <td colSpan="3" class="border-bottom-right border-bottom-left">
+                    <div class="inline-table-notes">
+                      <label v-if="invoice.tx2">Item:</label><span
+                        v-if="invoice.tx2">{{ _decode(invoice.tx2) }}<br></span>
+                      <label v-if="invoice.payee_email">Payee:</label><span
+                        v-if="invoice.payee_email">{{ invoice.payee_email }}<br></span>
+                      <label>Crypto:</label><span>{{ invoice.btc_value }} {{ invoice.crypto }}</span><br>
+                      <label>Address:</label><span>{{ invoice.address }}</span><br>
+                      <label>Received:</label><span>{{ invoice.received }}
+                        {{ invoice.crypto }}<br>{{ ((invoice.received / invoice.btc_value) * 100).toFixed(2) }} %</span>
+                    </div>
+                  </td>
+                </tr>
+              </template>
             </table>
           </div>
         </section>
-      </vue-html2pdf> -->
+      </vue3-html2pdf>
     </div>
   </div>
 </template>
 
-<script setup>
-import { ref, computed, watch, onMounted } from 'vue';
-import { useStore } from 'vuex';
-import DateRangePicker from 'vue3-daterange-picker';
-import VueHtml2pdf from 'vue-html2pdf';
-import { useRoute } from 'vue-router';
-const route = useRoute();
-
-const store = useStore();
-
-const message = ref(false);
-const working = ref(true);
-const spinning = ref(true);
-const viewing = ref(20);
-const filter = ref(false);
-const invoices = ref(false);
-const count = ref(0);
-const active = ref(false);
-const statistics = ref(false);
-const dateRange = ref({
-  startDate: false,
-  endDate: false,
-});
-const select = ref([
-  {
-    open: false,
-    selected: false,
-    options: ['expired', 'confirmed', 'receiving', 'partial', '1 confirmation', '2 confirmations'],
+<script>
+import {
+  mapGetters
+} from 'vuex';
+import DateRangePicker from 'vue3-daterange-picker'
+import Vue3Html2pdf from 'vue3-html2pdf'
+export default {
+  name: "InvoicesManager",
+  components: {
+    // eslint-disable-next-line vue/no-unused-components
+    DateRangePicker,
+    Vue3Html2pdf,
   },
-]);
-
-const session = computed(() => store.getters.session);
-const fingerprint = computed(() => store.getters.fingerprint);
-const user = computed(() => store.getters.user);
-const keyiv = computed(() => store.getters.keyiv);
-const keyivId = computed(() => store.getters.keyivId);
-const activeStore = computed(() => store.getters.activeStore);
-const stores = computed(() => store.getters.stores);
-const time = computed(() => store.getters.time);
-
-const currentStore = computed(() => {
-  let current = false;
-  for (const store of stores.value) {
-    if (`${store.store_id.substring(0, 5)}${store.store_id.substring(store.store_id.length - 5)}` === route.params.storeId10) {
-      current = store;
-      break;
+  data() {
+    return {
+      message: false,
+      working: true,
+      spinning: true,
+      viewing: 20,
+      total: false,
+      queryFilter: false,
+      // filters: ['expired', 'confirmed', 'receiving', 'partial', '1 conf.', '2 confs'],
+      invoices: false,
+      count: 0,
+      active: false,
+      statistics: false,
+      dateRange: {
+        startDate: false,
+        endDate: false,
+      },
+      select: [{
+        open: false,
+        selected: false,
+        options: ['expired', 'confirmed', 'receiving', 'partial', '1 confirmation', '2 confirmations']
+      },],
     }
-  }
-  return current;
-});
-
-const reportName = computed(() => {
-  return 'F18Pay Report for Store: ' + decode(currentStore.value.store_name) + ' ::' + dateRange.value.startDate + ' to ' + dateRange.value.endDate + ' ::' + (filter.value ? filter.value : 'unfiltered');
-});
-
-const statisticsOrganised = computed(() => {
-  let array = [];
-  if (statistics.value.average) {
-    let average = Number(statistics.value.average.sum) / Number(statistics.value.average.count);
-    average = average < 0.001 ? average.toFixed(6) : average.toFixed(3);
-    average = !isNaN(average) ? average : 0;
-    array.push({
-      name: 'Average value ' + currentStore.value.network,
-      value: average,
-    });
-  }
-  if (statistics.value.statuses) {
-    let total = 0;
-    for (const stat of statistics.value.statuses) {
-      array.push({
-        name: capitalise(stat.status),
-        value: stat.count,
-      });
-      total += Number(stat.count);
-    }
-    array.push({
-      name: 'Total',
-      value: total,
-    });
-  }
-  if (statistics.value.max) {
-    let value = Number(statistics.value.max);
-    value = value < 0.001 ? value.toFixed(6) : value.toFixed(3);
-    array.push({
-      name: 'Highest value ' + currentStore.value.network,
-      value: value,
-    });
-  }
-  return array;
-});
-
-const range = computed(() => {
-  return viewing.value > 20 ? viewing.value - 20 + 1 : 1;
-});
-
-const storeCode = computed(() => {
-  return activeStore.value.substr(0, 4) + currentStore.value.store_id_int + activeStore.value.substr(activeStore.value.length - 4);
-});
-
-const random = computed(() => {
-  return String(Math.floor(Math.random() * 100) + 2 + '' + new Date().getTime() + Math.floor(Math.random() * 100) + 2 + (Math.random().toString(36).replace(/[^a-zA-Z]+/g, '').substr(0, 5)));
-});
-
-watch(viewing, () => {
-  getInvoices();
-});
-
-watch(filter, () => {
-  viewing.value = 20;
-  getInvoices();
-});
-
-watch(working, (newVal) => {
-  store.commit('setWorking', newVal);
-});
-
-onMounted(() => {
-  document.querySelector('.dynamic-cta-header-space') && (document.querySelector('.dynamic-cta-header-space').innerHTML = '');
-
-
-  store.dispatch('headerUIAppend', [
-    {
-      id: '.refresh-button',
-      fn: getInvoices,
-    },
-    {
-      id: '.download-file',
-      fn: downloadFile,
-    },
-  ]);
-});
-
-const modernSelect = (index, value) => {
-  select.value[index].selected = value;
-  select.value[index].open = false;
-};
-
-const dateTime = () => {
-  let currentdate = new Date();
-  return (
-    currentdate.getFullYear() +
-    '-' +
-    ((currentdate.getMonth() + 1 <= 9 ? '0' + (currentdate.getMonth() + 1) : currentdate.getMonth() + 1) + '-') +
-    (currentdate.getDate() <= 9 ? '0' + currentdate.getDate() : currentdate.getDate()) +
-    ' ' +
-    currentdate.getHours() +
-    ':' +
-    currentdate.getMinutes() +
-    ':' +
-    currentdate.getSeconds()
-  );
-};
-
-const downloadFile = () => {
-  html2Pdf.value.generatePdf();
-};
-
-const capitalise = (string) => {
-  return string.substr(0, 1).toUpperCase() + string.substr(1);
-};
-
-const getInvoiceStatistics = async () => {
-  const username = await store.dispatch('encrypt', {
-    string: user.value,
-    keyiv: keyiv.value,
-  });
-  const storeName = await store.dispatch('encrypt', {
-    string: encodeURIComponent(encodeURI(currentStore.value.store_name)),
-    keyiv: keyiv.value,
-  });
-  await fetch(import.meta.env.VITE_APPLICATION_ENDPOINT + '/store-invoice-statistics', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      username: username,
-      storeName: storeName,
-      fingerprint: fingerprint.value,
-      keyivId: keyivId.value,
-      store_id: currentStore.value.store_id,
+  },
+  computed: {
+    ...mapGetters({
+      session: 'session',
+      fingerprint: 'fingerprint',
+      user: 'user',
+      keyiv: 'keyiv',
+      keyivId: 'keyivId',
+      activeStore: 'activeStore',
+      stores: 'stores',
+      time: 'time',
+      epoch: 'epoch',
     }),
-  })
-    .then((response) => response.json())
-    .then(async (data) => {
-      if (data.proceed == true) {
-        statistics.value = JSON.parse(await store.dispatch('decrypt', {
-          string: data.statistics,
-          keyiv: keyiv.value,
-        }));
-      } else {
-        message.value = data.debug ? data.debug : 'There was a problem with the information provided.';
+    invoicesActive() {
+      let active = false
+      if (this.invoices && this.active) {
+        active = this.invoices[this.active]
       }
-    })
-    .catch((error) => {
-      message.value = message.value + ' \nError: ' + error + '\n';
-      console.error('Error:', error);
-    });
-};
-
-const getInvoices = async () => {
-  working.value = true;
-  spinning.value = true;
-
-  active.value = false;
-  const username = await store.dispatch('encrypt', {
-    string: user.value,
-    keyiv: keyiv.value,
-  });
-  const storeName = await store.dispatch('encrypt', {
-    string: encodeURIComponent(encodeURI(currentStore.value.store_name)),
-    keyiv: keyiv.value,
-  });
-  const storeId = await store.dispatch('encrypt', {
-    string: currentStore.value.store_id,
-    keyiv: keyiv.value,
-  });
-  Date.prototype.yyyymmdd = function () {
-    var mm = this.getMonth() + 1; // getMonth() is zero-based
-    var dd = this.getDate();
-    return [this.getFullYear(), (mm > 9 ? '-' : '-0') + mm, (dd > 9 ? '-' : '-0') + dd].join('');
-  };
-  let rangeStart = dateRange.value.startDate instanceof Date ? dateRange.value.startDate.yyyymmdd() : String(dateRange.value.startDate);
-  rangeStart = rangeStart.indexOf('T') >= 0 ? rangeStart.split('T')[0] : rangeStart.indexOf(' ') >= 0 ? rangeStart.split(' ')[0] : rangeStart;
-  let rangeEnd = dateRange.value.endDate instanceof Date ? dateRange.value.endDate.yyyymmdd() : String(dateRange.value.endDate);
-  rangeEnd = rangeEnd.indexOf('T') >= 0 ? rangeEnd.split('T')[0] : rangeEnd.indexOf(' ') >= 0 ? rangeEnd.split(' ')[0] : rangeEnd;
-  let viewingVal = viewing.value;
-  await fetch(import.meta.env.VITE_APPLICATION_ENDPOINT + '/store-invoices', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
+      return active
     },
-    body: JSON.stringify({
-      username: username,
-      storeName: storeName,
-      fingerprint: fingerprint.value,
-      keyivId: keyivId.value,
-      store_id: storeId,
-      viewing: viewingVal,
-      filter: filter.value,
-      rangeStart: rangeStart,
-      rangeEnd: rangeEnd,
-    }),
-  })
-    .then((response) => response.json())
-    .then(async (data) => {
-      if (data.proceed == true) {
-        count.value = data.count;
-        invoices.value = JSON.parse(await store.dispatch('decrypt', {
-          string: data.invoices,
-          keyiv: keyiv.value,
-        }));
-        dateRange.value.endDate = data.now;
-        working.value = false;
-        spinning.value = false;
-        for (const invoice of invoices.value) {
-          if (invoice.status == 1) {
-            invoice._status = 'receiving';
-          } else if (invoice.status != 4) {
-            getStatus(invoice);
-          } else {
-            invoice._status = 'confirmed';
-          }
-        }
-      } else {
-        message.value = data.debug ? data.debug : 'There was a problem with the information provided.';
-      }
-    })
-    .catch((error) => {
-      message.value = message.value + ' \nError: ' + error + '\n';
-      console.error('Error:', error);
-    });
-};
-
-const getStatus = async (invoice) => {
-  working.value = true;
-  const username = await store.dispatch('encrypt', {
-    string: user.value,
-    keyiv: keyiv.value,
-  });
-  const address = await store.dispatch('encrypt', {
-    string: invoice.address,
-    keyiv: keyiv.value,
-  });
-  const created = await store.dispatch('encrypt', {
-    string: invoice.created,
-    keyiv: keyiv.value,
-  });
-  const id = await store.dispatch('encrypt', {
-    string: invoice.id,
-    keyiv: keyiv.value,
-  });
-  const crypto = await store.dispatch('encrypt', {
-    string: invoice.crypto,
-    keyiv: keyiv.value,
-  });
-  const value = await store.dispatch('encrypt', {
-    string: invoice.btc_value,
-    keyiv: keyiv.value,
-  });
-  const status = await store.dispatch('encrypt', {
-    string: invoice.status,
-    keyiv: keyiv.value,
-  });
-  await fetch(import.meta.env.VITE_APPLICATION_ENDPOINT + '/invoice-check-status', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
+    reportName() {
+      return 'F18Pay Report for Store: ' + this._decode(this.currentStore.store_name) + ' ::' + this.dateRange.startDate + ' to ' + this.dateRange.endDate + ' ::' + (this.queryFilter ? this.queryFilter : 'unfiltered')
     },
-    body: JSON.stringify({
-      username: username,
-      fingerprint: fingerprint.value,
-      keyivId: keyivId.value,
-      address: address,
-      created: created,
-      id: id,
-      crypto: crypto,
-      value: value,
-      status: status,
-    }),
-  })
-    .then((response) => response.json())
-    .then(async (data) => {
-      if (data.proceed == true) {
-        let status_ = await store.dispatch('decrypt', {
-          string: data.status,
-          keyiv: keyiv.value,
+    computedDateRange() {
+      return new Date();
+    },
+    statisticsOrganised() {
+      let array = [];
+
+      if (this.statistics.average) {
+        let average = Number(this.statistics.average.sum) / Number(this.statistics.average.count);
+        average = average < 0.001 ? average.toFixed(6) : average.toFixed(3);
+        average = !isNaN(average) ? average : 0;
+        array.push({
+          name: 'Average value ' + this.currentStore.network,
+          value: average
         });
-        for (const invoice_ of invoices.value) {
-          if (invoice_.id === invoice.id) {
-            invoice_._status = status_;
+      }
+
+      if (this.statistics.statuses) {
+        let total = 0;
+        for (const stat of this.statistics.statuses) {
+          array.push({
+            name: this.capitalise(stat.status),
+            value: stat.count
+          })
+          total += Number(stat.count)
+        }
+        array.push({
+          name: "Total",
+          value: total
+        })
+      }
+      if (this.statistics.max) {
+        let value = Number(this.statistics.max);
+        value = value < 0.001 ? value.toFixed(6) : value.toFixed(3);
+        array.push({
+          name: 'Highest value ' + this.currentStore.network,
+          value: value
+        });
+      }
+
+      return array
+    },
+    range() {
+      let range = this.viewing > 20 ? this.viewing - 20 + 1 : 1
+      return range
+    },
+    storeCode() {
+      return this.activeStore.substr(0, 4) + this.currentStore.store_id_int + this.activeStore.substr(this.activeStore.length - 4)
+    },
+    random() {
+      let random = String(Math.floor(Math.random() * 100) + 2 + "" + new Date().getTime() + Math.floor(Math.random() * 100) + 2 + (Math.random().toString(36).replace(/[^a-zA-Z]+/g, '').substr(0, 5)));
+      return random;
+    },
+    currentStore() {
+      let current = false;
+      if (this.stores) {
+        for (const sto of this.stores) {
+          if (`${sto.store_id.substring(0, 5)}${sto.store_id.substring(sto.store_id.length - 5)}` === this.$route.params.storeId10) {
+            current = sto;
             break;
           }
         }
-        working.value = false;
-      } else {
-        message.value = data.debug ? data.debug : 'There was a problem with the information provided.';
+        return current;
       }
-    })
-    .catch((error) => {
-      message.value = message.value + ' \nError: ' + error + '\n';
-      console.error('Error:', error);
-    });
-};
+      return false
+    },
+    storeName: {
+      get() {
+        return !this.storeNameProxy ? this._decode(this.currentStore.store_name) : this.storeNameProxy;
+      },
+      set(value) {
+        this.storeNameProxy = value
+      }
+    },
+  },
+  watch: {
+    viewing: function () {
+      this.getInvoices()
+    },
+    queryFilter: function () {
+      this.viewing = 20;
+      this.getInvoices()
+    },
+    working() {
+      this.$store.commit("setWorking", this.working);
+    },
+    currentStore() {
+      this.init()
+    },
+  },
+  mounted() {
+    this.init()
+  },
+  created() {
 
-const decode = (string) => {
-  let decoded = decodeURIComponent(decodeURI(string));
-  return decoded;
-};
+  },
+  methods: {
+    init() {
 
-const handleClickStop = () => false;
+      if (this.currentStore) {
+        this.dateRange.startDate = this.currentStore.created.indexOf(' ') >= 0 ? this.currentStore.created.split(' ')[0] : this.currentStore.created;
+        this.dateRange.startDate = this.dateRange.startDate.indexOf('T') > 0 ? this.dateRange.startDate.split('T')[0] : this.dateRange.startDate;
+      } else {
+        this.dateRange.startDate = this.epoch
+      }
+      this.dateRange.endDate = this.time;
 
-// Perform initialization previously done in the created hook
-dateRange.value.startDate = currentStore.value.created.indexOf(' ') >= 0 ? currentStore.value.created.split(' ')[0] : currentStore.value.created;
-dateRange.value.startDate = currentStore.value.created.indexOf('T') >= 0 ? currentStore.value.created.split('T')[0] : dateRange.value.startDate;
-dateRange.value.endDate = time.value;
+      document.querySelector('.dynamic-cta-header-space') && (document.querySelector('.dynamic-cta-header-space').innerHTML = '')
+      this.getInvoiceStatistics();
+      this.getInvoices();
 
-getInvoiceStatistics();
-  getInvoices();
+      this.$store.dispatch('headerUIAppend', [{
+        id: '.refresh-button',
+        fn: this.getInvoices,
+      }, {
+        id: '.download-file',
+        fn: this.downloadFile,
+      }]);
+    },
+    modernSelect(index, value) {
+      this.select[index].selected = value;
+      this.select[index].open = false;
+    },
+    dateTime() {
+      let currentdate = new Date();
+      return currentdate.getFullYear() + "-" +
+        +((currentdate.getMonth() + 1) <= 9 ? '0' + (currentdate.getMonth() + 1) : (currentdate.getMonth() + 1)) + "-" + (currentdate.getDate() <= 9 ? '0' + currentdate.getDate() : currentdate.getDate()) + "-" +
+        +" " +
+        currentdate.getHours() + ":" +
+        currentdate.getMinutes() + ":" +
+        currentdate.getSeconds()
+    },
+    downloadFile() {
+      this.$refs.html2Pdf.generatePdf()
+    },
+    capitalise(string) {
+      return string.substr(0, 1).toUpperCase() + string.substr(1);
+    },
+    async getInvoiceStatistics() {
+      const username = await this.$store.dispatch('encrypt', {
+        string: this.user,
+        keyiv: this.keyiv
+      });
+      const storeName = await this.$store.dispatch('encrypt', {
+        string: encodeURIComponent(encodeURI(this.storeName)),
+        keyiv: this.keyiv
+      });
+      await fetch(process.env.VUE_APP_APPLICATION_ENDPOINT + "/store-invoice-statistics", {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          username: username,
+          storeName: storeName,
+          fingerprint: this.fingerprint,
+          keyivId: this.keyivId,
+          store_id: this.currentStore.store_id,
+        }),
+      })
+        .then((response) => response.json())
+        .then(async (data) => {
+          if (data.proceed == true) {
+            this.statistics = JSON.parse(await this.$store.dispatch('decrypt', {
+              string: data.statistics,
+              keyiv: this.keyiv
+            }))
+          } else {
+            this.message = data.debug ? data.debug : "There was a problem with the information provided."
+          }
+        })
+        .catch((error) => {
+          this.message = this.message + ' \nError: ' + error + '\n';
+          console.error("Error:", error);
+        });
+    },
+    async getInvoices() {
+      this.working = true;
+      this.spinning = true;
+
+      this.active = false;
+      const username = await this.$store.dispatch('encrypt', {
+        string: this.user,
+        keyiv: this.keyiv
+      });
+      const storeName = await this.$store.dispatch('encrypt', {
+        string: encodeURIComponent(encodeURI(this.storeName)),
+        keyiv: this.keyiv
+      });
+      const storeId = await this.$store.dispatch('encrypt', {
+        string: this.currentStore.store_id,
+        keyiv: this.keyiv
+      });
+      Date.prototype.yyyymmdd = function () {
+        var mm = this.getMonth() + 1; // getMonth() is zero-based
+        var dd = this.getDate();
+        return [this.getFullYear(),
+        (mm > 9 ? '-' : '-0') + mm,
+        (dd > 9 ? '-' : '-0') + dd
+        ].join('');
+      };
+      let rangeStart = this.dateRange.startDate instanceof Date ? this.dateRange.startDate.yyyymmdd() : String(this.dateRange.startDate);
+      rangeStart = rangeStart.indexOf("T") >= 0 ? rangeStart.split('T')[0] : (rangeStart.indexOf(" ") >= 0 ? rangeStart.split(' ')[0] : rangeStart);
+      let rangeEnd = this.dateRange.endDate instanceof Date ? this.dateRange.endDate.yyyymmdd() : String(this.dateRange.endDate);
+      rangeEnd = rangeEnd.indexOf("T") >= 0 ? rangeEnd.split('T')[0] : (rangeEnd.indexOf(" ") >= 0 ? rangeEnd.split(' ')[0] : rangeEnd);
+      let viewing = this.viewing; //==this.count?this.range:this.viewing;
+      const invoicesFetchBody = {
+        username: username,
+        storeName: storeName,
+        fingerprint: this.fingerprint,
+        keyivId: this.keyivId,
+        store_id: storeId,
+        viewing: viewing,
+        rangeStart: rangeStart,
+        rangeEnd: rangeEnd,
+      }
+      if (this.queryFilter) { invoicesFetchBody.filter = this.queryFilter }
+      await fetch(process.env.VUE_APP_APPLICATION_ENDPOINT + "/store-invoices", {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(invoicesFetchBody),
+      })
+        .then((response) => response.json())
+        .then(async (data) => {
+          if (data.proceed == true) {
+            this.count = data.count;
+            this.invoices = JSON.parse(await this.$store.dispatch('decrypt', {
+              string: data.invoices,
+              keyiv: this.keyiv
+            })),
+              this.dateRange.endDate = data.now;
+            this.working = false;
+            this.spinning = false;
+            for (const invoice of this.invoices) {
+
+              if (invoice.status == 1) {
+                invoice._status = "receiving";
+              } else if (invoice.status != 4) {
+                this.getStatus(invoice)
+              } else {
+                invoice._status = "confirmed";
+              }
+            }
+          } else {
+            this.message = data.debug ? data.debug : "There was a problem with the information provided."
+          }
+        })
+        .catch((error) => {
+          this.message = this.message + ' \nError: ' + error + '\n';
+          console.error("Error:", error);
+        });
+    },
+    async getStatus(invoice) {
+      if (!invoice.id) { return }
+      this.working = true;
+      const username = await this.$store.dispatch('encrypt', {
+        string: this.user,
+        keyiv: this.keyiv
+      });
+      const address = await this.$store.dispatch('encrypt', {
+        string: invoice.address,
+        keyiv: this.keyiv
+      });
+      const created = await this.$store.dispatch('encrypt', {
+        string: invoice.created,
+        keyiv: this.keyiv
+      });
+      const id = await this.$store.dispatch('encrypt', {
+        string: String(invoice.id).trim(),
+        keyiv: this.keyiv
+      });
+      const crypto = await this.$store.dispatch('encrypt', {
+        string: invoice.crypto,
+        keyiv: this.keyiv
+      });
+      const value = await this.$store.dispatch('encrypt', {
+        string: invoice.btc_value,
+        keyiv: this.keyiv
+      });
+      const status = await this.$store.dispatch('encrypt', {
+        string: invoice.status,
+        keyiv: this.keyiv
+      });
+      await fetch(process.env.VUE_APP_APPLICATION_ENDPOINT + "/invoice-check-status", {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          username: username,
+          fingerprint: this.fingerprint,
+          keyivId: this.keyivId,
+          address: address,
+          created: created,
+          id: id,
+          crypto: crypto,
+          value: value,
+          status: status,
+        }),
+      })
+        .then((response) => response.json())
+        .then(async (data) => {
+          if (data.proceed == true) {
+            let status_ = await this.$store.dispatch('decrypt', {
+              string: data.status,
+              keyiv: this.keyiv
+            })
+            for (const invoice_ of this.invoices) {
+              if (invoice_.id === invoice.id) {
+                invoice_._status = status_;
+                break;
+              }
+            }
+            this.working = false;
+
+          } else {
+            this.message = data.debug ? data.debug : "There was a problem with the information provided."
+          }
+        })
+        .catch((error) => {
+          this.message = this.message + ' \nError: ' + error + '\n';
+          console.error("Error:", error);
+        });
+    },
+    _decode(string) {
+      let decoded = decodeURIComponent(decodeURI(string));
+      return decoded
+    },
+    _null() {
+      return false
+    },
+  },
+}
 </script>
 
 <style lang="scss" scoped>
+@import "@/assets/css/fonts-mono.scss";
+
 .invoice-list {
   min-height: 500px;
   border-collapse: collapse;
@@ -621,7 +662,7 @@ getInvoiceStatistics();
     }
   }
 
-  .timeago {
+  .vue-moments-ago {
     font-size: inherit;
   }
 
@@ -715,7 +756,4 @@ getInvoiceStatistics();
     }
   }
 }
-</style>
-<style lang="css">
-@import "@/assets/css/fonts-mono.css";
 </style>

@@ -1,19 +1,19 @@
-import { createApp } from 'vue';
-import App from './App.vue';
-import router from './router';
-import store from './store';
-import VueCryptojs from 'vue-cryptojs';
+import {createApp} from 'vue'
+import App from './App.vue'
+import router from './router'
+import store from './store'
+import CryptoJS from 'crypto-js'
 import timeago from 'vue-timeago3'
-import InputColorPicker from "./components/modules/InputColorPicker.vue";
-const app = createApp(App);
 
-app.use(router);
-app.use(store);
-app.use(VueCryptojs);
-app.use(timeago);
+const app = createApp(App)
 
-app.use(InputColorPicker);
-app.mount('#app');
+// app.config.globalProperties.$crypto = CryptoJS
+
+app.use(router)
+app.use(store)
+app.use(CryptoJS)
+app.use(timeago)
+app.mount('#app')
 
 store.dispatch('init');
 store.dispatch('ui');

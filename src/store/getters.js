@@ -50,5 +50,8 @@ let getters = {
   working: state => {
     return state.working
   },
+  epoch: () => {
+    return "2018-01-01"
+  },
 }
 export default getters

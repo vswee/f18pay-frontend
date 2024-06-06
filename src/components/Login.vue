@@ -40,7 +40,6 @@ import {
   mapGetters
 } from 'vuex';
 
-
 export default {
   name: "Login",
   data() {
@@ -79,7 +78,7 @@ export default {
         this.message = "Please enter your account email address"
       } else {
         const username = this.encrypt(this.username);
-        fetch(import.meta.env.VITE_APPLICATION_ENDPOINT + "/check-username", {
+        fetch('http://localhost:3000/check-username', {
             method: 'POST', // or 'PUT'
             headers: {
               'Content-Type': 'application/json',
@@ -111,7 +110,7 @@ export default {
       this.working = true;
       const encrypted = this.encrypt(this.password);
       const username = this.encrypt(this.username);
-      fetch(import.meta.env.VITE_APPLICATION_ENDPOINT + "/password-login", {
+      fetch('http://localhost:3000/password-login', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -150,7 +149,7 @@ export default {
       this.$router.push('dashboard');
       return
     }
-    fetch(import.meta.env.VITE_APPLICATION_ENDPOINT + "/get-keyiv", {
+    fetch(process.env.VUE_APP_APPLICATION_ENDPOINT + "/get-keyiv", {
         headers: {
           "Content-Type": "multipart/form-data",
       },

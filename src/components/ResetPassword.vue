@@ -37,7 +37,10 @@ import {
   mapGetters
 } from 'vuex';
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> upgrade-from-v1-vue2-to-v1-vue3
 export default {
   name: "Signup",
   data() {
@@ -78,7 +81,11 @@ export default {
         this.message = "Please enter your email address"
       } else {
         const username = this.encrypt(this.username);
+<<<<<<< HEAD
         fetch(import.meta.env.VITE_APPLICATION_ENDPOINT + "/check-username-for-password-reset", {
+=======
+        fetch('http://localhost:3000/check-username-for-password-reset', {
+>>>>>>> upgrade-from-v1-vue2-to-v1-vue3
             method: 'POST', // or 'PUT'
             headers: {
               'Content-Type': 'application/json',
@@ -109,7 +116,11 @@ export default {
         const encrypted = this.encrypt(this.password);
         const encrypted2 = this.encrypt(this.password2);
         const username = this.encrypt(this.username);
+<<<<<<< HEAD
         fetch(import.meta.env.VITE_APPLICATION_ENDPOINT + "/register-new-user", {
+=======
+        fetch('http://localhost:3000/register-new-user', {
+>>>>>>> upgrade-from-v1-vue2-to-v1-vue3
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -151,7 +162,11 @@ export default {
       this.$router.push('dashboard');
       return
     }
+<<<<<<< HEAD
     fetch(import.meta.env.VITE_APPLICATION_ENDPOINT + "/get-keyiv", {
+=======
+    fetch(process.env.VUE_APP_APPLICATION_ENDPOINT + "/get-keyiv", {
+>>>>>>> upgrade-from-v1-vue2-to-v1-vue3
         headers: {
           "Content-Type": "multipart/form-data",
         },
