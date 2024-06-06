@@ -1,5 +1,6 @@
-import Vue from 'vue'
-import VueRouter from 'vue-router'
+/* eslint-disable no-unused-vars */
+import { createApp } from 'vue'
+import { createRouter, createWebHistory } from 'vue-router'
 import Home from '@/components/Home'
 import Login from '@/components/Login'
 import Signup from '@/components/Signup'
@@ -12,7 +13,9 @@ import WalletSettings from '@/components/stores-views/WalletSettings.vue';
 import StoreAssets from '@/components/stores-views/StoreAssets.vue';
 import InvoicesManager from '@/components/stores-views/InvoicesManager.vue';
 import PaymentRequest from '@/components/stores-views/PaymentRequest.vue';
-Vue.use(VueRouter)
+
+const app = createApp({})
+
 const routes = [
   { path: '/', name: 'home', component: Home, meta: { title: 'Home', description: 'Welcome to our application!' } },
   {
@@ -30,124 +33,15 @@ const routes = [
   { path: '/verify-email', name: 'verify-email', component: VerifyEmail, meta: { title: 'Verify Email', description: 'Verify your email address!' } },
   { path: '/reset-password', name: 'reset-password', component: ResetPassword, meta: { title: 'Reset Password', description: 'Reset your password!' } },
 ];
-// 
 
-// const routes = [
-//   {
-//     path: '/',
-//     name: 'home',
-//     component: Home,
-//     meta: {
-//       title: 'Home',
-//       metaTags: [
-//         {
-//           name: 'description',
-//           content: 'Placeholder'
-//         },
-//         {
-//           property: 'og:description',
-//           content: 'Placeholder'
-//         }
-//       ]
-//     }
-//   },
-//   {
-//     path: '/login',
-//     name: 'login',
-//     component: Login,
-//     meta: {
-//       title: 'Login',
-//       metaTags: [
-//         {
-//           name: 'description',
-//           content: 'Placeholder'
-//         },
-//         {
-//           property: 'og:description',
-//           content: 'Placeholder'
-//         }
-//       ]
-//     }
-//   },
-//   {
-//     path: '/signup',
-//     name: 'signup',
-//     component: Signup,
-//     meta: {
-//       title: 'Signup',
-//       metaTags: [
-//         {
-//           name: 'description',
-//           content: 'Placeholder'
-//         },
-//         {
-//           property: 'og:description',
-//           content: 'Placeholder'
-//         }
-//       ]
-//     }
-//   },
-//   {
-//     path: '/verify-email',
-//     name: 'verify-email',
-//     component: VerifyEmail,
-//     meta: {
-//       title: 'Verify Email',
-//       metaTags: [
-//         {
-//           name: 'description',
-//           content: 'Placeholder'
-//         },
-//         {
-//           property: 'og:description',
-//           content: 'Placeholder'
-//         }
-//       ]
-//     }
-//   },
-//   {
-//     path: '/reset-password',
-//     name: 'reset-password',
-//     component: ResetPassword,
-//     meta: {
-//       title: 'Verify Email',
-//       metaTags: [
-//         {
-//           name: 'description',
-//           content: 'Placeholder'
-//         },
-//         {
-//           property: 'og:description',
-//           content: 'Placeholder'
-//         }
-//       ]
-//     }
-//   },
-//   {
-//     path: '/dashboard',
-//     name: 'dashboard',
-//     component: Dashboard,
-//     meta: {
-//       title: 'Dashboard',
-//       metaTags: [
-//         {
-//           name: 'description',
-//           content: 'Placeholder'
-//         },
-//         {
-//           property: 'og:description',
-//           content: 'Placeholder'
-//         }
-//       ]
-//     }
-//   },
-// ]
 
-const router = new VueRouter({
+const router = createRouter({
+  history: createWebHistory(),
   mode: 'history',
   base: process.env.BASE_URL,
   routes
 })
+app.use(router)
 
 // This callback runs before every route change, including on page load.
 router.beforeEach((to, from, next) => {

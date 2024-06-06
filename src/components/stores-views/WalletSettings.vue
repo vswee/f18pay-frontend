@@ -107,6 +107,9 @@ export default {
     working() {
       this.$store.commit("setWorking", this.working);
     },
+    currentStore() {
+      this.init()
+    },
   },
   computed: {
     ...mapGetters({
@@ -157,16 +160,17 @@ export default {
     },
   },
   mounted() {
-    document.querySelector('.dynamic-cta-header-space') && (document.querySelector('.dynamic-cta-header-space').innerHTML = '')
+this.init()
+  },
+  methods: {
+    init(){    document.querySelector('.dynamic-cta-header-space') && (document.querySelector('.dynamic-cta-header-space').innerHTML = '')
     this.zpub = this.currentStore.zpub || '';
     this.network = this.currentStore.network || '';
     this.addressDerivationType = this.currentStore.zpub ? 'external' : 'internal'
     this.$store.dispatch('headerUIAppend', [{
       id: '#saveButton',
       fn: this.saveSettings,
-    }]);
-  },
-  methods: {
+    }]);},
     async startRequestForKeys() {
       //COMPLETE
       this.working = true;

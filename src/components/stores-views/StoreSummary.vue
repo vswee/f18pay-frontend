@@ -57,19 +57,24 @@ export default {
     },
   },
   watch: {
-    activeStore: function (val) {
+    currentStore(val) {
       this.fetchInvoiceValues(val)
+      this.init()
     },
     $route(){
     this.fetchInvoiceValues(this.activeStore)
+    this.init()
       
     },
   },
   mounted() {
-    document.querySelector('.dynamic-cta-header-space') && (document.querySelector('.dynamic-cta-header-space').innerHTML = '')
-    this.fetchInvoiceValues(this.activeStore)
+    this.init()
   },
   methods: {
+    init() {
+      document.querySelector('.dynamic-cta-header-space') && (document.querySelector('.dynamic-cta-header-space').innerHTML = '')
+    this.fetchInvoiceValues(this.activeStore)
+    },
     parseImgSrc,
     _decode(string) {
       let decoded = decodeURIComponent(decodeURI(string));

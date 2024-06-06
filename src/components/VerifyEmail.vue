@@ -37,13 +37,9 @@
 </template>
 
 <script>
-import Vue from "vue";
-import VueCryptojs from "vue-cryptojs";
 import {
   mapGetters
 } from 'vuex';
-
-Vue.use(VueCryptojs);
 
 export default {
   name: "VerifyEmail",

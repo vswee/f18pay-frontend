@@ -1,3 +1,5 @@
+<!-- eslint-disable vue/require-v-for-key -->
+<!-- eslint-disable vue/no-template-key -->
 <template lang="">
 <div :class="working && spinning?'store-management no-click spin-fresco':(working && !spinning?'store-management no-click':'store-management')">
   <!-- MODAL -->
@@ -20,7 +22,7 @@
         <input id="copy_to_clipboard_workspace" class="transparent">
 
       </template>
-      <template v-if="!confirmedCreatedAddress">
+<template v-if="!confirmedCreatedAddress">
         <div class="form-section">
           <div class="sub-sect">
             <label for="">Description</label>
@@ -89,45 +91,47 @@
           </div>
         </div>
       </template>
+</div>
+</div>
+<!-- MODAL -->
+<div :class="working?'form page working':'form page'" @click.stop="_null()">
+  <h1><span>Payment Requests</span><span :class="'badge ' + currentStore.network">{{currentStore.network}}</span></h1>
+
+  <div class="message" v-if="message"><i class="fas fa-exclamation-circle"></i> {{message}}</div>
+  <div class="flex">
+    <div class="button-cluster">
+      <a class="btn refresh-button" @click="getPaymentRequests" title="Refresh"><i class="fas fa-sync"></i></a>
     </div>
+    <div class="button-cluster">
+      <a class="btn" id="newRequests" @click="newRequest()" title="Create Payment Request"><i class="fas fa-plus"></i>
+        <span>New Request</span></a>
+    </div>
+    <div class="button-cluster">
+      <a class="btn" @click="viewing=20"><i><i class="fas fa-chevron-left"></i><i
+            class="fas fa-chevron-left"></i></i></a>
+      <a class="btn list-back" @click="viewing=viewing-20<20?20:viewing=viewing-20"><i
+          class="fas fa-chevron-left"></i></a>
+      <a class="">{{range}} to {{viewing>=count?count:viewing}} of {{count}}</a>
+      <a class="btn" @click="viewing=viewing+20>count?count:viewing+20"><i class="fas fa-chevron-right"></i></a>
+      <a class="btn" @click="viewing=count"><i><i class="fas fa-chevron-right"></i><i
+            class="fas fa-chevron-right"></i></i></a>
+    </div>
+
+    <div class="date-range-parent">
+      <DateRangePicker ref="picker" :locale-data="{ firstDay: 1, format: 'dd-mm-yyyy' }" :minDate="null" :maxDate="null" :singleDatePicker="false" :timePicker="false" :timePicker24Hour="false" :showWeekNumbers="true" :showDropdowns="false" :autoApply="true" v-model="dateRange" :dateRange="dateRange" @update="getPaymentRequests" :linkedCalendars="false"/>
+    </div>
+
   </div>
-  <!-- MODAL -->
-  <div :class="working?'form page working':'form page'" @click.stop="_null()">
-    <h1><span>Payment Requests</span><span :class="'badge ' + currentStore.network">{{currentStore.network}}</span></h1>
-
-    <div class="message" v-if="message"><i class="fas fa-exclamation-circle"></i> {{message}}</div>
-    <div class="flex">
-      <div class="button-cluster">
-        <a class="btn refresh-button" @click="getPaymentRequests" title="Refresh"><i class="fas fa-sync"></i></a>
-      </div>
-      <div class="button-cluster">
-        <a class="btn" id="newRequests" @click="newRequest()" title="Create Payment Request"><i class="fas fa-plus"></i> <span>New Request</span></a>
-      </div>
-      <div class="button-cluster">
-        <a class="btn" @click="viewing=20"><i><i class="fas fa-chevron-left"></i><i class="fas fa-chevron-left"></i></i></a>
-        <a class="btn list-back" @click="viewing=viewing-20<20?20:viewing=viewing-20"><i class="fas fa-chevron-left"></i></a>
-        <a class="">{{range}} to {{viewing>=count?count:viewing}} of {{count}}</a>
-        <a class="btn" @click="viewing=viewing+20>count?count:viewing+20"><i class="fas fa-chevron-right"></i></a>
-        <a class="btn" @click="viewing=count"><i><i class="fas fa-chevron-right"></i><i class="fas fa-chevron-right"></i></i></a>
-      </div>
-
-      <div class="date-range-parent">
-        <date-range-picker ref="picker" :locale-data="{ firstDay: 1, format: 'dd-mm-yyyy' }" :minDate="null" :maxDate="null" :singleDatePicker="false" :timePicker="false" :timePicker24Hour="false" :showWeekNumbers="true" :showDropdowns="false" :autoApply="true" v-model="dateRange" @update="getPaymentRequests" :linkedCalendars="false">
-
-        </date-range-picker>
-      </div>
-
-    </div>
-    <table class="request-list">
-      <tr>
-        <th>#</th>
-        <th>ID</th>
-        <th>Created</th>
-        <th>Value</th>
-        <th>Status</th>
-      </tr>
-      <template v-for="(request, key) of requests">
-        <tr :class="active==key?'list-item active':'list-item'" @click="active=key" :key="key">
+  <table class="request-list">
+    <tr>
+      <th>#</th>
+      <th>ID</th>
+      <th>Created</th>
+      <th>Value</th>
+      <th>Status</th>
+    </tr>
+    <template v-for="(request, key) of requests" :key="key">
+        <tr :class="active==key?'list-item active':'list-item'" @click.stop="active=key">
           <td class="mono border-top-left">
             <div>
               <span>{{(key+range)}}</span>
@@ -141,7 +145,7 @@
           <td>
             <div>
               <span>
-                <vue-moments-ago prefix="" suffix="ago" :date="request.created" lang="en" /></span>
+                <timeago prefix="" suffix="ago" :datetime="request.created" lang="en" /></span>
               <span v-if="active==key"><small>{{(request.created)}} [UTC]</small></span>
             </div>
           </td>
@@ -169,9 +173,9 @@
             </div>
           </td>
         </tr>
-      </template>
-    </table>
-  </div>
+    </template>
+  </table>
+</div>
 
 </div>
 </template>
@@ -180,12 +184,10 @@
 import {
   mapGetters
 } from 'vuex';
-import VueMomentsAgo from 'vue-moments-ago'
-import DateRangePicker from 'vue2-daterange-picker'
+import DateRangePicker from 'vue3-daterange-picker'
 export default {
   name: "PaymentRequest",
   components: {
-    VueMomentsAgo,
     DateRangePicker,
   },
   data() {
@@ -239,6 +241,13 @@ export default {
       activeStore: 'activeStore',
       stores: 'stores',
     }),
+    requestsActive() {
+      let active = false
+      if (this.requests && this.active) {
+        active = this.requests[this.active]
+      }
+      return active
+    },
     newRequestCheck() {
       let issues = 0;
       if (!this.value || isNaN(this.value) || this.value < 0) {
@@ -359,16 +368,21 @@ export default {
       this.getPaymentRequests()
     },
     currentStore() {
-      this.getPrePopulate();
-    this.getPaymentRequests();
+      this.init()
     },
   },
   mounted() {
-    // let t = this;
+      this.init()
+    
+  },
+  created() {
+  },
+  methods: {
+    init() {
+      // let t = this;
     document.querySelector('.dynamic-cta-header-space') && (document.querySelector('.dynamic-cta-header-space').innerHTML = '')
     this.getPrePopulate();
     this.getPaymentRequests();
-    this.select[2].options.push(this.currentStore.network.toUpperCase())
 
     this.$store.dispatch('headerUIAppend', [{
       id: '#newRequests',
@@ -376,17 +390,16 @@ export default {
     }, {
       id: '.refresh-button',
       fn: this.getPaymentRequests,
-    }]);
-  },
-  created() {
-    this.dateRange.startDate = this.currentStore.created.indexOf(' ') >= 0 ? this.currentStore.created.split(' ')[0] : this.currentStore.created;
-  },
-  methods: {
+      }]);
+    if(this.currentStore)
+    {this.select[2].options.push(this.currentStore.network.toUpperCase())
+    this.dateRange.startDate = this.currentStore.created.indexOf(' ') >= 0 ? this.currentStore.created.split(' ')[0] : this.currentStore.created;}
+    },
     copyCode(copied) {
 
       let workspace = document.getElementById("copy_to_clipboard_workspace");
       (workspace.value = copied),
-      workspace.focus(),
+        workspace.focus(),
         workspace.select();
       try {
         if (document.execCommand("copy")) {
@@ -429,22 +442,22 @@ export default {
         });
 
         await fetch(process.env.VUE_APP_APPLICATION_ENDPOINT + "/store-requests-create-new", {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-              username: username,
-              fingerprint: this.fingerprint,
-              keyivId: this.keyivId,
-              store_id: storeId,
-              description: description,
-              email: email,
-              value: value,
-              currency: currency,
-              notify: this.sendEmail,
-            }),
-          })
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            username: username,
+            fingerprint: this.fingerprint,
+            keyivId: this.keyivId,
+            store_id: storeId,
+            description: description,
+            email: email,
+            value: value,
+            currency: currency,
+            notify: this.sendEmail,
+          }),
+        })
           .then((response) => response.json())
           .then(async (data) => {
             if (data.proceed == true) {
@@ -507,17 +520,17 @@ export default {
         keyiv: this.keyiv
       });
       await fetch(process.env.VUE_APP_APPLICATION_ENDPOINT + "/store-requests-pre-populate", {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            username: username,
-            fingerprint: this.fingerprint,
-            keyivId: this.keyivId,
-            store_id: storeId,
-          }),
-        })
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          username: username,
+          fingerprint: this.fingerprint,
+          keyivId: this.keyivId,
+          store_id: storeId,
+        }),
+      })
         .then((response) => response.json())
         .then(async (data) => {
           if (data.proceed == true) {
@@ -567,8 +580,8 @@ export default {
         var mm = this.getMonth() + 1; // getMonth() is zero-based
         var dd = this.getDate();
         return [this.getFullYear(),
-          (mm > 9 ? '-' : '-0') + mm,
-          (dd > 9 ? '-' : '-0') + dd
+        (mm > 9 ? '-' : '-0') + mm,
+        (dd > 9 ? '-' : '-0') + dd
         ].join('');
       };
       let rangeStart = this.dateRange.startDate instanceof Date ? this.dateRange.startDate.yyyymmdd() : String(this.dateRange.startDate);
@@ -577,30 +590,30 @@ export default {
       rangeEnd = rangeEnd.indexOf("T") >= 0 ? rangeEnd.split('T')[0] : (rangeEnd.indexOf(" ") >= 0 ? rangeEnd.split(' ')[0] : rangeEnd);
       let viewing = this.viewing; //==this.count?this.range:this.viewing;
       await fetch(process.env.VUE_APP_APPLICATION_ENDPOINT + "/store-requests", {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            username: username,
-            storeName: storeName,
-            fingerprint: this.fingerprint,
-            keyivId: this.keyivId,
-            store_id: storeId,
-            viewing: viewing,
-            filter: this.filter,
-            rangeStart: rangeStart,
-            rangeEnd: rangeEnd,
-          }),
-        })
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          username: username,
+          storeName: storeName,
+          fingerprint: this.fingerprint,
+          keyivId: this.keyivId,
+          store_id: storeId,
+          viewing: viewing,
+          filter: this.filter,
+          rangeStart: rangeStart,
+          rangeEnd: rangeEnd,
+        }),
+      })
         .then((response) => response.json())
         .then(async (data) => {
           if (data.proceed == true) {
             this.count = data.count;
             this.requests = JSON.parse(await this.$store.dispatch('decrypt', {
-                string: data.requests,
-                keyiv: this.keyiv
-              })),
+              string: data.requests,
+              keyiv: this.keyiv
+            })),
               this.dateRange.endDate = data.now;
             this.working = false;
             this.spinning = false;
@@ -650,22 +663,22 @@ export default {
         keyiv: this.keyiv
       });
       await fetch(process.env.VUE_APP_APPLICATION_ENDPOINT + "/request-check-status", {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            username: username,
-            fingerprint: this.fingerprint,
-            keyivId: this.keyivId,
-            address: address,
-            created: created,
-            id: id,
-            crypto: crypto,
-            value: value,
-            status: status,
-          }),
-        })
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          username: username,
+          fingerprint: this.fingerprint,
+          keyivId: this.keyivId,
+          address: address,
+          created: created,
+          id: id,
+          crypto: crypto,
+          value: value,
+          status: status,
+        }),
+      })
         .then((response) => response.json())
         .then(async (data) => {
           if (data.proceed == true) {
@@ -703,6 +716,7 @@ export default {
 
 <style lang="scss" scoped>
 @import "@/assets/css/fonts-mono.scss";
+
 .request-list {
   min-height: 500px;
   border-collapse: collapse;

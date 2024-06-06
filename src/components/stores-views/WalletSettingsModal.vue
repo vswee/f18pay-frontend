@@ -31,7 +31,7 @@
         <div class="form-section" v-if="!downloadFile">
           <div class="sub-sect">
             <label for="storeName">Enter code</label>
-            <input v-model="code" type="text" placeholder="123456" v-on:keyup.enter="verifyCode()" />
+            <input v-model="codeProxy" type="text" placeholder="123456" v-on:keyup.enter="verifyCode()" />
             <span class="help-text">We've sent a code to the email address for this F18 Pay account owner. Enter it above to download all the internal keys associated with this Store.</span>
           </div>
           <div class="flex">
@@ -83,6 +83,7 @@ export default {
       email: false,
       url: false,
       downloadFile: false,
+      codeProxy:this.code,
     }
   },
   watch: {

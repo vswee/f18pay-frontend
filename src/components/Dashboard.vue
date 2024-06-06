@@ -88,6 +88,7 @@ export default {
         });
       }
     } else {
+      console.log("SESSION VALIDATED")
       this.fetchStores()
     }
 
@@ -135,10 +136,6 @@ export default {
           this.message = this.message + ' \nError: ' + error + '\n';
           console.error("Error:", error);
         });
-    },
-    async openStore(id) {
-      this.$store.commit("setStoreView", 'overview');
-      this.$store.commit("setActiveStore", id);
     },
     newStore() {
       this.$store.commit("setStoreModalView", 'new');

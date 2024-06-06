@@ -45,7 +45,7 @@
               <input type="hidden" name="redirectURL" :value="currentStore.url" />
               <input type="hidden" name="currency" :value="select[0].selected" />
 
-              <button type="submit" :style="'cursor:pointer;min-width: 150px;width: max-content;background: ' + storePrimaryColour+ ';color:' + textColor + ';border: 0;font-size: 14px;font-family: \'Arial\', sans-serif;border-radius: 100px;padding: 15px 20px;max-width: calc(200px - 40px);line-height: 14px;transition:.1s ease;'" alt="Click here to complete this payment." :onmouseenter="'this.style[\'background-color\']=\''+storeSecondaryColour+'\';this.style.color=\'' + textAccent + '\';'" :onmouseleave="'this.style[\'background-color\']=\''+storePrimaryColour+'\';this.style.color=\'' + textColor + '\';'">Pay <span style="display: inline-grid; grid-template: 1fr auto / 1fr;vertical-align: top;gap: 0;line-height: 1;position: relative;"><span>{{fixedPrice}}</span> <span style="font-size: 7px;position: absolute;bottom: 7px;width: 100%;text-align: center;top: 100%;opacity: .5;">{{select[0].selected}}</span></span> with F18</button>
+              <button type="submit" :style="'cursor:pointer;min-width: 150px;width: max-content;background: ' + storePrimaryProxy+ ';color:' + textColor + ';border: 0;font-size: 14px;font-family: \'Arial\', sans-serif;border-radius: 100px;padding: 15px 20px;max-width: calc(200px - 40px);line-height: 14px;transition:.1s ease;'" alt="Click here to complete this payment." :onmouseenter="'this.style[\'background-color\']=\''+storeSecondaryProxy+'\';this.style.color=\'' + textAccent + '\';'" :onmouseleave="'this.style[\'background-color\']=\''+storePrimaryProxy+'\';this.style.color=\'' + textColor + '\';'">Pay <span style="display: inline-grid; grid-template: 1fr auto / 1fr;vertical-align: top;gap: 0;line-height: 1;position: relative;"><span>{{fixedPrice}}</span> <span style="font-size: 7px;position: absolute;bottom: 7px;width: 100%;text-align: center;top: 100%;opacity: .5;">{{select[0].selected}}</span></span> with F18</button>
             </form>
           </div>
           <div class="flex">
@@ -65,11 +65,11 @@
               <input type="hidden" name="currency" :value="select[0].selected" />
 
               <div>
-                <a :style="'margin-right:.5rem;cursor:pointer;min-width: 150px;width: max-content;background: ' + storePrimaryColour+ ';color: ' + textColor + ';border: 0;font-size: 14px;font-family: \'Arial\', sans-serif;border-radius: 100px;padding: 15px 20px;max-width: calc(200px - 40px);line-height: 14px;transition:.1s ease;'" alt="Increase value" :onmouseenter="'this.style[\'background-color\']=\''+storeSecondaryColour+'\';this.style.color=\'' + textAccent + '\';'" :onmouseleave="'this.style[\'background-color\']=\''+storePrimaryColour+'\';this.style.color=\'' + textColor + '\';'" onclick="this.parentNode.parentNode.querySelector('.priceValue').value=Number(this.parentNode.parentNode.querySelector('.priceValue').value)+1;this.parentNode.querySelector('.priceValueDisplay').innerHTML=Number(this.parentNode.querySelector('.priceValueDisplay').innerHTML)+1;">+</a>
+                <a :style="'margin-right:.5rem;cursor:pointer;min-width: 150px;width: max-content;background: ' + storePrimaryProxy+ ';color: ' + textColor + ';border: 0;font-size: 14px;font-family: \'Arial\', sans-serif;border-radius: 100px;padding: 15px 20px;max-width: calc(200px - 40px);line-height: 14px;transition:.1s ease;'" alt="Increase value" :onmouseenter="'this.style[\'background-color\']=\''+storeSecondaryProxy+'\';this.style.color=\'' + textAccent + '\';'" :onmouseleave="'this.style[\'background-color\']=\''+storePrimaryProxy+'\';this.style.color=\'' + textColor + '\';'" onclick="this.parentNode.parentNode.querySelector('.priceValue').value=Number(this.parentNode.parentNode.querySelector('.priceValue').value)+1;this.parentNode.querySelector('.priceValueDisplay').innerHTML=Number(this.parentNode.querySelector('.priceValueDisplay').innerHTML)+1;">+</a>
 
-                <button type="submit" :style="'cursor:pointer;min-width: 150px;width: max-content;background: ' + storePrimaryColour+ ';color: ' + textColor + ';border: 0;font-size: 14px;font-family: \'Arial\', sans-serif;border-radius: 100px;padding: 15px 20px;max-width: calc(200px - 40px);line-height: 14px;transition:.1s ease;'" alt="Click here to complete this payment." :onmouseenter="'this.style[\'background-color\']=\''+storeSecondaryColour+'\';this.style.color=\'' + textAccent + '\';'" :onmouseleave="'this.style[\'background-color\']=\''+storePrimaryColour+'\';this.style.color=\'' + textColor + '\';'">Pay <span style="display: inline-grid; grid-template: 1fr auto / 1fr;vertical-align: top;gap: 0;line-height: 1;position: relative;"><span class="priceValueDisplay">{{fixedPrice}}</span> <span style="font-size: 7px;position: absolute;bottom: 7px;width: 100%;text-align: center;top: 100%;opacity: .5;">{{select[0].selected}}</span></span> with F18</button>
+                <button type="submit" :style="'cursor:pointer;min-width: 150px;width: max-content;background: ' + storePrimaryProxy+ ';color: ' + textColor + ';border: 0;font-size: 14px;font-family: \'Arial\', sans-serif;border-radius: 100px;padding: 15px 20px;max-width: calc(200px - 40px);line-height: 14px;transition:.1s ease;'" alt="Click here to complete this payment." :onmouseenter="'this.style[\'background-color\']=\''+storeSecondaryProxy+'\';this.style.color=\'' + textAccent + '\';'" :onmouseleave="'this.style[\'background-color\']=\''+storePrimaryProxy+'\';this.style.color=\'' + textColor + '\';'">Pay <span style="display: inline-grid; grid-template: 1fr auto / 1fr;vertical-align: top;gap: 0;line-height: 1;position: relative;"><span class="priceValueDisplay">{{fixedPrice}}</span> <span style="font-size: 7px;position: absolute;bottom: 7px;width: 100%;text-align: center;top: 100%;opacity: .5;">{{select[0].selected}}</span></span> with F18</button>
 
-                <a :style="'margin-left:.5rem;cursor:pointer;min-width: 150px;width: max-content;background: ' + storePrimaryColour+ ';color: ' + textColor + ';border: 0;font-size: 14px;font-family: \'Arial\', sans-serif;border-radius: 100px;padding: 15px 20px;max-width: calc(200px - 40px);line-height: 14px;transition:.1s ease;'" alt="Increase value" :onmouseenter="'this.style[\'background-color\']=\''+storeSecondaryColour+'\';this.style.color=\'' + textAccent + '\';'" :onmouseleave="'this.style[\'background-color\']=\''+storePrimaryColour+'\';this.style.color=\'' + textColor + '\';'" onclick="this.parentNode.parentNode.querySelector('.priceValue').value=Number(this.parentNode.parentNode.querySelector('.priceValue').value)-1||1;this.parentNode.querySelector('.priceValueDisplay').innerHTML=Number(this.parentNode.querySelector('.priceValueDisplay').innerHTML)-1 || 1;">-</a>
+                <a :style="'margin-left:.5rem;cursor:pointer;min-width: 150px;width: max-content;background: ' + storePrimaryProxy+ ';color: ' + textColor + ';border: 0;font-size: 14px;font-family: \'Arial\', sans-serif;border-radius: 100px;padding: 15px 20px;max-width: calc(200px - 40px);line-height: 14px;transition:.1s ease;'" alt="Increase value" :onmouseenter="'this.style[\'background-color\']=\''+storeSecondaryProxy+'\';this.style.color=\'' + textAccent + '\';'" :onmouseleave="'this.style[\'background-color\']=\''+storePrimaryProxy+'\';this.style.color=\'' + textColor + '\';'" onclick="this.parentNode.parentNode.querySelector('.priceValue').value=Number(this.parentNode.parentNode.querySelector('.priceValue').value)-1||1;this.parentNode.querySelector('.priceValueDisplay').innerHTML=Number(this.parentNode.querySelector('.priceValueDisplay').innerHTML)-1 || 1;">-</a>
               </div>
             </form>
           </div>
@@ -83,9 +83,9 @@
         <div class="sub-sect">
           <label for="">Override Default Store Colours</label>
           <div class="flex colour-pickers">
-            <v-input-colorpicker v-model="storePrimaryColour" :style="'box-shadow: var(--dark) 0px 0px 0px 3px, #' + currentStore.store_colour + ' -2rem 0px 0px -3px, #' + currentStore.store_colour + ' -1rem 0px 0px -3px'"></v-input-colorpicker>
-            <v-input-colorpicker v-model="storeSecondaryColour" :style="'margin-left:3rem;box-shadow: var(--dark) 0px 0px 0px 3px, #' + currentStore.store_accent_colour + ' -2rem 0px 0px -3px, #' + currentStore.store_accent_colour + ' -1rem 0px 0px -3px'"></v-input-colorpicker>
-          </div>
+              <input type="color" v-model="storePrimaryProxy" :style="'box-shadow: var(--dark) 0px 0px 0px 3px, #' + currentStore.store_colour + ' -1.75rem 0px 0px -3px, ' + storePrimaryProxy+ ' -3rem 0px 0px -3px'"/>
+              <input v-model="storeSecondaryProxy" type="color" :style="'margin-left:3rem;box-shadow: var(--dark) 0px 0px 0px 3px, #' + currentStore.store_accent_colour + ' -1.75rem 0px 0px -3px, ' + storeSecondaryProxy + ' -3rem 0px 0px -3px'"/>
+            </div>
           <span class="help-text flex">Primary and Secondary / Accent Store colours.</span>
         </div>
       </div>
@@ -140,11 +140,9 @@
 import {
   mapGetters
 } from 'vuex';
-import InputColorPicker from 'vue-native-color-picker'
 export default {
   name: "StoreAssets",
   components: {
-    "v-input-colorpicker": InputColorPicker
   },
   data() {
     return {
@@ -157,6 +155,8 @@ export default {
       accordianIndex: 0,
       supportedCurrencies: ['USD', 'GBP', 'EUR', 'TTD'],
       fixedPrice: 10,
+      storePrimaryProxy: '',
+      storeSecondaryProxy: '',
       primryColour: false,
       accentColour: false,
       dynamicCopied: false,
@@ -177,6 +177,9 @@ export default {
 
     working() {
       this.$store.commit("setWorking", this.working);
+    },
+    currentStore() {
+      this.init()
     },
   },
   computed: {
@@ -217,24 +220,6 @@ export default {
         this.storeNameProxy = value
       }
     },
-    storePrimaryColour: {
-      get() {
-        return !this.primryColour ? "#" + this.currentStore.store_colour : "#" + this.primryColour;
-      },
-      set(value) {
-        this.primryColour = value.replace("#", "")
-        this.text = this.darkOrLight(this.primryColour);
-      }
-    },
-    storeSecondaryColour: {
-      get() {
-        return !this.accentColour ? "#" + this.currentStore.store_accent_colour : "#" + this.accentColour;
-      },
-      set(value) {
-        this.accentColour = value.replace("#", "")
-        this.text2 = this.darkOrLight(this.accentColour);
-      }
-    },
     textColor() {
       return !this.text ? "#" + this.currentStore.text_primary : "#" + this.text;
     },
@@ -243,11 +228,18 @@ export default {
     },
   },
   mounted() {
-    document.querySelector('.dynamic-cta-header-space') && (document.querySelector('.dynamic-cta-header-space').innerHTML = '')
-    this.supportedCurrencies.push(this.currentStore.network.toUpperCase())
-    this.select[0].options=this.supportedCurrencies;
+    this.init()
+
+
   },
   methods: {
+    init() {
+      document.querySelector('.dynamic-cta-header-space') && (document.querySelector('.dynamic-cta-header-space').innerHTML = '')
+      if (this.currentStore.network) { this.supportedCurrencies.push(this.currentStore.network.toUpperCase()) }
+      this.select[0].options = this.supportedCurrencies;
+      if (this.currentStore.store_colour) { this.storePrimaryProxy = "#" + this.currentStore.store_colour }
+      if (this.currentStore.store_accent_colour) { this.storeSecondaryProxy = "#" + this.currentStore.store_accent_colour }
+    },
     modernSelect(index, value) {
       this.select[index].selected = value;
       this.select[index].open = false;
@@ -269,20 +261,20 @@ export default {
         keyiv: this.keyiv
       });
       await fetch(process.env.VUE_APP_APPLICATION_ENDPOINT + "/store-settings-async", {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            username: username,
-            storeName: storeName,
-            fingerprint: this.fingerprint,
-            keyivId: this.keyivId,
-            store_id: this.currentStore.store_id,
-            property: parameter,
-            value: value,
-          }),
-        })
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          username: username,
+          storeName: storeName,
+          fingerprint: this.fingerprint,
+          keyivId: this.keyivId,
+          store_id: this.currentStore.store_id,
+          property: parameter,
+          value: value,
+        }),
+      })
         .then((response) => response.json())
         .then((data) => {
           if (data.proceed == true) {
@@ -336,7 +328,7 @@ export default {
       let copied = document.getElementById(id).innerHTML;
       let workspace = document.getElementById("copy_to_clipboard_workspace");
       (workspace.value = copied),
-      workspace.focus(),
+        workspace.focus(),
         workspace.select();
       try {
         if (document.execCommand("copy")) {

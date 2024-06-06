@@ -128,7 +128,9 @@ export default {
   },
   watch: {
     activeStore(newVal) {
-      this.storeId10 = newVal.store_id.substring(0, 5) + newVal.store_id.substring(newVal.store_id.length - 5)
+      if (newVal.store_id) {
+        this.storeId10 = newVal.store_id.substring(0, 5) + newVal.store_id.substring(newVal.store_id.length - 5)
+      }
     },
     storesDropdown() {
       // this.setSidebarWidth()
@@ -138,11 +140,11 @@ export default {
     },
   },
   async created() {
-    let session = await this.$store.dispatch('verifySession')
-    if (!session) {
-      console.log("NO SESSION")
-      this.$store.commit("setStores", false);
-    }
+    // let session = await this.$store.dispatch('verifySession')
+    // if (!session) {
+    //   console.log("NO SESSION")
+    //   this.$store.commit("setStores", false);
+    // }
     // this.setSidebarWidth()
   },
   mounted() {
@@ -172,33 +174,26 @@ export default {
     },
     openStore(id) {
       this.storeId10 = id.substring(0, 5) + id.substring(id.length - 5)
-      this.$store.commit("setActiveStore", id);
-      this.$store.commit("setStoreView", 'overview');
       this.$store.commit("setViewTitle", 'Store Overview');
       router.push({ name: 'StoreSummary', params: { storeId10: this.storeId10 } })
     },
     settingsView() {
-      this.$store.commit("setStoreView", 'settings');
       this.$store.commit("setViewTitle", 'Manage Store');
       router.push({ name: 'StoreSettings', params: { storeId10: this.$route.params.storeId10 } })
     },
     walletView() {
-      this.$store.commit("setStoreView", 'wallet');
       this.$store.commit("setViewTitle", 'Wallet');
       router.push({ name: 'WalletSettings', params: { storeId10: this.$route.params.storeId10 } })
     },
     assetsView() {
-      this.$store.commit("setStoreView", 'buttons');
       this.$store.commit("setViewTitle", 'Payment Assets');
       router.push({ name: 'StoreAssets', params: { storeId10: this.$route.params.storeId10 } })
     },
     invoicesView() {
-      this.$store.commit("setStoreView", 'invoices');
       this.$store.commit("setViewTitle", 'Invoices');
       router.push({ name: 'Invoices', params: { storeId10: this.$route.params.storeId10 } })
     },
     requestsView() {
-      this.$store.commit("setStoreView", 'requests');
       this.$store.commit("setViewTitle", 'Payment Requests');
       router.push({ name: 'PaymentRequest', params: { storeId10: this.$route.params.storeId10 } })
     },

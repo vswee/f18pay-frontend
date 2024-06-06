@@ -1,8 +1,6 @@
-import Vue from 'vue'
-import VueCryptojs from 'vue-cryptojs'
-import router from '@/router'
+import CryptoJS from 'crypto-js'
+import router from '../router'
 
-Vue.use(VueCryptojs)
 
 let actions = {
 
@@ -25,11 +23,11 @@ let actions = {
     try {
       let string = payload.string, keyiv = payload.keyiv;
       let key = keyiv.substr(0, 32);
-      key = Vue.CryptoJS.SHA256(key).toString(Vue.CryptoJS.enc.Hex).substr(0, 32);
+      key = CryptoJS.SHA256(key).toString(CryptoJS.enc.Hex).substr(0, 32);
       let iv = keyiv.substr(33);
-      iv = Vue.CryptoJS.SHA256(iv).toString(Vue.CryptoJS.enc.Hex).substr(0, 16);
-      const encrypted = Vue.CryptoJS.AES.encrypt(string, Vue.CryptoJS.enc.Utf8.parse(key), {
-        iv: Vue.CryptoJS.enc.Utf8.parse(iv),
+      iv = CryptoJS.SHA256(iv).toString(CryptoJS.enc.Hex).substr(0, 16);
+      const encrypted = CryptoJS.AES.encrypt(string, CryptoJS.enc.Utf8.parse(key), {
+        iv: CryptoJS.enc.Utf8.parse(iv),
       }).toString();
       return encrypted;
     } catch (e) {
@@ -39,16 +37,16 @@ let actions = {
   },
 
   async decrypt(context, payload) {
-    try{
-    let string = payload.string, keyiv = payload.keyiv;
-    let key = keyiv.substr(0, 32);
-    key = Vue.CryptoJS.SHA256(key).toString(Vue.CryptoJS.enc.Hex).substr(0, 32);
-    let iv = keyiv.substr(33);
-    iv = Vue.CryptoJS.SHA256(iv).toString(Vue.CryptoJS.enc.Hex).substr(0, 16);
-    const decrypted = Vue.CryptoJS.enc.Utf8.stringify(Vue.CryptoJS.AES.decrypt(string, Vue.CryptoJS.enc.Utf8.parse(key), {
-      iv: Vue.CryptoJS.enc.Utf8.parse(iv),
-      mode: Vue.CryptoJS.mode.CBC
-    })).toString();
+    try {
+      let string = payload.string, keyiv = payload.keyiv;
+      let key = keyiv.substr(0, 32);
+      key = CryptoJS.SHA256(key).toString(CryptoJS.enc.Hex).substr(0, 32);
+      let iv = keyiv.substr(33);
+      iv = CryptoJS.SHA256(iv).toString(CryptoJS.enc.Hex).substr(0, 16);
+      const decrypted = CryptoJS.enc.Utf8.stringify(CryptoJS.AES.decrypt(string, CryptoJS.enc.Utf8.parse(key), {
+        iv: CryptoJS.enc.Utf8.parse(iv),
+        mode: CryptoJS.mode.CBC
+      })).toString();
       return decrypted;
     } catch (e) {
       console.log("Decryption process error:", e)
@@ -97,6 +95,7 @@ let actions = {
     const fingerprint = getters.fingerprint
     const keyivId = getters.keyivId
     const keyiv = getters.keyiv
+    const route = router.currentRoute.name || router.currentRoute.value.name;
     if (!user || !fingerprint || !keyivId || !keyiv) {
       commit("setSession", false);
       session = false;
@@ -121,7 +120,6 @@ let actions = {
           commit("setSession", false);
           session = false;
         }
-        let route = router.currentRoute.name;
         if (!session) {
           switch (route) {
             case 'login':
@@ -132,8 +130,8 @@ let actions = {
               break;
             case 'dashboard':
               // console.log("throw error")
-          commit("setAuthFailure", "Session expired. Please re-authenticate to continue.");
-          break;
+              commit("setAuthFailure", "Session expired. Please re-authenticate to continue.");
+              break;
             case 'home':
               break;
             default:
@@ -143,20 +141,22 @@ let actions = {
           }
         }
         if (session) {
-          switch (route) {
-            case 'home':
-            case 'login':
-            case 'signup':
-            case 'verify-email':
-            case 'reset-password':
-            case undefined:
-              router.push({
-                name: 'dashboard'
-              });
-              break;
-            default:
+          if (route&&route.indexOf('/dashboard') < 0) {
+            switch (route) {
+              case 'home':
+              case 'login':
+              case 'signup':
+              case 'verify-email':
+              case 'reset-password':
+              case undefined:
+                router.push({
+                  name: 'dashboard'
+                });
+                break;
+              default:
+            }
           }
-          commit("setAuthFailure", false);          
+          commit("setAuthFailure", false);
         }
 
       })

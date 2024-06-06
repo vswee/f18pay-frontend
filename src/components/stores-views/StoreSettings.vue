@@ -34,8 +34,8 @@
           <div class="sub-sect">
             <label for="">Store Colours</label>
             <div class="flex colour-pickers">
-              <v-input-colorpicker v-model="storePrimaryColour" :style="'box-shadow: var(--dark) 0px 0px 0px 3px, #' + currentStore.store_colour + ' -2rem 0px 0px -3px, #' + currentStore.store_colour + ' -1rem 0px 0px -3px'"></v-input-colorpicker>
-              <v-input-colorpicker v-model="storeSecondaryColour" :style="'margin-left:3rem;box-shadow: var(--dark) 0px 0px 0px 3px, #' + currentStore.store_accent_colour + ' -2rem 0px 0px -3px, #' + currentStore.store_accent_colour + ' -1rem 0px 0px -3px'"></v-input-colorpicker>
+              <input type="color" v-model="storePrimaryProxy" :style="'box-shadow: var(--dark) 0px 0px 0px 3px, #' + currentStore.store_colour + ' -1.75rem 0px 0px -3px, ' + storePrimaryProxy+ ' -3rem 0px 0px -3px'"/>
+              <input v-model="storeSecondaryProxy" type="color" :style="'margin-left:3rem;box-shadow: var(--dark) 0px 0px 0px 3px, #' + currentStore.store_accent_colour + ' -1.75rem 0px 0px -3px, ' + storeSecondaryProxy + ' -3rem 0px 0px -3px'"/>
             </div>
             <span class="help-text">Primary and Secondary / Accent Store colours.</span>
           </div>
@@ -69,60 +69,58 @@
   
   </div>
   </template>
-  
-  <script>
-  import {
-    mapGetters
-  } from 'vuex';
-  import InputColorPicker from 'vue-native-color-picker'
-import { parseImgSrc} from '@/utils/fn.js'
-  export default {
-    name: "StoreSettings",
-    components: {
-      "v-input-colorpicker": InputColorPicker,
+
+<script>
+import {
+  mapGetters
+} from 'vuex';
+import { parseImgSrc } from '@/utils/fn.js'
+export default {
+  name: "StoreSettings",
+  components: [
+  ],
+  data() {
+    return {
+      storeNameProxy: false,
+      storeLogoProxy: false,
+      storePrimaryProxy: '',
+      storeSecondaryProxy: '',
+      message: false,
+      working: false,
+      accordianIndex: 0,
+      deleted: false,
+      confirmAddresses: false,
+      addressesForConfirmation: false,
+      email: false,
+      url: false,
+      confirmCode: false,
+      code: '',
+      imageChanged: false,
+    }
+  },
+  watch: {
+    deleted() {
+      this.saveSettings()
     },
-    data() {
-      return {
-        storeNameProxy: false,
-        storeLogoProxy: false,
-        storePrimaryProxy: false,
-        storeSecondaryProxy: false,
-        message: false,
-        working: false,
-        accordianIndex: 0,
-        deleted: false,
-        confirmAddresses: false,
-        addressesForConfirmation: false,
-        email: false,
-        url: false,
-        confirmCode: false,
-        code: '',
-        imageChanged: false,
-      }
+    working() {
+      this.$store.commit("setWorking", this.working);
     },
-    watch: {
-      deleted() {
-        this.saveSettings()
-      },
-      working() {
-        this.$store.commit("setWorking", this.working);
-      },
-      currentStore(sto) {
-        if(sto.store_logo){this.storeLogoProxy = this.parseImgSrc(sto.store_logo)}
-      },
+    currentStore() {
+      this.init()
     },
-    computed: {
-      ...mapGetters({
-        session: 'session',
-        fingerprint: 'fingerprint',
-        user: 'user',
-        keyiv: 'keyiv',
-        keyivId: 'keyivId',
-        activeStore: 'activeStore',
-        stores: 'stores',
-      }),
-      currentStore() {
-        let current = false;
+  },
+  computed: {
+    ...mapGetters({
+      session: 'session',
+      fingerprint: 'fingerprint',
+      user: 'user',
+      keyiv: 'keyiv',
+      keyivId: 'keyivId',
+      activeStore: 'activeStore',
+      stores: 'stores',
+    }),
+    currentStore() {
+      let current = false;
       if (this.stores) {
         for (const sto of this.stores) {
           if (`${sto.store_id.substring(0, 5)}${sto.store_id.substring(sto.store_id.length - 5)}` === this.$route.params.storeId10) {
@@ -133,136 +131,128 @@ import { parseImgSrc} from '@/utils/fn.js'
         return current;
       }
       return false
-      },
-      storeName: {
-        get() {
-          return !this.storeNameProxy ? this._decode(this.currentStore.store_name) : this.storeNameProxy;
-        },
-        set(value) {
-          this.storeNameProxy = value
-        }
-      },
-      storePrimaryColour: {
-        get() {
-          return !this.storePrimaryProxy ? "#" + this.currentStore.store_colour : "#" + this.storePrimaryProxy;
-        },
-        set(value) {
-          this.storePrimaryProxy = value.replace("#", "")
-        }
-      },
-      storeSecondaryColour: {
-        get() {
-          return !this.storeSecondaryProxy ? "#" + this.currentStore.store_accent_colour : "#" + this.storeSecondaryProxy;
-        },
-        set(value) {
-          this.storeSecondaryProxy = value.replace("#", "")
-        }
-      },
     },
-    mounted() {
+    storeName: {
+      get() {
+        return !this.storeNameProxy ? this._decode(this.currentStore.store_name) : this.storeNameProxy;
+      },
+      set(value) {
+        this.storeNameProxy = value
+      }
+    },
+  },
+  mounted() {
+    this.init()
+  },
+  methods: {
+    init() {
       let t = this;
       document.querySelector('.dynamic-cta-header-space') && (document.querySelector('.dynamic-cta-header-space').innerHTML = '')
       document.getElementById("imageInput").addEventListener("change", function () {
         if (this.files && this.files[0]) {
-        if (this.files[0].size > 40000) {
-          t.message = `File too large. Icons are limited to 40KB. Your provided file is ${this.files[0].size/1000}KB`
-          console.log("File too large:", this.files[0].size)
+          if (this.files[0].size > 40000) {
+            t.message = `File too large. Icons are limited to 40KB. Your provided file is ${this.files[0].size / 1000}KB`
+            console.log("File too large:", this.files[0].size)
+          }
+          let reader = new FileReader();
+          reader.onload = function (e) {
+            t.storeLogoProxy = e.target.result
+          }
+          reader.readAsDataURL(this.files[0]);
+          this.imageChanged = true
         }
-        let reader = new FileReader();
-        reader.onload = function (e) {
-          t.storeLogoProxy = e.target.result
-        }
-        reader.readAsDataURL(this.files[0]);
-        this.imageChanged = true
-      }
       })
-      this.storeLogoProxy = this.currentStore.store_logo || false;
       this.url = this.currentStore.url || '';
       this.email = this.currentStore.email || '';
       this.deleted = !this.currentStore.deleted ? 0 : this.currentStore.deleted;
-  
+      if (this.currentStore.store_logo) { this.storeLogoProxy = this.parseImgSrc(this.currentStore.store_logo) }
+      if (this.currentStore.store_colour) { this.storePrimaryProxy = "#" + this.currentStore.store_colour }
+      if (this.currentStore.store_accent_colour) { this.storeSecondaryProxy = "#" + this.currentStore.store_accent_colour }
+
       this.$store.dispatch('headerUIAppend', [{
         id: '#saveButton',
         fn: this.saveSettings,
       }]);
+
+
     },
-    methods: {
-      parseImgSrc,
-      _decode(string) {
-        let decoded = decodeURIComponent(decodeURI(string));
-        return decoded
-      },
-      _null() {
-        return false
-      },
-      uploadNewImage() {
-        document.getElementById("imageInput").click();
-      },
-      accordianIndexSet(number) {
-        this.accordianIndex = this.accordianIndex == number ? -1 : number;
-      },
-      async saveSettings() {
-        //COMPLETE
-        this.working = true;
-        const username = await this.$store.dispatch('encrypt', {
-          string: this.user,
-          keyiv: this.keyiv
-        });
-        const storeName = await this.$store.dispatch('encrypt', {
-          string: encodeURIComponent(encodeURI(this.storeName)),
-          keyiv: this.keyiv
-        });
-        const url = await this.$store.dispatch('encrypt', {
-          string: this.url,
-          keyiv: this.keyiv
-        });
-        const email = await this.$store.dispatch('encrypt', {
-          string: this.email,
-          keyiv: this.keyiv
-        });
-        const updateStoreSettingsBody = {
-              username: username,
-              storeName: storeName,
-              storePrimaryColour: this.storePrimaryColour.replace("#", ""),
-              storeSecondaryColour: this.storeSecondaryColour.replace("#", ""),
-              fingerprint: this.fingerprint,
-              keyivId: this.keyivId,
-              store_id: this.currentStore.store_id,
-              disabled: this.deleted,
-              url: url,
-              email: email,
-        }
-            if(this.imageChanged){updateStoreSettingsBody.logo=this.storeLogoProxy}
-        await fetch(process.env.VUE_APP_APPLICATION_ENDPOINT + "/store-settings-bulk", {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(updateStoreSettingsBody),
-          })
-          .then((response) => response.json())
-          .then((data) => {
-            this.message = data.debug ? data.debug : false
-            if (data.proceed == true) {
-              if (!data.extra && data.currentStore) {
-                this.$store.dispatch('getStores')
-                this.$store.commit("setActiveStore", data.currentStore);
-              }
-            } else {
-              this.message = data.debug ? data.debug : "There was a problem with the information provided."
+    parseImgSrc,
+    _decode(string) {
+      let decoded = decodeURIComponent(decodeURI(string));
+      return decoded
+    },
+    _null() {
+      return false
+    },
+    uploadNewImage() {
+      document.getElementById("imageInput").click();
+    },
+    accordianIndexSet(number) {
+      this.accordianIndex = this.accordianIndex == number ? -1 : number;
+    },
+    async saveSettings() {
+      //COMPLETE
+      if(!this.currentStore.store_id){return}
+      this.working = true;
+      this.message = ''
+      const username = await this.$store.dispatch('encrypt', {
+        string: this.user,
+        keyiv: this.keyiv
+      });
+      const storeName = await this.$store.dispatch('encrypt', {
+        string: encodeURIComponent(encodeURI(this.storeName)),
+        keyiv: this.keyiv
+      });
+      const url = await this.$store.dispatch('encrypt', {
+        string: this.url,
+        keyiv: this.keyiv
+      });
+      const email = await this.$store.dispatch('encrypt', {
+        string: this.email,
+        keyiv: this.keyiv
+      });
+      const updateStoreSettingsBody = {
+        username: username,
+        storeName: storeName,
+        storePrimaryColour: this.storePrimaryProxy.replace("#", ""),
+        storeSecondaryColour: this.storeSecondaryProxy.replace("#", ""),
+        fingerprint: this.fingerprint,
+        keyivId: this.keyivId,
+        store_id: this.currentStore.store_id,
+        disabled: this.deleted,
+        url: url,
+        email: email,
+      }
+      if (this.imageChanged) { updateStoreSettingsBody.logo = this.storeLogoProxy }
+      await fetch(process.env.VUE_APP_APPLICATION_ENDPOINT + "/store-settings-bulk", {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(updateStoreSettingsBody),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          this.message = data.debug ? data.debug : false
+          if (data.proceed == true) {
+            if (!data.extra && data.currentStore) {
+              this.$store.dispatch('getStores')
+              this.$store.commit("setActiveStore", data.currentStore);
             }
-            this.working = false;
-          })
-          .catch((error) => {
-            this.message = this.message + ' \nError: ' + error + '\n';
-            console.error("Error:", error);
-          });
-      },
+          } else {
+            this.message = data.debug ? data.debug : "There was a problem with the information provided."
+          }
+          this.working = false;
+        })
+        .catch((error) => {
+          this.message = this.message + ' \nError: ' + error + '\n';
+          console.error("Error:", error);
+        });
     },
-  }
-  </script>
-  
-  <style lang="">
-    
+  },
+}
+</script>
+
+<style lang="">
+
   </style>
-  

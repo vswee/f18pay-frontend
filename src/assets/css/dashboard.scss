@@ -19,9 +19,9 @@ h3 {
   user-select: none;
 }
 
-h1{
-  .store-icon{
-  transform: translateY(7px);
+h1 {
+  .store-icon {
+    transform: translateY(7px);
   }
 }
 .store-icon {
@@ -194,7 +194,9 @@ h1{
   animation: buildIn 0.6s ease forwards 1;
   .form {
     margin: 0;
-    box-shadow: 0 30px 60px #000, 0 0 0 1px var(--dark);
+    box-shadow:
+      0 30px 60px #000,
+      0 0 0 1px var(--dark);
     &.page {
       padding: 1rem;
     }
@@ -340,111 +342,175 @@ h1{
   padding: 15px 5px;
   cursor: pointer;
 }
-.daterangepicker {
-  position: absolute;
-  z-index: 2;
-  background: var(--black);
-  color: var(--white);
-  border-radius: 8px;
-  left: 50%;
-  transform: translate(-50%, 0%);
-  top: 4rem;
-  box-shadow: 0 10px 50px -30px;
-  .calendars {
-    display: grid;
-    gap: 1rem;
-    min-width: 230px;
-    padding: 15px;
-  }
-  .ranges {
-    ul {
-      flex-direction: row;
-      flex-wrap: wrap;
-      display: flex;
-      list-style: none;
-      padding: 0;
-      margin: 0;
-      justify-content: space-around;
-      li {
-        padding: 10px;
-        font-size: 0.8rem;
-        opacity: 0.5;
-        cursor: pointer;
-        &:hover {
-          background: var(--dark);
-        }
-      }
-    }
-  }
-  .calendars-container {
-    display: flex;
-    gap: 15px;
-    .table-condensed {
-      thead {
-        th {
-          text-align: center;
-          font-weight: 100;
-        }
-      }
-      tbody {
-        .week {
-          opacity: 0.2;
-        }
-        th {
-          font-weight: 500;
-        }
-        td {
-          padding: 6px;
-          font-size: 0.8rem;
-          text-align: center;
-          transition: none !important;
-          cursor: pointer;
-          &.off {
-            opacity: 0.4;
-          }
-          &.in-range {
-            color: var(--black);
-            background: var(--accent-4);
-          }
-          &.start-date,
-          &.end-date {
-            background: var(--accent);
-          }
-        }
-      }
-      .prev {
-        &.available {
-          cursor: pointer;
-          span::before {
-            content: "\f053";
-            font-family: "Font Awesome 5 Free";
-            font-weight: 900;
-            -moz-osx-font-smoothing: grayscale;
-            font-style: normal;
-            font-variant: normal;
-            text-rendering: auto;
-            line-height: 1;
-          }
-        }
-      }
-      .next {
-        &.available {
-          cursor: pointer;
-          span::before {
-            content: "\f054";
-            font-family: "Font Awesome 5 Free";
-            font-weight: 900;
-            -moz-osx-font-smoothing: grayscale;
-            font-style: normal;
-            font-variant: normal;
-            text-rendering: auto;
-            line-height: 1;
-          }
-        }
-      }
-    }
+
+.vue-daterange-picker {
+  padding: 0;
+  .form-control {
+    background: transparent;
+    border: 0;
+    color: inherit;
+    font-size: inherit;
+    padding: 0 10px;
   }
 }
+.daterangepicker {
+  background: var(--black);
+  border-radius: 10px;
+  color: var(--white);
+  border: 0;
+  box-shadow:
+    0 0 50px -20px #000,
+    0px 2px 5px -4px var(--white);
+  .calendar-table {
+    border: 0;
+    border-radius: 4px;
+    background-color: transparent;
+    th,
+    td {
+      background-color: transparent;
+      &.in-range {
+        background-color: var(--accent-bg);
+        border-color: transparent;
+        color: var(--accent);
+        border-radius: 0;
+        &.start-date,
+        &.end-date {
+          background-color: var(--accent);
+          color: var(--black);
+        }
+      }
+    }
+    .prev,
+    .next {
+      span {
+        border-color: var(--white) !important;
+      }
+    }
+  }
+  &.show-ranges .drp-calendar.left {
+    border-left: 1px solid var(--accent-bg) !important;
+  }
+  .ranges li:hover {
+    background-color: var(--accent);
+}
+&::before {
+  top: -7px;
+  border-right: 7px solid transparent;
+  border-left: 7px solid transparent;
+  border-bottom: 7px solid var(--black);
+}
+&::after {
+  top: -6px;
+  border-right: 6px solid transparent;
+  border-bottom: 6px solid var(--black);
+  border-left: 6px solid transparent;
+}
+}
+// .daterangepicker {
+//   position: absolute;
+//   z-index: 2;
+//   background: var(--black);
+//   color: var(--white);
+//   border-radius: 8px;
+//   left: 50%;
+//   transform: translate(-50%, 0%);
+//   top: 4rem;
+//   box-shadow: 0 10px 50px -30px;
+//   .calendars {
+//     display: grid;
+//     gap: 1rem;
+//     min-width: 230px;
+//     padding: 15px;
+//   }
+//   .ranges {
+//     ul {
+//       flex-direction: row;
+//       flex-wrap: wrap;
+//       display: flex;
+//       list-style: none;
+//       padding: 0;
+//       margin: 0;
+//       justify-content: space-around;
+//       li {
+//         padding: 10px;
+//         font-size: 0.8rem;
+//         opacity: 0.5;
+//         cursor: pointer;
+//         &:hover {
+//           background: var(--dark);
+//         }
+//       }
+//     }
+//   }
+//   .calendars-container {
+//     display: flex;
+//     gap: 15px;
+//     .table-condensed {
+//       thead {
+//         th {
+//           text-align: center;
+//           font-weight: 100;
+//         }
+//       }
+//       tbody {
+//         .week {
+//           opacity: 0.2;
+//         }
+//         th {
+//           font-weight: 500;
+//         }
+//         td {
+//           padding: 6px;
+//           font-size: 0.8rem;
+//           text-align: center;
+//           transition: none !important;
+//           cursor: pointer;
+//           &.off {
+//             opacity: 0.4;
+//           }
+//           &.in-range {
+//             color: var(--black);
+//             background: var(--accent-4);
+//           }
+//           &.start-date,
+//           &.end-date {
+//             background: var(--accent);
+//           }
+//         }
+//       }
+//       .prev {
+//         &.available {
+//           cursor: pointer;
+//           span::before {
+//             content: "\f053";
+//             font-family: "Font Awesome 5 Free";
+//             font-weight: 900;
+//             -moz-osx-font-smoothing: grayscale;
+//             font-style: normal;
+//             font-variant: normal;
+//             text-rendering: auto;
+//             line-height: 1;
+//           }
+//         }
+//       }
+//       .next {
+//         &.available {
+//           cursor: pointer;
+//           span::before {
+//             content: "\f054";
+//             font-family: "Font Awesome 5 Free";
+//             font-weight: 900;
+//             -moz-osx-font-smoothing: grayscale;
+//             font-style: normal;
+//             font-variant: normal;
+//             text-rendering: auto;
+//             line-height: 1;
+//           }
+//         }
+//       }
+//     }
+//   }
+// }
 
 .modern-select {
   position: relative;
@@ -484,7 +550,10 @@ h1{
   .accordian-sect {
     background: var(--black);
     padding: 2rem;
-    box-shadow: 0 -4rem var(--black), -1rem 0 var(--black), -1rem -4rem 0 var(--black);
+    box-shadow:
+      0 -4rem var(--black),
+      -1rem 0 var(--black),
+      -1rem -4rem 0 var(--black);
   }
 }
 .dynamic-cta-header-space {

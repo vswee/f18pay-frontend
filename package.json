@@ -8,22 +8,27 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
+    "@babel/plugin-proposal-nullish-coalescing-operator": "^7.18.6",
+    "@babel/plugin-transform-nullish-coalescing-operator": "^7.24.7",
     "@vue/cli-plugin-babel": "~4.5.0",
     "@vue/cli-plugin-eslint": "~4.5.0",
     "@vue/cli-service": "~4.5.0",
     "chart.js": "^2.9.4",
     "core-js": "^3.6.5",
+    "crypto-js": "^4.2.0",
     "node-sass": "^7.0.3",
     "sass": "^1.43.4",
-    "vue": "^2.6.11",
+    "vue": "^3.4.27",
     "vue-chartjs": "^3.5.1",
-    "vue-cryptojs": "^2.1.6",
-    "vue-html2pdf": "^1.8.0",
-    "vue-moments-ago": "^0.2.0",
-    "vue-native-color-picker": "^1.2.0",
-    "vue2-daterange-picker": "^0.6.8"
+    "vue-router": "^4.3.2",
+    "vue-timeago3": "^2.3.2",
+    "vue3-daterange-picker": "^1.0.1",
+    "vue3-html2pdf": "^1.1.2",
+    "vuex": "^4.1.0"
   },
   "devDependencies": {
+    "@babel/plugin-proposal-optional-chaining": "^7.21.0",
+    "@types/crypto-js": "^4.2.2",
     "@vue/cli-plugin-babel": "~4.5.0",
     "@vue/cli-plugin-eslint": "~4.5.0",
     "@vue/cli-service": "~4.5.0",
@@ -34,9 +39,7 @@
     "node-sass": "^7.0.3",
     "sass": "^1.43.4",
     "sass-loader": "^10.3.1",
-    "vue-router": "^3.5.3",
     "vue-template-compiler": "^2.6.11",
-    "vuex": "^3.6.2",
     "webpack": "^4.46.0"
   },
   "eslintConfig": {
