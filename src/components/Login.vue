@@ -62,7 +62,6 @@ export default {
     })
   },
   methods: {
-
     async checkUsername() {
       this.message = false;
       this.working = true;
