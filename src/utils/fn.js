@@ -1,5 +1,6 @@
 const parseImgSrc = (logo) => {
   if(!logo.data.length){return 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='}
+  if(logo.data=='\\x'){return 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='}
   let bufferArray = new Uint8Array(logo.data)
   let binary = '';
   const bytes = new Uint8Array(bufferArray);

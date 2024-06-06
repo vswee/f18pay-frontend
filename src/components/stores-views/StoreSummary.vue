@@ -60,6 +60,10 @@ export default {
     activeStore: function (val) {
       this.fetchInvoiceValues(val)
     },
+    $route(){
+    this.fetchInvoiceValues(this.activeStore)
+      
+    },
   },
   mounted() {
     document.querySelector('.dynamic-cta-header-space') && (document.querySelector('.dynamic-cta-header-space').innerHTML = '')

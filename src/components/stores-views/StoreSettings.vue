@@ -75,6 +75,7 @@
     mapGetters
   } from 'vuex';
   import InputColorPicker from 'vue-native-color-picker'
+import { parseImgSrc} from '@/utils/fn.js'
   export default {
     name: "StoreSettings",
     components: {
@@ -96,6 +97,7 @@
         url: false,
         confirmCode: false,
         code: '',
+        imageChanged: false,
       }
     },
     watch: {
@@ -104,6 +106,9 @@
       },
       working() {
         this.$store.commit("setWorking", this.working);
+      },
+      currentStore(sto) {
+        if(sto.store_logo){this.storeLogoProxy = this.parseImgSrc(sto.store_logo)}
       },
     },
     computed: {
@@ -159,14 +164,17 @@
       document.querySelector('.dynamic-cta-header-space') && (document.querySelector('.dynamic-cta-header-space').innerHTML = '')
       document.getElementById("imageInput").addEventListener("change", function () {
         if (this.files && this.files[0]) {
-          let reader = new FileReader();
-          reader.onload = function (e) {
-            t.storeLogoProxy = e.target.result
-            console.log(this.storeLogoProxy)
-          }
-          reader.readAsDataURL(this.files[0]);
-  
+        if (this.files[0].size > 40000) {
+          t.message = `File too large. Icons are limited to 40KB. Your provided file is ${this.files[0].size/1000}KB`
+          console.log("File too large:", this.files[0].size)
         }
+        let reader = new FileReader();
+        reader.onload = function (e) {
+          t.storeLogoProxy = e.target.result
+        }
+        reader.readAsDataURL(this.files[0]);
+        this.imageChanged = true
+      }
       })
       this.storeLogoProxy = this.currentStore.store_logo || false;
       this.url = this.currentStore.url || '';
@@ -179,6 +187,7 @@
       }]);
     },
     methods: {
+      parseImgSrc,
       _decode(string) {
         let decoded = decodeURIComponent(decodeURI(string));
         return decoded
@@ -211,24 +220,25 @@
           string: this.email,
           keyiv: this.keyiv
         });
-        await fetch(process.env.VUE_APP_APPLICATION_ENDPOINT + "/store-settings-bulk", {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
+        const updateStoreSettingsBody = {
               username: username,
               storeName: storeName,
               storePrimaryColour: this.storePrimaryColour.replace("#", ""),
               storeSecondaryColour: this.storeSecondaryColour.replace("#", ""),
-              logo: this.storeLogoProxy,
               fingerprint: this.fingerprint,
               keyivId: this.keyivId,
               store_id: this.currentStore.store_id,
               disabled: this.deleted,
               url: url,
               email: email,
-            }),
+        }
+            if(this.imageChanged){updateStoreSettingsBody.logo=this.storeLogoProxy}
+        await fetch(process.env.VUE_APP_APPLICATION_ENDPOINT + "/store-settings-bulk", {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(updateStoreSettingsBody),
           })
           .then((response) => response.json())
           .then((data) => {
