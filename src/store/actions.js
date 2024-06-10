@@ -55,6 +55,8 @@ let actions = {
   },
 
   async init(context) {
+    context.commit("setURL", process.env.VUE_APP_BASE_URL);
+
     if (localStorage.getItem("fingerprint")) {
       context.commit("setFingerprint", localStorage.getItem("fingerprint"));
     } else {
@@ -120,45 +122,46 @@ let actions = {
           commit("setSession", false);
           session = false;
         }
-        if (!session) {
-          switch (route) {
-            case 'login':
-            case 'signup':
-            case 'verify-email':
-            case 'reset-password':
-            case undefined:
-              break;
-            case 'dashboard':
-              // console.log("throw error")
-              commit("setAuthFailure", "Session expired. Please re-authenticate to continue.");
-              break;
-            case 'home':
-              break;
-            default:
-              router.push({
-                name: 'home'
-              });
-          }
-        }
-        if (session) {
-          if (route&&route.indexOf('/dashboard') < 0) {
+        if (route !== 'InvoiceAPI') {
+          if (!session) {
             switch (route) {
-              case 'home':
               case 'login':
               case 'signup':
               case 'verify-email':
               case 'reset-password':
               case undefined:
-                router.push({
-                  name: 'dashboard'
-                });
+                break;
+              case 'dashboard':
+                // console.log("throw error")
+                commit("setAuthFailure", "Session expired. Please re-authenticate to continue.");
+                break;
+              case 'home':
                 break;
               default:
+                router.push({
+                  name: 'home'
+                });
             }
           }
-          commit("setAuthFailure", false);
+          if (session) {
+            if (route && route.indexOf('/dashboard') < 0) {
+              switch (route) {
+                case 'home':
+                case 'login':
+                case 'signup':
+                case 'verify-email':
+                case 'reset-password':
+                case undefined:
+                  router.push({
+                    name: 'dashboard'
+                  });
+                  break;
+                default:
+              }
+            }
+            commit("setAuthFailure", false);
+          }
         }
-
       })
       .catch((error) => {
         console.error("Error:", error);

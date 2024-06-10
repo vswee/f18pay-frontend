@@ -1,14 +1,26 @@
 <template>
-<div id="app" :class="theme">
-  <Header />
-  <Sidebar />
-  <div id="main" :class="session?'sessioned':''">
-    <router-view></router-view>
+  <div id="app" :class="theme">
+
+    <template v-if="$route.name === 'InvoiceAPI'">
+      <div id="main">
+        <router-view></router-view>
+      </div>
+      <ChatWoot />
+    </template>
+
+    <template v-else>
+      <Header />
+      <Sidebar />
+
+      <div id="main" :class="session ? 'sessioned' : ''">
+        <router-view></router-view>
+      </div>
+
+      <Footer />
+      <ChatWoot />
+      <NewStoreModal v-if="session && storeModalView == 'new'"></NewStoreModal>
+    </template>
   </div>
-  <Footer />
-  <ChatWoot />
-  <NewStoreModal v-if="session && storeModalView=='new'"></NewStoreModal>
-</div>
 </template>
 
 <script>
@@ -38,7 +50,7 @@ export default {
     })
   },
   watch: {
-    '$route': function(){this.initChecks()}
+    '$route': function () { this.initChecks() }
   },
   async created() {
     this.$store.dispatch('init')
@@ -46,15 +58,15 @@ export default {
   },
   mounted() {
     document.getElementById("main").addEventListener('scroll', this.scrollUITriggers);
-  let t=this
+    let t = this
     window.addEventListener("focus", t.verifySession)
   },
   methods: {
-    async initChecks(){
+    async initChecks() {
       this.$store.dispatch('init')
       this.$store.dispatch('verifySession', false)
     },
-    verifySession(){
+    verifySession() {
       console.log("verifying session")
       this.$store.dispatch('verifySession', false)
     },

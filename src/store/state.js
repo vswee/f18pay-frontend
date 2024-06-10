@@ -18,5 +18,6 @@ let state = {
   notifications: {
     authFailure: false,
   },
+  url:false,
 }
 export default state

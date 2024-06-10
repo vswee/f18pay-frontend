@@ -63,5 +63,8 @@ let mutations = {
   setWorking(state, payload) {
     state.working = payload
   },
+  setURL(state, payload) {
+    state.url = payload
+  }
 }
 export default mutations

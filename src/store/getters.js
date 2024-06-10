@@ -53,5 +53,8 @@ let getters = {
   epoch: () => {
     return "2018-01-01"
   },
+  url: state => {
+    return state.url
+  },
 }
 export default getters

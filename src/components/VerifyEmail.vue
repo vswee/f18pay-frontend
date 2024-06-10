@@ -65,23 +65,16 @@ export default {
     })
   },
   methods: {
-    encrypt(string) {
-      let key = this.keyiv.substr(0, 32);
-      key = this.CryptoJS.SHA256(key).toString(this.CryptoJS.enc.Hex).substr(0, 32);
-      let iv = this.keyiv.substr(33);
-      iv = this.CryptoJS.SHA256(iv).toString(this.CryptoJS.enc.Hex).substr(0, 16);
-      const encrypted = this.CryptoJS.AES.encrypt(string, this.CryptoJS.enc.Utf8.parse(key), {
-        iv: this.CryptoJS.enc.Utf8.parse(iv),
-      }).toString();
-      return encrypted;
-    },
-    checkUsername() {
+    async checkUsername() {
       this.message = false;
       this.working = true;
       if (!this.usernameManual || this.usernameManual.length == 0) {
         this.message = "Please enter your email address"
       } else {
-        const username = this.encrypt(this.usernameManual);
+        const username = await this.$store.dispatch('encrypt', {
+          string: this.usernameManual,
+          keyiv: this.keyiv
+        });
         fetch(process.env.VUE_APP_APPLICATION_ENDPOINT + '/check-username-for-activation', {
             method: 'POST', // or 'PUT'
             headers: {
@@ -108,11 +101,14 @@ export default {
           });
       }
     },
-    checkCode() {
+    async checkCode() {
       this.message = false;
       this.working = true;
       if (this.code.length >= 6 && (this.username || this.usernameManual)) {
-        const username = this.encrypt(this.username);
+        const username = await this.$store.dispatch('encrypt', {
+          string: this.username,
+          keyiv: this.keyiv
+        });
         fetch(process.env.VUE_APP_APPLICATION_ENDPOINT + '/code-verify', {
             method: 'POST',
             headers: {
@@ -146,11 +142,22 @@ export default {
 
       }
     },
-    getNewCode() {
+    async getNewCode() {
       this.message = false;
       this.working = true;
       if (this.username || this.usernameManual) {
-        const username = this.username ? this.encrypt(this.username) : this.encrypt(this.usernameManual);
+        let username = false
+        if (this.username) {
+          username = await this.$store.dispatch('encrypt', {
+          string: this.username,
+          keyiv: this.keyiv
+        });
+        } else {
+          username = await this.$store.dispatch('encrypt', {
+          string: this.usernameManual,
+          keyiv: this.keyiv
+        });
+        }
         fetch(process.env.VUE_APP_APPLICATION_ENDPOINT + '/request-new-code', {
             method: 'POST',
             headers: {

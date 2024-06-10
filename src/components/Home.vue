@@ -59,7 +59,7 @@
     <div>
       <h2>A button like this could be on your website 🔥</h2>
       <p>Generate Invoices effortlessly and get paid directly to your own, private crypto wallet<sup>*</sup></p>
-      <form target="_blank" method="GET" action="https://pay.flat18.co.uk/api/v1/invoices/">
+      <form target="_blank" method="GET" :action="base_url">
         <input type="hidden" name="store_id" value="I1wxWgfpeUCfsIKSx9sqvLvdGXCKUqTKGt8EXDUkdZbsgouxUInNLrxQEyK1b3R6P0cAGhT6YFjNvd1V3RMTe6RwB6SDOay1eOdgDgLVSUXljlsI83QNOcZJDRdbnqnFnLhrwL87exLP9ymIgP0HMfeT59OiVApX4BROH4xV1G61KhkViIFXzrbfTPM73YObf6kUQODIyzqod778Ya62YYZ6elWIu1lksZsdggkcRneN5VqR4dHsClu75b3hHKXoPWzTHPgKbdf1YqdvlCgio4iG6lwZ9zDB2cCf4bAVFP3BRN7hRjaoDkLbAWg37iNYxN4rjaWpCp0zDPDHJUWGTY7l49hdU7YOoS2IuvFzRkAyti2uE8eurgUU2XRIV4Hb9SfA4AirZT2PMOWbxhzftomYYbpZgnMHagkHsAX80z70lwosOoufnjmNvErZNvTwP6buMVXcHI6FCv1ZOX4LqaM4GpLwMXhfjpFMqWZiBzxmWpZL574n3DEFVNgELd9z" />
 
         <input type="hidden" name="redirectURL" value="" />
@@ -103,9 +103,18 @@
 </template>
 
 <script>
+import {
+  mapGetters
+} from 'vuex';
 export default {
   name: 'home',
+  computed: {
+    ...mapGetters({
+      base_url: 'url',
+    })
+  },
 }
+
 </script>
 
 <style lang="scss">
