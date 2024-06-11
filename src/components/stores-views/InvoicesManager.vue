@@ -302,6 +302,7 @@ const getInvoices = async () => {
   if (queryFilter.value) {
     invoicesFetchBody.filter = queryFilter.value;
   }
+  
   await fetch(`${import.meta.env.VITE_APP_APPLICATION_ENDPOINT}/store-invoices`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
