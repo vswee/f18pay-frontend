@@ -267,18 +267,19 @@ function layout() {
 
 onMounted(() => {
   try {
-    document.documentElement.style.setProperty('--primary', '#' + state.colours[0]);
-    document.documentElement.style.setProperty('--primary-2', '#' + state.colours[0] + '80');
-    document.documentElement.style.setProperty('--primary-3', '#' + state.colours[0] + '60');
-    document.documentElement.style.setProperty('--accent', '#' + state.colours[1]);
+    const invoiceDOM = document.getElementById("invoice")
+    invoiceDOM.style.setProperty('--primary', '#' + state.colours[0]);
+    invoiceDOM.style.setProperty('--primary-2', '#' + state.colours[0] + '80');
+    invoiceDOM.style.setProperty('--primary-3', '#' + state.colours[0] + '60');
+    invoiceDOM.style.setProperty('--accent', '#' + state.colours[1]);
     state.colours.text = '#' + darkOrLight('#' + state.colours[0]);
     state.colours.accentText = '#' + darkOrLight('#' + state.colours[1], true);
     state.colours.white = '#' + darkOrLight('#' + state.colours[0], true);
-    document.documentElement.style.setProperty('--text', state.colours.text);
-    document.documentElement.style.setProperty('--accent-text', state.colours.accentText);
-    document.documentElement.style.setProperty('--white', state.colours.white);
-    document.documentElement.style.setProperty('--shadow-20', state.colours.text === "#222" ? 'rgba(15, 33, 133, 0.2)' : '#000');
-    document.documentElement.style.setProperty('--shadow-5', state.colours.text === "#222" ? 'rgba(15, 33, 133, 0.05)' : '#2d2d2d');
+    invoiceDOM.style.setProperty('--text', state.colours.text);
+    invoiceDOM.style.setProperty('--accent-text', state.colours.accentText);
+    invoiceDOM.style.setProperty('--white', state.colours.white);
+    invoiceDOM.style.setProperty('--shadow-20', state.colours.text === "#222" ? 'rgba(15, 33, 133, 0.2)' : '#000');
+    invoiceDOM.style.setProperty('--shadow-5', state.colours.text === "#222" ? 'rgba(15, 33, 133, 0.05)' : '#2d2d2d');
 
     layout()
 

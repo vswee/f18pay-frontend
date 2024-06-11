@@ -79,60 +79,54 @@ onMounted(() => {
 </script>
 
 <template>
-  <div id="main">
-    <div class="invoice-wrapper">
-      <template v-if="state.loading">
-        <a class="spin-fresco"></a>
-      </template>
-      <template v-else-if="state.error">
-        <p>{{ state.error }}</p>
-      </template>
-      <template v-else>
-        <InvoiceInterface :invoiceData="state.invoice" />
-      </template>
-    </div>
+  <div class="invoice-wrapper">
+    <template v-if="state.loading">
+      <a class="spin-fresco"></a>
+    </template>
+    <template v-else-if="state.error">
+      <p>{{ state.error }}</p>
+    </template>
+    <template v-else>
+      <InvoiceInterface :invoiceData="state.invoice" />
+    </template>
   </div>
 </template>
 
 <style lang="scss" scoped>
-#main {
-  min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin: auto;
-
-  .invoice-wrapper {
+.invoice-wrapper {
     height: 100%;
-    width: 100%;
+    width: max-content;
+    min-width:120px;
     min-height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
-    position: relative;
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
 
-    .spin-fresco {
-      &::before {
-        content: "";
-        position: absolute;
-        height: 120px;
-        width: 120px;
-        border-color: transparent transparent transparent var(--accent);
-        border-style: solid;
-        border-width: 5px;
-        border-radius: 180px;
-        animation: spin 1s linear forwards infinite;
-        transform-origin: center;
-        margin: auto;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
+  .spin-fresco {
+    &::before {
+      content: "";
+      position: absolute;
+      height: 120px;
+      width: 120px;
+      border-color: transparent transparent transparent #035bdf;
+      border-style: solid;
+      border-width: 5px;
+      border-radius: 180px;
+      animation: spin 1s linear forwards infinite;
+      transform-origin: center;
+      margin: auto;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
 
-        @keyframes spin {
-          to {
-            transform: rotate(360deg);
-          }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
         }
       }
     }
