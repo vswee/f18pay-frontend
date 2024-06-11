@@ -92,13 +92,13 @@ onMounted(() => {
   </div>
 </template>
 
-<style lang="scss">
+<style lang="scss" scoped>
 #main {
   min-height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
-
+  margin: auto;
   .invoice-wrapper {
     height: 100%;
     width: 100%;

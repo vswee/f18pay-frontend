@@ -2,9 +2,7 @@
   <div id="app" :class="theme">
 
     <template v-if="$route.name === 'InvoiceAPI'">
-      <div id="main">
         <router-view></router-view>
-      </div>
       <ChatWoot />
     </template>
 
