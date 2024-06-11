@@ -1,69 +1,34 @@
 <template>
-  <div id="app" :class="theme">
-    <Header />
-    <Sidebar />
-    <div id="main" :class="session ? 'sessioned' : ''">
-      <router-view></router-view>
-    </div>
-    <Footer />
-    <ChatWoot />
-    <NewStoreModal v-if="session && storeModalView === 'new'" />
+  <div id="app">
+
+    <template v-if="$route.name === 'InvoiceAPI'">
+      <InvoiceAPIContainer />
+    </template>
+    <template v-else>
+      <AppContainer />
+    </template>
+
   </div>
 </template>
 
-<script setup>
-import { computed, onMounted, watch } from 'vue';
-import { useStore } from 'vuex';
-import { useRoute, useRouter } from 'vue-router';
-import Footer from './components/Footer.vue';
-import Header from './components/Header.vue';
-import Sidebar from './components/Sidebar.vue';
-import ChatWoot from './components/ChatWoot.vue';
-import NewStoreModal from '@/components/NewStoreModal.vue';
-
-const store = useStore();
-const route = useRoute();
-const router = useRouter()
-
-const theme = computed(() => store.getters.theme);
-const session = computed(() => store.getters.session);
-const storeModalView = computed(() => store.getters.storeModalView);
-const viewTitle = computed(() => store.getters.viewTitle);
-
-const initChecks = async () => {
-  await store.dispatch('init');
-  await store.dispatch('verifySession', {flag:false, route:route.name, router: router});
-};
-
-const verifySession = async () => {
-  console.log('verifying session');
-  await store.dispatch('verifySession', {flag:false, route:route.name, router: router});
-};
-
-const scrollUITriggers = () => {
-  if (document.getElementById('main').scrollTop > 80 && viewTitle.value) {
-    store.commit('setShowTitle', true);
-  } else {
-    store.commit('setShowTitle', false);
+<script>
+import AppContainer from './components/AppContainer.vue'
+import InvoiceAPIContainer from './components/InvoiceAPIContainer.vue'
+export default {
+  name: 'App',
+  components: {
+    AppContainer,
+    InvoiceAPIContainer,
   }
-};
-
-watch(() => route.path, initChecks);
-
-onMounted(() => {
-  store.dispatch('init');
-  store.dispatch('verifySession', {flag:false, route:route.name, router: router});
-
-  document.getElementById('main').addEventListener('scroll', scrollUITriggers);
-  window.addEventListener('focus', verifySession);
-});
+}
 </script>
-
-<style lang="css">
-@import './assets/css/fonts.css';
-</style>
 <style lang="scss">
-@import './assets/css/breakpoints.scss';
-@import './assets/css/mixins.scss';
-@import './assets/css/general.scss';
+body{
+  font-family: "Rubik", "Helvetica Neue", "Helvetica", "Arial", "Font Awesome 5 Brands", "Font Awesome 5", sans-serif;
+  margin: 0;
+  padding: 0;
+}
+</style>
+<style lang="css">
+@import "./assets/css/fonts.css";
 </style>

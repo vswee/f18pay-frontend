@@ -65,39 +65,31 @@ export default {
     })
   },
   methods: {
-    encrypt(string) {
-      let key = this.keyiv.substr(0, 32);
-      key = this.$CryptoJS.SHA256(key).toString(this.$CryptoJS.enc.Hex).substr(0, 32);
-      let iv = this.keyiv.substr(33);
-      iv = this.$CryptoJS.SHA256(iv).toString(this.$CryptoJS.enc.Hex).substr(0, 16);
-      const encrypted = this.$CryptoJS.AES.encrypt(string, this.$CryptoJS.enc.Utf8.parse(key), {
-        iv: this.$CryptoJS.enc.Utf8.parse(iv),
-      }).toString();
-      return encrypted;
-    },
-    checkUsername() {
+    async checkUsername() {
       this.message = false;
       this.working = true;
       if (!this.usernameManual || this.usernameManual.length == 0) {
         this.message = "Please enter your email address"
       } else {
-        const username = this.encrypt(this.usernameManual);
-        fetch('http://localhost:3000/check-username-for-activation', {
-            method: 'POST', // or 'PUT'
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              username: username,
-              keyivId: this.keyivId
-            }),
-          })
+        const username = await this.$store.dispatch('encrypt', {
+          string: this.usernameManual,
+          keyiv: this.keyiv
+        });
+        fetch(process.env.VUE_APP_APPLICATION_ENDPOINT + '/check-username-for-activation', {
+          method: 'POST', // or 'PUT'
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            username: username,
+            keyivId: this.keyivId
+          }),
+        })
           .then((response) => response.json())
           .then((data) => {
             this.usernameManualConfirmedBool = data.usernameConfirmed
-            if (data.usernameConfirmed !== true) {
-              this.message = data.debug ? data.debug : false;
-            } else {
+            this.message = data.debug ? data.debug : false;
+            if (data.usernameConfirmed == true) {
               this.$store.commit("setUser", this.usernameManual);
             }
             this.working = false
@@ -108,22 +100,25 @@ export default {
           });
       }
     },
-    checkCode() {
+    async checkCode() {
       this.message = false;
       this.working = true;
       if (this.code.length >= 6 && (this.username || this.usernameManual)) {
-        const username = this.encrypt(this.username);
-        fetch('http://localhost:3000/code-verify', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              username: username,
-              code: this.code,
-              keyivId: this.keyivId
-            }),
-          })
+        const username = await this.$store.dispatch('encrypt', {
+          string: this.username,
+          keyiv: this.keyiv
+        });
+        fetch(process.env.VUE_APP_APPLICATION_ENDPOINT + '/code-verify', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            username: username,
+            code: this.code,
+            keyivId: this.keyivId
+          }),
+        })
           .then((response) => response.json())
           .then((data) => {
             this.message = data.debug ? data.debug : false
@@ -146,21 +141,32 @@ export default {
 
       }
     },
-    getNewCode() {
+    async getNewCode() {
       this.message = false;
       this.working = true;
       if (this.username || this.usernameManual) {
-        const username = this.username ? this.encrypt(this.username) : this.encrypt(this.usernameManual);
-        fetch('http://localhost:3000/request-new-code', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              username: username,
-              keyivId: this.keyivId
-            }),
-          })
+        let username = false
+        if (this.username) {
+          username = await this.$store.dispatch('encrypt', {
+            string: this.username,
+            keyiv: this.keyiv
+          });
+        } else {
+          username = await this.$store.dispatch('encrypt', {
+            string: this.usernameManual,
+            keyiv: this.keyiv
+          });
+        }
+        fetch(process.env.VUE_APP_APPLICATION_ENDPOINT + '/request-new-code', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            username: username,
+            keyivId: this.keyivId
+          }),
+        })
           .then((response) => response.json())
           .then((data) => {
             this.message = data.debug ? data.debug : false
@@ -180,7 +186,7 @@ export default {
       }
     }
   },
-  mounted() {},
+  mounted() { },
   async created() {
     if (this.session) {
       this.$router.push('dashboard');
@@ -188,10 +194,10 @@ export default {
     }
     if (!this.keyivId) {
       fetch(process.env.VUE_APP_APPLICATION_ENDPOINT + "/get-keyiv", {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        })
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
         .then((response) => response.json())
         .then((data) => {
           this.serverMessage = data.debug ? data.debug : false;
@@ -203,7 +209,7 @@ export default {
           this.message = this.message + ' \nError: ' + error + '\n';
           console.error("Error:", error);
         });
-    }else{
+    } else {
       this.keyiv = this.keyivIfIDSet
     }
   },

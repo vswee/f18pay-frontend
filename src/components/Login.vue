@@ -58,36 +58,30 @@ export default {
     ...mapGetters({
       fingerprint: 'fingerprint',
       session: 'session',
+      keyiv: 'keyiv',
     })
   },
   methods: {
-    encrypt(string) {
-      let key = this.keyiv.substr(0, 32);
-      key = this.$CryptoJS.SHA256(key).toString(this.$CryptoJS.enc.Hex).substr(0, 32);
-      let iv = this.keyiv.substr(33);
-      iv = this.$CryptoJS.SHA256(iv).toString(this.$CryptoJS.enc.Hex).substr(0, 16);
-      const encrypted = this.$CryptoJS.AES.encrypt(string, this.$CryptoJS.enc.Utf8.parse(key), {
-        iv: this.$CryptoJS.enc.Utf8.parse(iv),
-      }).toString();
-      return encrypted;
-    },
-    checkUsername() {
+    async checkUsername() {
       this.message = false;
       this.working = true;
       if (!this.username || this.username.length == 0) {
         this.message = "Please enter your account email address"
       } else {
-        const username = this.encrypt(this.username);
-        fetch('http://localhost:3000/check-username', {
-            method: 'POST', // or 'PUT'
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              username: username,
-              keyivId: this.keyivId
-            }),
-          })
+        const username = await this.$store.dispatch('encrypt', {
+          string: this.username,
+          keyiv: this.keyiv
+        });
+        fetch(process.env.VUE_APP_APPLICATION_ENDPOINT + '/check-username', {
+          method: 'POST', // or 'PUT'
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            username: username,
+            keyivId: this.keyivId
+          }),
+        })
           .then((response) => response.json())
           .then((data) => {
             this.usernameConfirmed = data.usernameConfirmed
@@ -105,22 +99,28 @@ export default {
           });
       }
     },
-    checkPassword() {
+    async checkPassword() {
       this.message = false;
       this.working = true;
-      const encrypted = this.encrypt(this.password);
-      const username = this.encrypt(this.username);
-      fetch('http://localhost:3000/password-login', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            username: username,
-            password: encrypted,
-            keyivId: this.keyivId
-          }),
-        })
+      const username = await this.$store.dispatch('encrypt', {
+        string: this.username,
+        keyiv: this.keyiv
+      });
+      const encrypted = await this.$store.dispatch('encrypt', {
+        string: this.password,
+        keyiv: this.keyiv
+      });
+      fetch(process.env.VUE_APP_APPLICATION_ENDPOINT + '/password-login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username: username,
+          password: encrypted,
+          keyivId: this.keyivId
+        }),
+      })
         .then((response) => response.json())
         .then((data) => {
           if (data.proceed == true && data.fingerprint) {
@@ -141,8 +141,7 @@ export default {
     }
   },
   mounted() {
-    if(this.$refs.username.$el)
-   { this.$refs.username.$el.focus()}
+    if (this.$refs.username.$el) { this.$refs.username.$el.focus() }
   },
   async created() {
     if (this.session) {
@@ -150,11 +149,10 @@ export default {
       return
     }
     fetch(process.env.VUE_APP_APPLICATION_ENDPOINT + "/get-keyiv", {
-        headers: {
-          "Content-Type": "multipart/form-data",
+      headers: {
+        "Content-Type": "multipart/form-data",
       },
-        method:'get'
-      })
+    })
       .then((response) => response.json())
       .then((data) => {
         this.keyiv = data.keyiv

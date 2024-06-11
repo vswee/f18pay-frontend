@@ -39,7 +39,7 @@
         <div class="sub-sect">
           <label for="storeName">Basic Button</label>
           <div class="button-preview" :random="random" id="basicButton">
-            <form target="_blank" method="GET" action="https://pay.flat18.co.uk/api/v1/invoices/">
+            <form target="_blank" method="GET" :action="base_url">
               <input type="hidden" name="store_id" :value="currentStore.store_id" />
               <input type="hidden" name="price" :value="fixedPrice" />
               <input type="hidden" name="redirectURL" :value="currentStore.url" />
@@ -58,7 +58,7 @@
         <div class="sub-sect">
           <label for="storeName">Dynamic Button</label>
           <div class="button-preview" :random="random" id="dynamicButton">
-            <form target="_blank" method="GET" action="https://pay.flat18.co.uk/api/v1/invoices/">
+            <form target="_blank" method="GET" :action="base_url">
               <input type="hidden" name="store_id" :value="currentStore.store_id" />
               <input type="hidden" name="price" :value="fixedPrice" class="priceValue" />
               <input type="hidden" name="redirectURL" :value="currentStore.url" />
@@ -191,6 +191,7 @@ export default {
       keyivId: 'keyivId',
       activeStore: 'activeStore',
       stores: 'stores',
+      base_url: 'url',
     }),
     storeCode() {
       return this.activeStore.substr(0, 4) + this.currentStore.store_id_int + this.activeStore.substr(this.activeStore.length - 4)

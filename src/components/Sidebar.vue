@@ -10,11 +10,15 @@
               <div
                 :class="[storesDropdown ? 'sidebar-shortcuts dropdown open store-length-' + stores.length : 'sidebar-shortcuts dropdown store-length-' + stores.length]"
                 @click="storesDropdown = !storesDropdown">
-                <template v-if="(!activeStore) && stores.length > 1">
+                <template v-if="(!activeStore)">
+                  <template v-if="stores.length > 1">
                   <div class="sidebar-shortcut active">
                     <i class="fas fa-th"></i>
                     <span class="collapsible"><span class="text"> Select Store </span></span>
                   </div>
+                </template>
+                <template v-else>
+                </template>
                 </template>
                 <template v-else>
                   <div class="sidebar-shortcut active">
