@@ -9,7 +9,7 @@
       <label for="username">email</label>
       <input v-model="usernameManual" type="email" placeholder="email@example.com" v-on:keyup.enter="checkUsername()" />
       <div class="flex">
-        <router-link :to="{name: 'Home'}" class="btn sec"><i class="fas fa-times"></i>Exit</router-link>
+        <router-link :to="{name: 'home'}" class="btn sec"><i class="fas fa-times"></i>Exit</router-link>
         <a class="btn" @click="checkUsername()">Next<i class="fas fa-arrow-right"></i></a>
       </div>
     </div>
@@ -26,7 +26,7 @@
       <input v-model="code" type="text" placeholder="" v-on:keyup.enter="checkCode()" />
 
       <div class="flex">
-        <router-link :to="{name: 'Home'}" class="btn sec">Exit</router-link>
+        <router-link :to="{name: 'home'}" class="btn sec">Exit</router-link>
         <a class="btn sec" @click="getNewCode()">Get New Code<i class="fas fa-keyboard"></i></a>
         <a class="btn" @click="checkCode()">Finish<i class="fas fa-arrow-right"></i></a>
       </div>
@@ -75,7 +75,7 @@ export default {
           string: this.usernameManual,
           keyiv: this.keyiv
         });
-        fetch(process.env.VUE_APP_APPLICATION_ENDPOINT + '/check-username-for-activation', {
+        fetch(import.meta.env.VITE_APP_APPLICATION_ENDPOINT + '/check-username-for-activation', {
           method: 'POST', // or 'PUT'
           headers: {
             'Content-Type': 'application/json',
@@ -108,7 +108,7 @@ export default {
           string: this.username,
           keyiv: this.keyiv
         });
-        fetch(process.env.VUE_APP_APPLICATION_ENDPOINT + '/code-verify', {
+        fetch(import.meta.env.VITE_APP_APPLICATION_ENDPOINT + '/code-verify', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -126,7 +126,7 @@ export default {
               this.$store.commit("setUser", this.username);
               this.$store.commit("setFingerprint", data.fingerprint);
               this.$router.push({
-                name: 'Dashboard'
+                name: 'dashboard'
               });
             }
             this.working = false
@@ -157,7 +157,7 @@ export default {
             keyiv: this.keyiv
           });
         }
-        fetch(process.env.VUE_APP_APPLICATION_ENDPOINT + '/request-new-code', {
+        fetch(import.meta.env.VITE_APP_APPLICATION_ENDPOINT + '/request-new-code', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -193,7 +193,7 @@ export default {
       return
     }
     if (!this.keyivId) {
-      fetch(process.env.VUE_APP_APPLICATION_ENDPOINT + "/get-keyiv", {
+      fetch(import.meta.env.VITE_APP_APPLICATION_ENDPOINT + "/get-keyiv", {
         headers: {
           "Content-Type": "multipart/form-data",
         },

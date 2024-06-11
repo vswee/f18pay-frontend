@@ -261,7 +261,7 @@ export default {
         string: encodeURIComponent(encodeURI(this.storeName)),
         keyiv: this.keyiv
       });
-      await fetch(process.env.VUE_APP_APPLICATION_ENDPOINT + "/store-settings-async", {
+      await fetch(import.meta.env.VITE_APP_APPLICATION_ENDPOINT + "/store-settings-async", {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

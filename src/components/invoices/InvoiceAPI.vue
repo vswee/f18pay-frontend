@@ -13,7 +13,7 @@ const state = reactive({
 
 async function fetchInvoice({ store_id, currency, price, ext, redirectURL }) {
   try {
-    const response = await fetch(`${process.env.VUE_APP_APPLICATION_ENDPOINT}/invoice`, {
+    const response = await fetch(`${import.meta.env.VITE_APP_APPLICATION_ENDPOINT}/invoice`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -41,7 +41,7 @@ async function fetchInvoice({ store_id, currency, price, ext, redirectURL }) {
 
 async function fetchExistingInvoice({ invoice_id, redirectURL }) {
   try {
-    const response = await fetch(`${process.env.VUE_APP_APPLICATION_ENDPOINT}/invoice-retrieve`, {
+    const response = await fetch(`${import.meta.env.VITE_APP_APPLICATION_ENDPOINT}/invoice-retrieve`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

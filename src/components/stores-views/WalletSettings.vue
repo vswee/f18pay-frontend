@@ -183,7 +183,7 @@ this.init()
         string: this.currentStore.store_id,
         keyiv: this.keyiv
       });
-      await fetch(process.env.VUE_APP_APPLICATION_ENDPOINT + "/store-management-request-keys", {
+      await fetch(import.meta.env.VITE_APP_APPLICATION_ENDPOINT + "/store-management-request-keys", {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -237,7 +237,7 @@ this.init()
         string: this.zpub,
         keyiv: this.keyiv
       });
-      await fetch(process.env.VUE_APP_APPLICATION_ENDPOINT + "/store-settings-change-zpub", {
+      await fetch(import.meta.env.VITE_APP_APPLICATION_ENDPOINT + "/store-settings-change-zpub", {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -288,7 +288,7 @@ this.init()
         string: this.zpub,
         keyiv: this.keyiv
       });
-      await fetch(process.env.VUE_APP_APPLICATION_ENDPOINT + "/store-settings-confirm-zpub-addresses", {
+      await fetch(import.meta.env.VITE_APP_APPLICATION_ENDPOINT + "/store-settings-confirm-zpub-addresses", {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'

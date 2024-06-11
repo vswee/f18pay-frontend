@@ -30,4 +30,4 @@ import git from 'git-rev-sync'
     },
  });
 
-process.env.VITE_GIT_HASH = git.tag()
+process.env.VITE_APP_GIT_HASH = git.tag()

@@ -224,7 +224,7 @@ export default {
         email: email,
       }
       if (this.imageChanged) { updateStoreSettingsBody.logo = this.storeLogoProxy }
-      await fetch(process.env.VUE_APP_APPLICATION_ENDPOINT + "/store-settings-bulk", {
+      await fetch(import.meta.env.VITE_APP_APPLICATION_ENDPOINT + "/store-settings-bulk", {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

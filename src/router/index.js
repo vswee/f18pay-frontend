@@ -16,7 +16,7 @@ import PaymentRequest from '@/components/stores-views/PaymentRequest.vue';
 import InvoiceAPI from '../components/invoices/InvoiceAPI.vue'
 
 if(window.location.protocol != 'https:') {
-  if(location.href.indexOf("808")<0)
+  if((location.href.indexOf("808")<0) && (location.href.indexOf("300")<0))
   location.href = location.href.replace("http://", "https://")
 }
 
@@ -49,7 +49,7 @@ const routes = [
 const router = createRouter({
   history: createWebHistory(),
   mode: 'history',
-  base: process.env.BASE_URL,
+  base: import.meta.env.VITE_APP_BASE_URL,
   routes
 })
 app.use(router)

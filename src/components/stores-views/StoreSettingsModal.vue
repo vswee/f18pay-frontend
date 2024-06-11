@@ -174,7 +174,7 @@ export default {
         string: this.code,
         keyiv: this.keyiv
       });
-      await fetch(process.env.VUE_APP_APPLICATION_ENDPOINT + "/store-management-request-keys-verify-code", {
+      await fetch(import.meta.env.VITE_APP_APPLICATION_ENDPOINT + "/store-management-request-keys-verify-code", {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -245,7 +245,7 @@ export default {
         string: this.email,
         keyiv: this.keyiv
       });
-      await fetch(process.env.VUE_APP_APPLICATION_ENDPOINT + "/store-settings-bulk", {
+      await fetch(import.meta.env.VITE_APP_APPLICATION_ENDPOINT + "/store-settings-bulk", {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'

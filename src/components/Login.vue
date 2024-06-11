@@ -13,10 +13,10 @@
 
       </div>
       <div class="centre">
-        <router-link :to="{name: 'ResetPassword'}" title="Reset your password" class="link">Password reset</router-link>
+        <router-link :to="{name: 'reset-password'}" title="Reset your password" class="link">Password reset</router-link>
       </div>
       <div class="centre">
-        <router-link :to="{name: 'Signup'}" title="Signup for F18 Pay" class="link">Sign up</router-link>
+        <router-link :to="{name: 'signup'}" title="Signup for F18 Pay" class="link">Sign up</router-link>
       </div>
     </div>
     <div class="form-section" v-if="usernameConfirmed">
@@ -72,7 +72,7 @@ export default {
           string: this.username,
           keyiv: this.keyiv
         });
-        fetch(process.env.VUE_APP_APPLICATION_ENDPOINT + '/check-username', {
+        fetch(import.meta.env.VITE_APP_APPLICATION_ENDPOINT + '/check-username', {
           method: 'POST', // or 'PUT'
           headers: {
             'Content-Type': 'application/json',
@@ -110,7 +110,7 @@ export default {
         string: this.password,
         keyiv: this.keyiv
       });
-      fetch(process.env.VUE_APP_APPLICATION_ENDPOINT + '/password-login', {
+      fetch(import.meta.env.VITE_APP_APPLICATION_ENDPOINT + '/password-login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -148,7 +148,7 @@ export default {
       this.$router.push('dashboard');
       return
     }
-    fetch(process.env.VUE_APP_APPLICATION_ENDPOINT + "/get-keyiv", {
+    fetch(import.meta.env.VITE_APP_APPLICATION_ENDPOINT + "/get-keyiv", {
       headers: {
         "Content-Type": "multipart/form-data",
       },

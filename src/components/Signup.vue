@@ -7,7 +7,7 @@
       <label for="username">email</label>
       <input v-model="username" type="email" placeholder="email@example.com" v-on:keyup.enter="checkUsername()" />
       <div class="flex">
-        <router-link :to="{name: 'Login'}" title="Log in to your account" class="btn sec"><i class="fas fa-arrow-circle-left"></i>Log in</router-link>
+        <router-link :to="{name: 'login'}" title="Log in to your account" class="btn sec"><i class="fas fa-arrow-circle-left"></i>Log in</router-link>
         <a class="btn" @click="checkUsername()">Next<i class="fas fa-arrow-right"></i></a>
       </div>
     </div>
@@ -70,7 +70,7 @@ export default {
           string: this.username,
           keyiv: this.keyiv
         });
-        fetch(process.env.VUE_APP_APPLICATION_ENDPOINT + '/check-username-pre-exist', {
+        fetch(import.meta.env.VITE_APP_APPLICATION_ENDPOINT + '/check-username-pre-exist', {
             method: 'POST', // or 'PUT'
             headers: {
               'Content-Type': 'application/json',
@@ -110,7 +110,7 @@ export default {
           string: this.password2,
           keyiv: this.keyiv
         });
-        fetch(process.env.VUE_APP_APPLICATION_ENDPOINT + '/register-new-user', {
+        fetch(import.meta.env.VITE_APP_APPLICATION_ENDPOINT + '/register-new-user', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -128,7 +128,7 @@ export default {
             if (data.proceed == true) {
               this.$store.commit("setUser", this.username);
               this.$router.push({
-                name: 'VerifyEmail'
+                name: 'verify-email'
               });
             } else {
               this.usernameConfirmed = false
@@ -152,7 +152,7 @@ export default {
       this.$router.push('dashboard');
       return
     }
-    fetch(process.env.VUE_APP_APPLICATION_ENDPOINT + "/get-keyiv", {
+    fetch(import.meta.env.VITE_APP_APPLICATION_ENDPOINT + "/get-keyiv", {
         headers: {
           "Content-Type": "multipart/form-data",
         },

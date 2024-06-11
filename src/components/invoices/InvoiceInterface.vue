@@ -182,7 +182,7 @@ if (invoice) {
 
 const invoiceStatus = async () => {
   try {
-    const response = await fetch(`${process.env.VUE_APP_APPLICATION_ENDPOINT}/invoice-status`, {
+    const response = await fetch(`${import.meta.env.VITE_APP_APPLICATION_ENDPOINT}/invoice-status`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

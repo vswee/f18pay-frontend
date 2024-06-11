@@ -1,6 +1,6 @@
 <template>
   <div :class="headerClasses" id="header">
-    <a @click="clearToHome()" title="home" class="logo">
+    <a @click="clearToHome" title="home" class="logo">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 158 201">
         <clipPath id="a">
           <path clip-rule="evenodd" d="m100 10.547c49.37 0 89.453 40.083 89.453 89.453 0 93.284-109.752 139.496-157.332 155.146-5.028 1.597-10.516.699-14.774-2.416s-6.774-8.074-6.774-13.35c-.026-44.211-.026-139.38-.026-139.38 0-49.37 40.083-89.453 89.453-89.453z" />
@@ -16,38 +16,44 @@
             <path d="m100 10.547c49.37 0 89.453 40.083 89.453 89.453 0 93.284-109.752 139.496-157.332 155.146-5.028 1.597-10.516.699-14.774-2.416s-6.774-8.074-6.774-13.35c-.026-44.211-.026-139.38-.026-139.38 0-49.37 40.083-89.453 89.453-89.453z" stroke="var(--accent)" stroke-width="23.02" />
           </g>
         </g>
-      </g>
-    </svg>
-    <b v-if="!showTitle || (!showTitle || !viewTitle)">F18 Pay</b>
-    <b v-if="session && (showTitle && viewTitle)" class="ui-scroll-title">{{viewTitle}}</b>
-  </a>
-  <div :class="session && (showTitle && viewTitle) ? 'dynamic-cta-header-space active':'dynamic-cta-header-space'"></div>
-  <div class="notification-workspace"><template v-if="authFailure">
-      <div @click="clearAuthFailure" class="notification foot bad error">{{authFailure}}</div>
-    </template></div>
-
+      </svg>
+      <b v-if="!showTitle || (!showTitle || !viewTitle)">F18 Pay</b>
+      <b v-if="session && (showTitle && viewTitle)" class="ui-scroll-title">{{ viewTitle }}</b>
+    </a>
+    <div :class="dynamicCtaHeaderSpaceClasses"></div>
+    <div class="notification-workspace">
+      <template v-if="authFailure">
+        <div @click="clearAuthFailure" class="notification foot bad error">{{ authFailure }}</div>
+      </template>
+    </div>
     <div class="links">
       <div class="links" v-if="!session">
-        <router-link :to="{name: 'login'}" title="Log in to your account or sign up" class="link" v-if="currentRouteName !== 'Login'">log in</router-link>
+        <router-link :to="{ name: 'login' }" title="Log in to your account or sign up" class="link" v-if="currentRouteName !== 'Login'">log in</router-link>
       </div>
-      <a class="link" @click="toggleTheme()">
+      <a class="link" @click="toggleTheme">
         <i v-if="theme === 'dark'" class="fas fa-sun"></i>
         <i v-if="theme === 'light'" class="fas fa-moon"></i>
       </a>
-      <a class="link" href="https://github.com/vswee/f18pay-frontend" target="_blank" title="F18 Pay Github"><i class="fab fa-github"></i></a>
-      <a class="link" href="https://twitter.com/f18micro" target="_blank" title="Flat18 Twitter"><i class="fab fa-twitter"></i></a>
+      <a class="link" href="https://github.com/vswee/f18pay-frontend" target="_blank" title="F18 Pay Github">
+        <i class="fab fa-github"></i>
+      </a>
+      <a class="link" href="https://twitter.com/f18micro" target="_blank" title="Flat18 Twitter">
+        <i class="fab fa-twitter"></i>
+      </a>
       <div class="links" v-if="session && currentRouteName">
-        <router-link v-if="currentRouteName !== 'Dashboard'" :to="{name: 'dashboard'}" title="Access your dashboard" class="link"><i class="fas fa-th"></i></router-link>
-        <a class="link" @click="logout()">Log Out</a>
+        <router-link v-if="currentRouteName !== 'Dashboard'" :to="{ name: 'dashboard' }" title="Access your dashboard" class="link">
+          <i class="fas fa-th"></i>
+        </router-link>
+        <a class="link" @click="logout">Log Out</a>
       </div>
     </div>
-</div>
+  </div>
 </template>
 
 <script setup>
 import { useRoute } from 'vue-router';
 import { useStore } from 'vuex';
-import {computed} from 'vue'
+import { computed } from 'vue';
 
 const route = useRoute();
 const store = useStore();
@@ -62,13 +68,13 @@ const currentRouteName = computed(() => route.name);
 const currentRoutePath = computed(() => route.path);
 
 const headerClasses = computed(() => ({
-  'header': true,
-  'working': session.value && (showTitle.value && viewTitle.value) && working.value,
+  header: true,
+  working: session.value && showTitle.value && viewTitle.value && working.value,
 }));
 
 const dynamicCtaHeaderSpaceClasses = computed(() => ({
   'dynamic-cta-header-space': true,
-  'active': session.value && (showTitle.value && viewTitle.value),
+  active: session.value && showTitle.value && viewTitle.value,
 }));
 
 function clearAuthFailure() {
@@ -78,10 +84,9 @@ function clearAuthFailure() {
 
 function clearToHome() {
   if (session.value) {
-    if (currentRoutePath.value.indexOf('dashboard') >-1) {
+    if (currentRoutePath.value.includes('dashboard')) {
       store.dispatch('fetchStores');
-    }
-    else{
+    } else {
       store.dispatch('routerPush', { name: 'Dashboard' });
     }
     store.commit('setActiveStore', false);
@@ -104,10 +109,7 @@ function logout() {
 function toggleTheme() {
   store.commit('setTheme', theme.value === 'dark' ? 'light' : 'dark');
 }
-
-clearToHome()
 </script>
-
 
 <style lang="scss" scoped>
 .notification {

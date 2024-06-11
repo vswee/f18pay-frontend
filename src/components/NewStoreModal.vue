@@ -136,7 +136,7 @@ export default {
         string: encodeURI(this.storeName),
         keyiv: this.keyiv
       });
-      await fetch(process.env.VUE_APP_APPLICATION_ENDPOINT + "/new-store-type-name-check", {
+      await fetch(import.meta.env.VITE_APP_APPLICATION_ENDPOINT + "/new-store-type-name-check", {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -201,7 +201,7 @@ export default {
           string: this.storeName,
           keyiv: this.keyiv
         });
-        await fetch(process.env.VUE_APP_APPLICATION_ENDPOINT + "/new-store-derivation-internal", {
+        await fetch(import.meta.env.VITE_APP_APPLICATION_ENDPOINT + "/new-store-derivation-internal", {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json'
@@ -258,7 +258,7 @@ export default {
         string: this.zpub,
         keyiv: this.keyiv
       });
-      await fetch(process.env.VUE_APP_APPLICATION_ENDPOINT + "/new-store-query-zpub", {
+      await fetch(import.meta.env.VITE_APP_APPLICATION_ENDPOINT + "/new-store-query-zpub", {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -306,7 +306,7 @@ export default {
         string: this.zpub,
         keyiv: this.keyiv
       });
-      await fetch(process.env.VUE_APP_APPLICATION_ENDPOINT + "/new-store-confirm-bitcoin-zpub-addresses-match", {
+      await fetch(import.meta.env.VITE_APP_APPLICATION_ENDPOINT + "/new-store-confirm-bitcoin-zpub-addresses-match", {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
