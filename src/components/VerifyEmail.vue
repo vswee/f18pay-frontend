@@ -76,21 +76,20 @@ export default {
           keyiv: this.keyiv
         });
         fetch(process.env.VUE_APP_APPLICATION_ENDPOINT + '/check-username-for-activation', {
-            method: 'POST', // or 'PUT'
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              username: username,
-              keyivId: this.keyivId
-            }),
-          })
+          method: 'POST', // or 'PUT'
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            username: username,
+            keyivId: this.keyivId
+          }),
+        })
           .then((response) => response.json())
           .then((data) => {
             this.usernameManualConfirmedBool = data.usernameConfirmed
-            if (data.usernameConfirmed !== true) {
-              this.message = data.debug ? data.debug : false;
-            } else {
+            this.message = data.debug ? data.debug : false;
+            if (data.usernameConfirmed == true) {
               this.$store.commit("setUser", this.usernameManual);
             }
             this.working = false
@@ -110,16 +109,16 @@ export default {
           keyiv: this.keyiv
         });
         fetch(process.env.VUE_APP_APPLICATION_ENDPOINT + '/code-verify', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              username: username,
-              code: this.code,
-              keyivId: this.keyivId
-            }),
-          })
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            username: username,
+            code: this.code,
+            keyivId: this.keyivId
+          }),
+        })
           .then((response) => response.json())
           .then((data) => {
             this.message = data.debug ? data.debug : false
@@ -149,25 +148,25 @@ export default {
         let username = false
         if (this.username) {
           username = await this.$store.dispatch('encrypt', {
-          string: this.username,
-          keyiv: this.keyiv
-        });
+            string: this.username,
+            keyiv: this.keyiv
+          });
         } else {
           username = await this.$store.dispatch('encrypt', {
-          string: this.usernameManual,
-          keyiv: this.keyiv
-        });
+            string: this.usernameManual,
+            keyiv: this.keyiv
+          });
         }
         fetch(process.env.VUE_APP_APPLICATION_ENDPOINT + '/request-new-code', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              username: username,
-              keyivId: this.keyivId
-            }),
-          })
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            username: username,
+            keyivId: this.keyivId
+          }),
+        })
           .then((response) => response.json())
           .then((data) => {
             this.message = data.debug ? data.debug : false
@@ -187,7 +186,7 @@ export default {
       }
     }
   },
-  mounted() {},
+  mounted() { },
   async created() {
     if (this.session) {
       this.$router.push('dashboard');
@@ -195,10 +194,10 @@ export default {
     }
     if (!this.keyivId) {
       fetch(process.env.VUE_APP_APPLICATION_ENDPOINT + "/get-keyiv", {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        })
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
         .then((response) => response.json())
         .then((data) => {
           this.serverMessage = data.debug ? data.debug : false;
@@ -210,7 +209,7 @@ export default {
           this.message = this.message + ' \nError: ' + error + '\n';
           console.error("Error:", error);
         });
-    }else{
+    } else {
       this.keyiv = this.keyivIfIDSet
     }
   },

@@ -1,6 +1,6 @@
 <template lang="">
 <div class="dashboard-root">
-  <template v-if="stores[0]?.store_id">
+  <template v-if="storesStores[0]?.store_id || stores[0]?.store_id">
     <div class="stores" v-if="!$route.params.storeId10">
       <router-link v-for="(store, index) in stores" :key="store.store_id" :class="store.deleted==1?'store-tile disabled':'store-tile active'" :style="'animation-delay:'+(index+1)/10+'s;'" :to="{ name: 'StoreSummary', params: { storeId10: store.store_id.substring(0, 5) + store.store_id.substring(store.store_id.length - 5) } }">
         <h2>
@@ -75,6 +75,7 @@ export default {
       activeStore: 'activeStore',
       storeView: 'storeView',
       storeModalView: 'storeModalView',
+      storesStores: 'stores',
     }),
     currentRouteName(){return this.$route.name},
   },

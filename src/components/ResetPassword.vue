@@ -110,7 +110,7 @@ export default {
           string: this.password2,
           keyiv: this.keyiv
         });
-        fetch(process.env.VUE_APP_APPLICATION_ENDPOINT + '/register-new-user', {
+        fetch(process.env.VUE_APP_APPLICATION_ENDPOINT + '/reset-user-pass', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
