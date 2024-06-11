@@ -68,10 +68,12 @@ onMounted(() => {
   if (invoice_id) {
     fetchExistingInvoice({ invoice_id, redirectURL })
   }
-  else if (!store_id) {
-    router.push({ name: 'home' })
-  } else {
-    fetchInvoice({ store_id, currency, price, ext, redirectURL })
+  else {
+    if (!store_id) {
+      router.push({ name: 'home' })
+    } else {
+      fetchInvoice({ store_id, currency, price, ext, redirectURL })
+    }
   }
 })
 </script>
@@ -99,6 +101,7 @@ onMounted(() => {
   justify-content: center;
   align-items: center;
   margin: auto;
+
   .invoice-wrapper {
     height: 100%;
     width: 100%;
