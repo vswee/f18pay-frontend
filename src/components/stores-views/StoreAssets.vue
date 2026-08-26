@@ -95,7 +95,7 @@
         <div class="sub-sect">
           <label>Generate a store API key</label>
           <span class="help-text">Use a separate key for each integration. Keys are limited to this store and the full secret is shown only once.</span>
-          <input v-model="apiKeyNickname" type="text" maxlength="100" placeholder="btcpayserver" @keyup.enter="createApiKey()" />
+          <input v-model="apiKeyNickname" type="text" maxlength="100" placeholder="api-nickname" @keyup.enter="createApiKey()" />
           <label class="api-permissions-label">Permissions</label>
           <div class="api-permissions">
             <label v-for="permission in apiPermissionOptions" :key="permission.value" class="api-permission">
