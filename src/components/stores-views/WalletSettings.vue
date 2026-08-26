@@ -66,269 +66,267 @@
 </div>
 </template>
 
-<script>
-import {
-  mapGetters
-} from 'vuex';
-import WalletSettingsModal from './WalletSettingsModal.vue'
-export default {
-  name: "WalletSettings",
-  components: {
-    WalletSettingsModal: WalletSettingsModal,
-  },
-  data() {
-    return {
-      message: false,
-      working: false,
-      addressDerivationType: false,
-      zpub: false,
-      accordianIndex: 0,
-      confirmAddresses: false,
-      addressesForConfirmation: false,
-      confirmCode: false,
-      code: '',
-      network: false,
-      numberOfAddressesToConfirm: false,
-      inputFocus: false,
+<script setup>
+import { ref, computed, watch, onMounted } from 'vue';
+import { useRoute } from 'vue-router';
+import { useMainStore } from '@/stores';
+import { storeToRefs } from 'pinia';
+import WalletSettingsModal from './WalletSettingsModal.vue';
+
+const route = useRoute();
+const store = useMainStore();
+
+// Reactive state
+const message = ref(false);
+const working = ref(false);
+const addressDerivationType = ref(false);
+const zpub = ref(false);
+const accordianIndex = ref(0);
+const confirmAddresses = ref(false);
+const addressesForConfirmation = ref(false);
+const confirmCode = ref(false);
+const code = ref('');
+const network = ref(false);
+const numberOfAddressesToConfirm = ref(false);
+const inputFocus = ref(false);
+
+// Store state with storeToRefs for reactivity
+const {
+  fingerprint,
+  user,
+  keyiv,
+  keyivId,
+  stores
+} = storeToRefs(store);
+
+// Computed properties
+const currentStore = computed(() => {
+  let current = false;
+  if (stores.value) {
+    for (const sto of stores.value) {
+      if (`${sto.store_id.substring(0, 5)}${sto.store_id.substring(sto.store_id.length - 5)}` === route.params.storeId10) {
+        current = sto;
+        break;
+      }
     }
-  },
-  watch: {
-    addressDerivationType() {
-      this.inputFocus = false
-    },
-    inputFocus() {
-      setTimeout(() => {
-        document.querySelector("input").select()
-      }, 200)
-    },
-    deleted() {
-      this.saveSettings()
-    },
-    working() {
-      this.$store.commit("setWorking", this.working);
-    },
-    currentStore() {
-      this.init()
-    },
-  },
-  computed: {
-    ...mapGetters({
-      session: 'session',
-      fingerprint: 'fingerprint',
-      user: 'user',
-      keyiv: 'keyiv',
-      keyivId: 'keyivId',
-      activeStore: 'activeStore',
-      stores: 'stores',
-    }),
-    currentStore() {
-      let current = false;
-      if (this.stores) {
-        for (const sto of this.stores) {
-          if (`${sto.store_id.substring(0, 5)}${sto.store_id.substring(sto.store_id.length - 5)}` === this.$route.params.storeId10) {
-            current = sto;
-            break;
-          }
-        }
-        return current;
-      }
-      return false
-    },
-    storeName: {
-      get() {
-        return !this.storeNameProxy ? this._decode(this.currentStore.store_name) : this.storeNameProxy;
+    return current;
+  }
+  return false;
+});
+
+// Watchers
+watch(addressDerivationType, () => {
+  inputFocus.value = false;
+});
+
+watch(inputFocus, () => {
+  setTimeout(() => {
+    const inputElement = document.querySelector("input");
+    if (inputElement) {
+      inputElement.select();
+    }
+  }, 200);
+});
+
+watch(working, (newValue) => {
+  store.setWorking(newValue);
+});
+
+watch(currentStore, () => {
+  init();
+});
+
+// Methods
+const init = () => {
+  const headerSpace = document.querySelector('.dynamic-cta-header-space');
+  if (headerSpace) {
+    headerSpace.innerHTML = '';
+  }
+
+  zpub.value = currentStore.value.zpub || '';
+  network.value = currentStore.value.network || '';
+  addressDerivationType.value = currentStore.value.zpub ? 'external' : 'internal';
+
+  // TODO: Implement headerUIAppend in Pinia store if needed
+  // store.headerUIAppend([{
+  //   id: '#saveButton',
+  //   fn: saveSettings,
+  // }]);
+};
+
+const startRequestForKeys = async () => {
+  working.value = true;
+  code.value = '';
+
+  try {
+    const username = await store.encrypt({
+      string: user.value,
+      keyiv: keyiv.value
+    });
+
+    const storeName = await store.encrypt({
+      string: currentStore.value.store_id,
+      keyiv: keyiv.value
+    });
+
+    const response = await fetch(`${import.meta.env.VITE_APP_APPLICATION_ENDPOINT}/store-management-request-keys`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
       },
-      set(value) {
-        this.storeNameProxy = value
+      body: JSON.stringify({
+        username: username,
+        store_id: storeName,
+        fingerprint: fingerprint.value,
+        keyivId: keyivId.value,
+      }),
+    });
+
+    const data = await response.json();
+    message.value = data.debug ? data.debug : false;
+
+    if (data.proceed === true) {
+      if (data.extra === 'confirmCode') {
+        window.scrollTo({
+          top: 0,
+          behavior: 'smooth'
+        });
+        confirmCode.value = true;
       }
-    },
-    storePrimaryColour: {
-      get() {
-        return !this.storePrimaryProxy ? "#" + this.currentStore.store_colour : "#" + this.storePrimaryProxy;
+    } else {
+      message.value = data.debug ? data.debug : "There was a problem with the information provided.";
+    }
+  } catch (error) {
+    message.value = `Error: ${error}`;
+    console.error("Error:", error);
+  } finally {
+    working.value = false;
+  }
+};
+
+const _null = () => {
+  return false;
+};
+
+const accordianIndexSet = (number) => {
+  accordianIndex.value = accordianIndex.value === number ? -1 : number;
+};
+
+const saveSettings = async () => {
+  working.value = true;
+
+  try {
+    const username = await store.encrypt({
+      string: user.value,
+      keyiv: keyiv.value
+    });
+
+    const encryptedZpub = await store.encrypt({
+      string: zpub.value,
+      keyiv: keyiv.value
+    });
+
+    const response = await fetch(`${import.meta.env.VITE_APP_APPLICATION_ENDPOINT}/store-settings-change-zpub`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
       },
-      set(value) {
-        this.storePrimaryProxy = value.replace("#", "")
+      body: JSON.stringify({
+        username: username,
+        addressDerivationType: addressDerivationType.value,
+        zpub: encryptedZpub,
+        fingerprint: fingerprint.value,
+        keyivId: keyivId.value,
+        store_id: currentStore.value.store_id,
+      }),
+    });
+
+    const data = await response.json();
+    message.value = data.debug ? data.debug : false;
+
+    if (data.proceed === true) {
+      if (!data.extra && data.currentStore) {
+        store.getStores();
+        store.setActiveStore(data.currentStore);
+      } else if (data.extra === 'confirm-addresses') {
+        window.scrollTo({
+          top: 0,
+          behavior: 'smooth'
+        });
+        confirmAddresses.value = true;
+        addressesForConfirmation.value = data.confirmAddresses;
+        numberOfAddressesToConfirm.value = data.number;
       }
-    },
-    storeSecondaryColour: {
-      get() {
-        return !this.storeSecondaryProxy ? "#" + this.currentStore.store_accent_colour : "#" + this.storeSecondaryProxy;
+    } else {
+      message.value = data.debug ? data.debug : "There was a problem with the information provided.";
+    }
+  } catch (error) {
+    message.value = `Error: ${error}`;
+    console.error("Error:", error);
+  } finally {
+    working.value = false;
+  }
+};
+
+const confirmAddressesMatchWallet = async () => {
+  working.value = true;
+
+  try {
+    const username = await store.encrypt({
+      string: user.value,
+      keyiv: keyiv.value
+    });
+
+    const encryptedZpub = await store.encrypt({
+      string: zpub.value,
+      keyiv: keyiv.value
+    });
+
+    const response = await fetch(`${import.meta.env.VITE_APP_APPLICATION_ENDPOINT}/store-settings-confirm-zpub-addresses`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
       },
-      set(value) {
-        this.storeSecondaryProxy = value.replace("#", "")
+      body: JSON.stringify({
+        username: username,
+        addressDerivationType: addressDerivationType.value,
+        zpub: encryptedZpub,
+        fingerprint: fingerprint.value,
+        keyivId: keyivId.value,
+        store_id: currentStore.value.store_id,
+      }),
+    });
+
+    const data = await response.json();
+    message.value = data.debug ? data.debug : false;
+
+    if (data.proceed === true) {
+      if (!data.extra && data.currentStore) {
+        store.getStores();
+        store.setActiveStore(data.currentStore);
+        confirmAddresses.value = false;
+        addressesForConfirmation.value = false;
+      } else if (data.extra === 'confirm-addresses') {
+        confirmAddresses.value = true;
+        addressesForConfirmation.value = data.confirmAddresses;
       }
-    },
-  },
-  mounted() {
-this.init()
-  },
-  methods: {
-    init(){    document.querySelector('.dynamic-cta-header-space') && (document.querySelector('.dynamic-cta-header-space').innerHTML = '')
-    this.zpub = this.currentStore.zpub || '';
-    this.network = this.currentStore.network || '';
-    this.addressDerivationType = this.currentStore.zpub ? 'external' : 'internal'
-    this.$store.dispatch('headerUIAppend', [{
-      id: '#saveButton',
-      fn: this.saveSettings,
-    }]);},
-    async startRequestForKeys() {
-      //COMPLETE
-      this.working = true;
-      this.code = '';
-      const username = await this.$store.dispatch('encrypt', {
-        string: this.user,
-        keyiv: this.keyiv
-      });
-      const storeName = await this.$store.dispatch('encrypt', {
-        string: this.currentStore.store_id,
-        keyiv: this.keyiv
-      });
-      await fetch(import.meta.env.VITE_APP_APPLICATION_ENDPOINT + "/store-management-request-keys", {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            username: username,
-            store_id: storeName,
-            fingerprint: this.fingerprint,
-            keyivId: this.keyivId,
-          }),
-        })
-        .then((response) => response.json())
-        .then((data) => {
-          this.message = data.debug ? data.debug : false
-          if (data.proceed == true) {
-            if (data.extra == 'confirmCode') {
-              window.scrollTo({
-                top: 0,
-                behavior: 'smooth'
-              });
-              this.confirmCode = true;
-            }
-          } else {
-            this.message = data.debug ? data.debug : "There was a problem with the information provided."
-          }
-          this.working = false;
-        })
-        .catch((error) => {
-          this.message = this.message + ' \nError: ' + error + '\n';
-          console.error("Error:", error);
-        });
-    },
-    _decode(string) {
-      let decoded = decodeURIComponent(decodeURI(string));
-      return decoded
-    },
-    _null() {
-      return false
-    },
-    accordianIndexSet(number) {
-      this.accordianIndex = this.accordianIndex == number ? -1 : number;
-    },
-    async saveSettings() {
-      //COMPLETE
-      this.working = true;
-      const username = await this.$store.dispatch('encrypt', {
-        string: this.user,
-        keyiv: this.keyiv
-      });
-      const zpub = await this.$store.dispatch('encrypt', {
-        string: this.zpub,
-        keyiv: this.keyiv
-      });
-      await fetch(import.meta.env.VITE_APP_APPLICATION_ENDPOINT + "/store-settings-change-zpub", {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            username: username,
-            addressDerivationType: this.addressDerivationType,
-            zpub: zpub,
-            fingerprint: this.fingerprint,
-            keyivId: this.keyivId,
-            store_id: this.currentStore.store_id,
-          }),
-        })
-        .then((response) => response.json())
-        .then((data) => {
-          this.message = data.debug ? data.debug : false
-          if (data.proceed == true) {
-            if (!data.extra && data.currentStore) {
-              this.$store.dispatch('getStores')
-              this.$store.commit("setActiveStore", data.currentStore);
-            } else if (data.extra == 'confirm-addresses') {
-              window.scrollTo({
-                top: 0,
-                behavior: 'smooth'
-              });
-              this.confirmAddresses = true;
-              this.addressesForConfirmation = data.confirmAddresses
-              this.numberOfAddressesToConfirm = data.number
-            }
-          } else {
-            this.message = data.debug ? data.debug : "There was a problem with the information provided."
-          }
-          this.working = false;
-        })
-        .catch((error) => {
-          this.message = this.message + ' \nError: ' + error + '\n';
-          console.error("Error:", error);
-        });
-    },
-    async confirmAddressesMatchWallet() {
-      //COMPLETE
-      this.working = true;
-      const username = await this.$store.dispatch('encrypt', {
-        string: this.user,
-        keyiv: this.keyiv
-      });
-      const zpub = await this.$store.dispatch('encrypt', {
-        string: this.zpub,
-        keyiv: this.keyiv
-      });
-      await fetch(import.meta.env.VITE_APP_APPLICATION_ENDPOINT + "/store-settings-confirm-zpub-addresses", {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            username: username,
-            addressDerivationType: this.addressDerivationType,
-            zpub: zpub,
-            fingerprint: this.fingerprint,
-            keyivId: this.keyivId,
-            store_id: this.currentStore.store_id,
-          }),
-        })
-        .then((response) => response.json())
-        .then((data) => {
-          this.message = data.debug ? data.debug : false
-          if (data.proceed == true) {
-            if (!data.extra && data.currentStore) {
-              this.$store.dispatch('getStores')
-              this.$store.commit("setActiveStore", data.currentStore);
-              this.confirmAddresses = false;
-              this.addressesForConfirmation = false
-            } else if (data.extra == 'confirm-addresses') {
-              this.confirmAddresses = true;
-              this.addressesForConfirmation = data.confirmAddresses
-            }
-          } else {
-            this.message = data.debug ? data.debug : "There was a problem with the information provided."
-          }
-          this.working = false;
-        })
-        .catch((error) => {
-          this.message = this.message + ' \nError: ' + error + '\n';
-          console.error("Error:", error);
-        });
-    },
-  },
-}
+    } else {
+      message.value = data.debug ? data.debug : "There was a problem with the information provided.";
+    }
+  } catch (error) {
+    message.value = `Error: ${error}`;
+    console.error("Error:", error);
+  } finally {
+    working.value = false;
+  }
+};
+
+// Lifecycle hooks
+onMounted(() => {
+  init();
+});
 </script>
 
 <style lang="">
-  
+
 </style>

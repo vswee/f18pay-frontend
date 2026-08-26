@@ -27,7 +27,7 @@
       var l = window.location;
       if(l.pathname.indexOf("api/v1")>=0){
       l.replace(
-        l.protocol + '//payapi.flat18.co.uk' + (l.port ? ':' + l.port : '') + l.pathname + l.search
+        l.protocol + '//f18-pay-backend.vercel.app' + (l.port ? ':' + l.port : '') + l.pathname + l.search
       );
       }else{
       l.replace(

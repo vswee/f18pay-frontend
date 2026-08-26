@@ -32,144 +32,149 @@
 </div>
 </template>
 
-<script>
-import {
-  mapGetters
-} from 'vuex';
+<script setup>
+import { ref, onBeforeMount } from 'vue';
+import { useRouter } from 'vue-router';
+import { useMainStore } from '@/stores';
+import { storeToRefs } from 'pinia';
+import { apiUrl } from '@/utils/api';
 
-export default {
-  name: "Signup",
-  data() {
-    return {
-      type: "sign-up",
-      keyiv: false,
-      keyivId: false,
-      password: "",
-      password2: "",
-      username: "",
-      usernameConfirmed: false,
-      message: false,
-      working: false,
-      serverMessage: false,
-    };
-  },
-  computed: {
-    ...mapGetters({
-      fingerprint: 'fingerprint',
-      session: 'session',
-    })
-  },
-  methods: {
-    async checkUsername() {
-      this.message = false;
-      this.working = true;
-      if (!this.username || this.username.length == 0) {
-        this.message = "Please enter your email address"
-      } else {
-        const username = await this.$store.dispatch('encrypt', {
-          string: this.username,
-          keyiv: this.keyiv
-        });
-        fetch(import.meta.env.VITE_APP_APPLICATION_ENDPOINT + '/check-username-for-password-reset', {
-            method: 'POST', // or 'PUT'
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              username: username,
-              keyivId: this.keyivId
-            }),
-          })
-          .then((response) => response.json())
-          .then((data) => {
-            this.usernameConfirmed = data.usernameConfirmed
-            if (data.usernameConfirmed !== true) {
-              this.message = data.debug ? data.debug : false;
-            }
-            this.working = false
-          })
-          .catch((error) => {
-            this.message = this.message + ' \nError: ' + error + '\n';
-            console.error("Error:", error);
-          });
-      }
-    },
-    async checkPassword() {
-      this.message = false;
-      this.working = true;
-      if (this.password === this.password2) {
-        const username = await this.$store.dispatch('encrypt', {
-          string: this.username,
-          keyiv: this.keyiv
-        });
-        const encrypted = await this.$store.dispatch('encrypt', {
-          string: this.password,
-          keyiv: this.keyiv
-        });
-        const encrypted2 = await this.$store.dispatch('encrypt', {
-          string: this.password2,
-          keyiv: this.keyiv
-        });
-        fetch(import.meta.env.VITE_APP_APPLICATION_ENDPOINT + '/reset-user-pass', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              username: username,
-              password: encrypted,
-              password2: encrypted2,
-              keyivId: this.keyivId
-            }),
-          })
-          .then((response) => response.json())
-          .then((data) => {
-            this.message = data.debug ? data.debug : false
-            if (data.proceed == true) {
-              this.$store.commit("setUser", this.username);
-              this.$router.push({
-                name: 'verify-email'
-              });
-            } else {
-              this.usernameConfirmed = false
-            }
-            this.working = false
-          })
-          .catch((error) => {
-            this.message = this.message + ' \nError: ' + error + '\n';
-            console.error("Error:", error);
-          });
-      } else {
-        this.message = "Passwords must match."
-        this.working = false
+const router = useRouter();
+const store = useMainStore();
 
-      }
+// Reactive state
+const type = ref("sign-up");
+const password = ref("");
+const password2 = ref("");
+const username = ref("");
+const usernameConfirmed = ref(false);
+const message = ref(false);
+const working = ref(false);
+const serverMessage = ref(false);
+
+// Store state with storeToRefs for reactivity
+const { session, keyiv, keyivId } = storeToRefs(store);
+
+// Methods
+const checkUsername = async () => {
+  message.value = false;
+  working.value = true;
+
+  if (!username.value || username.value.length === 0) {
+    message.value = "Please enter your email address";
+    working.value = false;
+    return;
+  }
+
+  try {
+    const encryptedUsername = await store.encrypt({
+      string: username.value,
+      keyiv: keyiv.value
+    });
+
+    const response = await fetch(apiUrl('/check-username-for-password-reset'), {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        username: encryptedUsername,
+        keyivId: keyivId.value
+      }),
+    });
+
+    const data = await response.json();
+    usernameConfirmed.value = data.usernameConfirmed;
+
+    if (data.usernameConfirmed !== true) {
+      message.value = data.debug ? data.debug : false;
     }
-  },
-  mounted() {},
-  async created() {
-    if (this.session) {
-      this.$router.push('dashboard');
-      return
-    }
-    fetch(import.meta.env.VITE_APP_APPLICATION_ENDPOINT + "/get-keyiv", {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      })
-      .then((response) => response.json())
-      .then((data) => {
-        this.serverMessage = data.debug ? data.debug : false;
-        this.keyiv = data.keyiv
-        this.keyivId = data.keyivId
-        this.$store.commit("setKeyivId", [data.keyivId, data.keyiv]);
-      })
-      .catch((error) => {
-        this.message = this.message + ' \nError: ' + error + '\n';
-        console.error("Error:", error);
-      });
-  },
+  } catch (error) {
+    message.value = `Error: ${error}`;
+    console.error("Error:", error);
+  } finally {
+    working.value = false;
+  }
 };
+
+const checkPassword = async () => {
+  message.value = false;
+  working.value = true;
+
+  if (password.value !== password2.value) {
+    message.value = "Passwords must match.";
+    working.value = false;
+    return;
+  }
+
+  try {
+    const encryptedUsername = await store.encrypt({
+      string: username.value,
+      keyiv: keyiv.value
+    });
+
+    const encryptedPassword = await store.encrypt({
+      string: password.value,
+      keyiv: keyiv.value
+    });
+
+    const encryptedPassword2 = await store.encrypt({
+      string: password2.value,
+      keyiv: keyiv.value
+    });
+
+    const response = await fetch(apiUrl('/reset-user-pass'), {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        username: encryptedUsername,
+        password: encryptedPassword,
+        password2: encryptedPassword2,
+        keyivId: keyivId.value
+      }),
+    });
+
+    const data = await response.json();
+    message.value = data.debug ? data.debug : false;
+
+    if (data.proceed === true) {
+      store.setUser(username.value);
+      router.push({ name: 'verify-email' });
+    } else {
+      usernameConfirmed.value = false;
+    }
+  } catch (error) {
+    message.value = `Error: ${error}`;
+    console.error("Error:", error);
+  } finally {
+    working.value = false;
+  }
+};
+
+// Lifecycle hooks
+onBeforeMount(async () => {
+  if (session.value) {
+    router.push({ name: 'dashboard' });
+    return;
+  }
+
+  try {
+    const response = await fetch(apiUrl('/get-keyiv'), {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+
+    const data = await response.json();
+    serverMessage.value = data.debug ? data.debug : false;
+    store.setKeyivId([data.keyivId, data.keyiv]);
+  } catch (error) {
+    message.value = `Error: ${error}`;
+    console.error("Error:", error);
+  }
+});
 </script>
 
 <style lang="scss">

@@ -6,6 +6,9 @@ import Login from '@/components/Login.vue'
 import Signup from '@/components/Signup.vue'
 import VerifyEmail from '@/components/VerifyEmail.vue'
 import ResetPassword from '@/components/ResetPassword.vue'
+import AccountManagement from '@/components/AccountManagement.vue'
+import AccountSecurity from '@/components/AccountSecurity.vue'
+import AccountPassword from '@/components/AccountPassword.vue'
 import Dashboard from '@/components/Dashboard.vue'
 import StoreSummary from '@/components/stores-views/StoreSummary.vue';
 import StoreSettings from '@/components/stores-views/StoreSettings.vue';
@@ -43,6 +46,9 @@ const routes = [
   { path: '/signup', name: 'signup', component: Signup, meta: { title: 'Signup', description: 'Sign up and join our community!' } },
   { path: '/verify-email', name: 'verify-email', component: VerifyEmail, meta: { title: 'Verify Email', description: 'Verify your email address!' } },
   { path: '/reset-password', name: 'reset-password', component: ResetPassword, meta: { title: 'Reset Password', description: 'Reset your password!' } },
+  { path: '/account', name: 'account', component: AccountManagement, meta: { title: 'Account Management', description: 'Manage your F18 Pay account.' } },
+  { path: '/account/security', name: 'account-security', component: AccountSecurity, meta: { title: 'Account Security', description: 'Review your F18 Pay account security.' } },
+  { path: '/account/password', name: 'account-password', component: AccountPassword, meta: { title: 'Change Password', description: 'Change your F18 Pay account password.' } },
 ];
 
 

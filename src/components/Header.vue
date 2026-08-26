@@ -51,19 +51,20 @@
 </template>
 
 <script setup>
-import { useRoute } from 'vue-router';
-import { useStore } from 'vuex';
+defineOptions({ name: 'SiteHeader' });
+
+import { useRoute, useRouter } from 'vue-router';
+import { useMainStore } from '@/stores';
+import { storeToRefs } from 'pinia';
 import { computed } from 'vue';
 
 const route = useRoute();
-const store = useStore();
+const router = useRouter();
+const store = useMainStore();
 
-const session = computed(() => store.getters['session']);
-const showTitle = computed(() => store.getters['showTitle']);
-const viewTitle = computed(() => store.getters['viewTitle']);
-const theme = computed(() => store.getters['theme']);
-const working = computed(() => store.getters['working']);
-const authFailure = computed(() => store.getters['authFailure']);
+// Use storeToRefs to maintain reactivity when destructuring
+const { session, showTitle, viewTitle, theme, working, authFailure } = storeToRefs(store);
+
 const currentRouteName = computed(() => route.name);
 const currentRoutePath = computed(() => route.path);
 
@@ -78,36 +79,36 @@ const dynamicCtaHeaderSpaceClasses = computed(() => ({
 }));
 
 function clearAuthFailure() {
-  store.commit('setAuthFailure', false);
-  store.dispatch('routerPush', { name: 'Login' });
+  store.setAuthFailure(false);
+  router.push({ name: 'login' });
 }
 
 function clearToHome() {
   if (session.value) {
     if (currentRoutePath.value.includes('dashboard')) {
-      store.dispatch('fetchStores');
+      store.getStores();
     } else {
-      store.dispatch('routerPush', { name: 'Dashboard' });
+      router.push({ name: 'dashboard' });
     }
-    store.commit('setActiveStore', false);
-    store.commit('setStoreView', false);
-    store.commit('setViewTitle', false);
-    store.commit('setShowTitle', false);
+    store.setActiveStore(false);
+    store.setStoreView(false);
+    store.setViewTitle(false);
+    store.setShowTitle(false);
   } else {
-    if (currentRouteName.value !== 'Home') {
-      store.dispatch('routerPush', { name: 'Home' });
+    if (currentRouteName.value !== 'home') {
+      router.push({ name: 'home' });
     }
   }
 }
 
 function logout() {
-  store.commit('setFingerprint', false);
-  store.commit('setSession', false);
-  store.dispatch('routerPush', { name: 'Home' });
+  store.setFingerprint(false);
+  store.setSession(false);
+  router.push({ name: 'home' });
 }
 
 function toggleTheme() {
-  store.commit('setTheme', theme.value === 'dark' ? 'light' : 'dark');
+  store.setTheme(theme.value === 'dark' ? 'light' : 'dark');
 }
 </script>
 

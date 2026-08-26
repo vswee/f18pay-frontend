@@ -136,227 +136,243 @@
 </div>
 </template>
 
-<script>
-import {
-  mapGetters
-} from 'vuex';
-export default {
-  name: "StoreAssets",
-  components: {
-  },
-  data() {
-    return {
-      modal: {
-        name: false,
-        payload: false
-      },
-      message: false,
-      working: false,
-      accordianIndex: 0,
-      supportedCurrencies: ['USD', 'GBP', 'EUR', 'TTD'],
-      fixedPrice: 10,
-      storePrimaryProxy: '',
-      storeSecondaryProxy: '',
-      primryColour: false,
-      accentColour: false,
-      dynamicCopied: false,
-      basicCodeCopied: false,
-      dynamicCodeCopied: false,
-      text: false,
-      text2: false,
-      settingPaymentPage: false,
-      settingEmailRequired: false,
-      select: [{
-        open: false,
-        selected: 'USD',
-        options: false
-      },],
+<script setup>
+import { ref, computed, watch, onMounted } from 'vue';
+import { useRoute } from 'vue-router';
+import { useMainStore } from '@/stores';
+import { storeToRefs } from 'pinia';
+
+// Reactive state
+const modal = ref({
+  name: false,
+  payload: false
+});
+const message = ref(false);
+const working = ref(false);
+const accordianIndex = ref(0);
+const supportedCurrencies = ref(['USD', 'GBP', 'EUR', 'TTD']);
+const fixedPrice = ref(10);
+const storePrimaryProxy = ref('');
+const storeSecondaryProxy = ref('');
+const dynamicCopied = ref(false);
+const basicCodeCopied = ref(false);
+const dynamicCodeCopied = ref(false);
+const text = ref(false);
+const text2 = ref(false);
+const settingPaymentPage = ref(false);
+const settingEmailRequired = ref(false);
+const select = ref([{
+  open: false,
+  selected: 'USD',
+  options: false
+}]);
+const storeNameProxy = ref(false);
+
+// Store state with storeToRefs for reactivity
+const route = useRoute();
+const store = useMainStore();
+const {
+  fingerprint,
+  user,
+  keyiv,
+  keyivId,
+  activeStore,
+  stores,
+  url: base_url
+} = storeToRefs(store);
+
+// Computed properties
+const storeCode = computed(() => {
+  return activeStore.value.substr(0, 4) + currentStore.value.store_id_int + activeStore.value.substr(activeStore.value.length - 4);
+});
+
+const random = computed(() => {
+  return String(Math.floor(Math.random() * 100) + 2 + "" + new Date().getTime() + Math.floor(Math.random() * 100) + 2 + (Math.random().toString(36).replace(/[^a-zA-Z]+/g, '').substr(0, 5)));
+});
+
+const currentStore = computed(() => {
+  let current = false;
+  if (stores.value) {
+    for (const sto of stores.value) {
+      if (`${sto.store_id.substring(0, 5)}${sto.store_id.substring(sto.store_id.length - 5)}` === route.params.storeId10) {
+        current = sto;
+        break;
+      }
     }
-  },
-  watch: {
+    return current;
+  }
+  return false;
+});
 
-    working() {
-      this.$store.commit("setWorking", this.working);
-    },
-    currentStore() {
-      this.init()
-    },
-  },
-  computed: {
-    ...mapGetters({
-      session: 'session',
-      fingerprint: 'fingerprint',
-      user: 'user',
-      keyiv: 'keyiv',
-      keyivId: 'keyivId',
-      activeStore: 'activeStore',
-      stores: 'stores',
-      base_url: 'url',
-    }),
-    storeCode() {
-      return this.activeStore.substr(0, 4) + this.currentStore.store_id_int + this.activeStore.substr(this.activeStore.length - 4)
-    },
-    random() {
-      let random = String(Math.floor(Math.random() * 100) + 2 + "" + new Date().getTime() + Math.floor(Math.random() * 100) + 2 + (Math.random().toString(36).replace(/[^a-zA-Z]+/g, '').substr(0, 5)));
-      return random;
-    },
-    currentStore() {
-      let current = false;
-      if (this.stores) {
-        for (const sto of this.stores) {
-          if (`${sto.store_id.substring(0, 5)}${sto.store_id.substring(sto.store_id.length - 5)}` === this.$route.params.storeId10) {
-            current = sto;
-            break;
-          }
-        }
-        return current;
-      }
-      return false
-    },
-    storeName: {
-      get() {
-        return !this.storeNameProxy ? this._decode(this.currentStore.store_name) : this.storeNameProxy;
+const storeName = computed({
+  get: () => !storeNameProxy.value ? _decode(currentStore.value.store_name) : storeNameProxy.value,
+  set: (value) => { storeNameProxy.value = value; }
+});
+
+const textColor = computed(() => {
+  return !text.value ? "#" + currentStore.value.text_primary : "#" + text.value;
+});
+
+const textAccent = computed(() => {
+  return !text2.value ? "#" + currentStore.value.text_accent : "#" + text2.value;
+});
+
+// Watchers
+watch(working, (newValue) => {
+  store.setWorking(newValue);
+});
+
+watch(currentStore, () => {
+  init();
+});
+
+// Methods
+const init = () => {
+  const headerSpace = document.querySelector('.dynamic-cta-header-space');
+  if (headerSpace) {
+    headerSpace.innerHTML = '';
+  }
+
+  if (currentStore.value.network) {
+    supportedCurrencies.value.push(currentStore.value.network.toUpperCase());
+  }
+
+  select.value[0].options = supportedCurrencies.value;
+
+  if (currentStore.value.store_colour) {
+    storePrimaryProxy.value = "#" + currentStore.value.store_colour;
+  }
+
+  if (currentStore.value.store_accent_colour) {
+    storeSecondaryProxy.value = "#" + currentStore.value.store_accent_colour;
+  }
+};
+
+const modernSelect = (index, value) => {
+  select.value[index].selected = value;
+  select.value[index].open = false;
+};
+
+const setPaymentPage = async (onOff) => {
+  await settingsAsync('payment_page', onOff, 'settingPaymentPage');
+};
+
+const setPRequireEmail = async (onOff) => {
+  await settingsAsync('require_email', onOff, 'settingEmailRequired');
+};
+
+const settingsAsync = async (parameter, value, workingParam) => {
+  if (workingParam === 'settingPaymentPage') {
+    settingPaymentPage.value = true;
+  } else if (workingParam === 'settingEmailRequired') {
+    settingEmailRequired.value = true;
+  }
+
+  try {
+    const username = await store.encrypt({
+      string: user.value,
+      keyiv: keyiv.value
+    });
+
+    const encryptedStoreName = await store.encrypt({
+      string: encodeURIComponent(encodeURI(storeName.value)),
+      keyiv: keyiv.value
+    });
+
+    const response = await fetch(`${import.meta.env.VITE_APP_APPLICATION_ENDPOINT}/store-settings-async`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
       },
-      set(value) {
-        this.storeNameProxy = value
-      }
-    },
-    textColor() {
-      return !this.text ? "#" + this.currentStore.text_primary : "#" + this.text;
-    },
-    textAccent() {
-      return !this.text2 ? "#" + this.currentStore.text_accent : "#" + this.text2;
-    },
-  },
-  mounted() {
-    this.init()
+      body: JSON.stringify({
+        username: username,
+        storeName: encryptedStoreName,
+        fingerprint: fingerprint.value,
+        keyivId: keyivId.value,
+        store_id: currentStore.value.store_id,
+        property: parameter,
+        value: value,
+      }),
+    });
 
+    const data = await response.json();
 
-  },
-  methods: {
-    init() {
-      document.querySelector('.dynamic-cta-header-space') && (document.querySelector('.dynamic-cta-header-space').innerHTML = '')
-      if (this.currentStore.network) { this.supportedCurrencies.push(this.currentStore.network.toUpperCase()) }
-      this.select[0].options = this.supportedCurrencies;
-      if (this.currentStore.store_colour) { this.storePrimaryProxy = "#" + this.currentStore.store_colour }
-      if (this.currentStore.store_accent_colour) { this.storeSecondaryProxy = "#" + this.currentStore.store_accent_colour }
-    },
-    modernSelect(index, value) {
-      this.select[index].selected = value;
-      this.select[index].open = false;
-    },
-    async setPaymentPage(onOff) {
-      await this.settingsAsync('payment_page', onOff, 'settingPaymentPage');
-    },
-    async setPRequireEmail(onOff) {
-      await this.settingsAsync('require_email', onOff, 'settingEmailRequired');
-    },
-    async settingsAsync(parameter, value, working) {
-      this[working] = true;
-      const username = await this.$store.dispatch('encrypt', {
-        string: this.user,
-        keyiv: this.keyiv
-      });
-      const storeName = await this.$store.dispatch('encrypt', {
-        string: encodeURIComponent(encodeURI(this.storeName)),
-        keyiv: this.keyiv
-      });
-      await fetch(import.meta.env.VITE_APP_APPLICATION_ENDPOINT + "/store-settings-async", {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          username: username,
-          storeName: storeName,
-          fingerprint: this.fingerprint,
-          keyivId: this.keyivId,
-          store_id: this.currentStore.store_id,
-          property: parameter,
-          value: value,
-        }),
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          if (data.proceed == true) {
-            this.$store.dispatch('getStores')
-            this[working] = false;
-
-          } else {
-            this.message = data.debug ? data.debug : "There was a problem with the information provided."
-          }
-        })
-        .catch((error) => {
-          this.message = this.message + ' \nError: ' + error + '\n';
-          console.error("Error:", error);
-        });
-      return value
-    },
-    darkOrLight(hex) {
-      var shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
-      hex = hex.replace(shorthandRegex, function (m, r, g, b) {
-        return r + r + g + g + b + b;
-      });
-      let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-      let rgb = {
-        r: parseInt(result[1], 16),
-        g: parseInt(result[2], 16),
-        b: parseInt(result[3], 16)
-      };
-      let brightness = (rgb.r * 299) + (rgb.g * 587) + (rgb.b * 114);
-      brightness = brightness / 255000;
-
-      // values range from 0 to 1
-      // anything greater than 0.5 should be bright enough for dark text
-      console.log(brightness)
-      if (brightness >= 0.6) {
-        return "222";
-      } else {
-        return "fefefe";
-      }
-    },
-    async showCode(id) {
-      window.scrollTo({
-        top: 0,
-        behavior: 'smooth'
-      });
-      this.modal.payload = await document.getElementById(id).innerHTML
-        .replace(/</g, "\n\n<")
-        .replace(/&quot;/g, '\'')
-      this.modal.name = "HTML Code"
-    },
-    copyCode(id) {
-      let copied = document.getElementById(id).innerHTML;
-      let workspace = document.getElementById("copy_to_clipboard_workspace");
-      (workspace.value = copied),
-        workspace.focus(),
-        workspace.select();
-      try {
-        if (document.execCommand("copy")) {
-          this.dynamicCopied = copied
-          this[id.replace(/Button/g, 'CodeCopied')] = true;
-        }
-      } catch (e) {
-        console.error(e)
-      }
-    },
-    _decode(string) {
-      let decoded = decodeURIComponent(decodeURI(string));
-      return decoded
-    },
-    _null() {
-      return false
-    },
-    accordianIndexSet(number) {
-      this.accordianIndex = this.accordianIndex == number ? -1 : number;
-    },
-
-    closeModal() {
-      this.modal.payload = false
-      this.modal.name = false
+    if (data.proceed === true) {
+      store.getStores();
+    } else {
+      message.value = data.debug ? data.debug : "There was a problem with the information provided.";
     }
-  },
-}
+  } catch (error) {
+    message.value = `Error: ${error}`;
+    console.error("Error:", error);
+  } finally {
+    if (workingParam === 'settingPaymentPage') {
+      settingPaymentPage.value = false;
+    } else if (workingParam === 'settingEmailRequired') {
+      settingEmailRequired.value = false;
+    }
+  }
+
+  return value;
+};
+
+const showCode = async (id) => {
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth'
+  });
+
+  modal.value.payload = await document.getElementById(id).innerHTML
+    .replace(/</g, "\n\n<")
+    .replace(/&quot;/g, '\'');
+
+  modal.value.name = "HTML Code";
+};
+
+const copyCode = (id) => {
+  const copied = document.getElementById(id).innerHTML;
+  const workspace = document.getElementById("copy_to_clipboard_workspace");
+
+  workspace.value = copied;
+  workspace.focus();
+  workspace.select();
+
+  try {
+    if (document.execCommand("copy")) {
+      dynamicCopied.value = copied;
+
+      if (id === 'basicButton') {
+        basicCodeCopied.value = true;
+      } else if (id === 'dynamicButton') {
+        dynamicCodeCopied.value = true;
+      }
+    }
+  } catch (e) {
+    console.error(e);
+  }
+};
+
+const _decode = (string) => {
+  return decodeURIComponent(decodeURI(string));
+};
+
+const _null = () => {
+  return false;
+};
+
+const accordianIndexSet = (number) => {
+  accordianIndex.value = accordianIndex.value === number ? -1 : number;
+};
+
+const closeModal = () => {
+  modal.value.payload = false;
+  modal.value.name = false;
+};
+
+// Lifecycle hooks
+onMounted(() => {
+  init();
+});
 </script>
 
 <style lang="scss">

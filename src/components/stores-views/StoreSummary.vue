@@ -12,169 +12,167 @@
 </div>
 </template>
 
-<script>
+<script setup>
 import BarChart from '@/components/BarGraph.vue'
 import { parseImgSrc } from '@/utils/fn.js'
-import {
-  mapGetters
-} from 'vuex';
-export default {
-  name: "StoreSummary",
-  components: {
-    BarChart
-  },
-  data() {
-    return {
-      invoice_values: false,
-      invoice_values2: false,
-      invoice_dates: false,
-      chartDestroy: false,
-    }
-  },
-  computed: {
-    ...mapGetters({
-      session: 'session',
-      fingerprint: 'fingerprint',
-      user: 'user',
-      keyiv: 'keyiv',
-      keyivId: 'keyivId',
-      activeStore: 'activeStore',
-      chart: 'chart',
-      stores: 'stores',
-    }),
-    currentStore() {
-      let current = false;
-      if (this.stores) {
-        for (const sto of this.stores) {
-          if (`${sto.store_id.substring(0, 5)}${sto.store_id.substring(sto.store_id.length - 5)}` === this.$route.params.storeId10) {
-            current = sto;
-            break;
-          }
-        }
-        return current;
-      }
-      return false
-    },
-  },
-  watch: {
-    currentStore(val) {
-      this.fetchInvoiceValues(val)
-      this.init()
-    },
-    $route(){
-    this.fetchInvoiceValues(this.activeStore)
-    this.init()
-      
-    },
-  },
-  mounted() {
-    this.init()
-  },
-  methods: {
-    init() {
-      document.querySelector('.dynamic-cta-header-space') && (document.querySelector('.dynamic-cta-header-space').innerHTML = '')
-    this.fetchInvoiceValues(this.activeStore)
-    },
-    parseImgSrc,
-    _decode(string) {
-      let decoded = decodeURIComponent(decodeURI(string));
-      return decoded
-    },
-    async fetchInvoiceValues(id) {
-      this.chartDestroy = true;
-      this.$store.commit("setChart", {
-        chartData: false,
-        options: false
-      });
-      const username = await this.$store.dispatch('encrypt', {
-        string: this.user,
-        keyiv: this.keyiv
-      });
-      await fetch(import.meta.env.VITE_APP_APPLICATION_ENDPOINT + "/store-invoice-values", {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          username: username,
-          fingerprint: this.fingerprint,
-          keyivId: this.keyivId,
-          storeId: id,
-        }),
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          this.message = data.debug ? data.debug : false
-          if (data.proceed == true) {
-            //HANDLE STORES DATA
-            let array = []
-            let array2 = []
-            let arrayDates = []
-            const year = new Date().getFullYear();
-            if (data.invoiceValues.length > 0) {
-              for (const invoice of data.invoiceValues) {
-                let value = invoice.count ? Number(invoice.count) : 0;
-                let value2 = invoice.count2 ? Number(invoice.count2) : 0;
-                let date = invoice.date.split(" ")[0] == year ? invoice.date.replace(year + ' ', '') : invoice.date;
-                array.push(value)
-                array2.push(value2)
-                arrayDates.push(date)
-              }
-              this.invoice_values = array.length == 0 ? false : array
-              this.invoice_values2 = array2.length == 0 ? false : array2
-              this.invoice_dates = arrayDates.length == 0 ? false : arrayDates
-              this.$store.commit("setChart", {
-                chartData: {
-                  labels: this.invoice_dates,
-                  datasets: [{
-                    data: this.invoice_values,
-                    label: "Paid Invoices",
-                    backgroundColor: "#19d87f"
-                  },
-                  {
-                    data: this.invoice_values2,
-                    label: "Total Invoices",
-                    backgroundColor: "#4780fa"
-                  },
-                  ]
-                },
-                options: {
-                  scales: {
-                    yAxes: [{
-                      ticks: {
-                        beginAtZero: false
-                      },
-                      gridLines: {
-                        display: false
-                      }
-                    }],
-                    xAxes: [{
-                      gridLines: {
-                        display: false
-                      }
-                    }]
-                  },
-                  legend: {
-                    display: true
-                  },
-                  responsive: true,
-                  maintainAspectRatio: false
-                }
-              });
-              this.chartDestroy = false;
-            }
+import { useMainStore } from '@/stores'
+import { storeToRefs } from 'pinia'
+import { ref, computed, watch, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
 
-          } else {
-            this.message = "Failed to fetch values"
+const route = useRoute()
+const store = useMainStore()
+
+// Reactive state
+const invoice_values = ref(false)
+const invoice_values2 = ref(false)
+const invoice_dates = ref(false)
+const chartDestroy = ref(false)
+
+// Store state with storeToRefs for reactivity
+const { fingerprint, user, keyiv, keyivId, activeStore, chart, stores } = storeToRefs(store)
+
+// Computed properties
+const currentStore = computed(() => {
+  let current = false
+  if (stores.value) {
+    for (const sto of stores.value) {
+      if (`${sto.store_id.substring(0, 5)}${sto.store_id.substring(sto.store_id.length - 5)}` === route.params.storeId10) {
+        current = sto
+        break
+      }
+    }
+    return current
+  }
+  return false
+})
+
+// Methods
+const init = () => {
+  const headerSpace = document.querySelector('.dynamic-cta-header-space')
+  if (headerSpace) {
+    headerSpace.innerHTML = ''
+  }
+  fetchInvoiceValues(activeStore.value)
+}
+
+const _decode = (string) => {
+  return decodeURIComponent(decodeURI(string))
+}
+
+const fetchInvoiceValues = async (id) => {
+  chartDestroy.value = true
+  store.setChart({
+    chartData: false,
+    options: false
+  })
+
+  try {
+    const username = await store.encrypt({
+      string: user.value,
+      keyiv: keyiv.value
+    })
+
+    const response = await fetch(`${import.meta.env.VITE_APP_APPLICATION_ENDPOINT}/store-invoice-values`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        username: username,
+        fingerprint: fingerprint.value,
+        keyivId: keyivId.value,
+        storeId: id,
+      }),
+    })
+
+    const data = await response.json()
+
+    if (data.proceed === true) {
+      // Handle stores data
+      const array = []
+      const array2 = []
+      const arrayDates = []
+      const year = new Date().getFullYear()
+
+      if (data.invoiceValues.length > 0) {
+        for (const invoice of data.invoiceValues) {
+          const value = invoice.count ? Number(invoice.count) : 0
+          const value2 = invoice.count2 ? Number(invoice.count2) : 0
+          const date = invoice.date.split(" ")[0] == year ? invoice.date.replace(year + ' ', '') : invoice.date
+
+          array.push(value)
+          array2.push(value2)
+          arrayDates.push(date)
+        }
+
+        invoice_values.value = array.length === 0 ? false : array
+        invoice_values2.value = array2.length === 0 ? false : array2
+        invoice_dates.value = arrayDates.length === 0 ? false : arrayDates
+
+        store.setChart({
+          chartData: {
+            labels: invoice_dates.value,
+            datasets: [
+              {
+                data: invoice_values.value,
+                label: "Paid Invoices",
+                backgroundColor: "#19d87f"
+              },
+              {
+                data: invoice_values2.value,
+                label: "Total Invoices",
+                backgroundColor: "#4780fa"
+              }
+            ]
+          },
+          options: {
+            scales: {
+              yAxes: [{
+                ticks: {
+                  beginAtZero: false
+                },
+                gridLines: {
+                  display: false
+                }
+              }],
+              xAxes: [{
+                gridLines: {
+                  display: false
+                }
+              }]
+            },
+            legend: {
+              display: true
+            },
+            responsive: true,
+            maintainAspectRatio: false
           }
         })
-        .catch((error) => {
-          this.message = this.message + ' \nError: ' + error + '\n';
-          console.error("Error:", error);
-        });
-    },
+
+        chartDestroy.value = false
+      }
+    }
+  } catch (error) {
+    console.error("Error:", error)
   }
 }
+
+// Watchers
+watch(currentStore, (val) => {
+  fetchInvoiceValues(val)
+  init()
+})
+
+watch(() => route.path, () => {
+  fetchInvoiceValues(activeStore.value)
+  init()
+})
+
+// Lifecycle hooks
+onMounted(() => {
+  init()
+})
 </script>
 
 <style lang="">

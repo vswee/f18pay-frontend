@@ -1,0 +1,148 @@
+.account-page {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 5vw;
+}
+
+.account-page-heading,
+.account-card-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1.5rem;
+}
+
+.account-page-heading {
+  margin-bottom: 2rem;
+}
+
+.account-page h1,
+.account-page h2,
+.account-page p {
+  margin-top: 0;
+}
+
+.account-page-icon,
+.account-card-heading > i {
+  color: var(--accent);
+  font-size: 1.6rem;
+}
+
+.eyebrow {
+  color: var(--accent);
+  font-size: .75rem;
+  font-weight: 700;
+  letter-spacing: .12em;
+  margin-bottom: .5rem !important;
+  text-transform: uppercase;
+}
+
+.account-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.25rem;
+}
+
+.account-card {
+  background: var(--black);
+  border-radius: 10px;
+  box-shadow: 0 20px 50px var(--shadow-30), 0 0 0 1px var(--dark);
+  display: grid;
+  gap: 1.25rem;
+  padding: 1.5rem;
+}
+
+.account-card-heading {
+  align-items: center;
+}
+
+.account-form {
+  display: grid;
+  gap: .75rem;
+}
+
+.account-form label {
+  color: var(--accent);
+  font-weight: 700;
+  margin-top: .5rem;
+}
+
+.account-form input {
+  width: 100%;
+}
+
+.account-form button {
+  justify-self: start;
+  margin-top: .75rem;
+}
+
+.account-form button:disabled {
+  cursor: not-allowed;
+  opacity: .55;
+}
+
+.field-help,
+.account-action small {
+  font-size: .75rem;
+  line-height: 1.35;
+  opacity: .65;
+}
+
+.account-actions {
+  display: grid;
+  gap: .75rem;
+}
+
+.account-action {
+  align-items: center;
+  background: var(--shadow-10);
+  border-radius: 8px;
+  display: grid;
+  gap: .75rem;
+  grid-template-columns: 1.25rem 1fr auto;
+  padding: .9rem;
+  transition: background-color .2s ease;
+}
+
+.account-action:hover {
+  background: var(--accent-bg);
+}
+
+.account-action > i:first-child {
+  color: var(--accent);
+}
+
+.account-action span {
+  display: grid;
+  gap: .2rem;
+}
+
+.account-action > i:last-child {
+  opacity: .65;
+}
+
+.account-status {
+  margin: 40px auto;
+  max-width: 420px;
+}
+
+.account-message {
+  margin: 0 0 1.25rem;
+  max-width: none;
+}
+
+.account-back-link {
+  color: var(--accent);
+  display: inline-block;
+  margin-top: 1.5rem;
+}
+
+.account-back-link i {
+  margin-right: .4rem;
+}
+
+@media (max-width: 600px) {
+  .account-page {
+    padding: 2rem 1rem;
+  }
+}

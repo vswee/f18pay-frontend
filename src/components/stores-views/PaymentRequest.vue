@@ -160,7 +160,7 @@
                 <label v-if="request.payee_email">Payee:</label><span v-if="request.payee_email">{{ request.payee_email }}</span>
                 <label>Crypto:</label><span>{{ request.btc_value }} {{ request.crypto }}</span>
                 <label>Address:</label><a target="_blank" :href="'https://www.blockchain.com/btc/address/' + request.address">{{ request.address }} <i class="fas fa-external-link-square-alt"></i></a>
-                <label>Received:</label><span>{{ request.tx3 | 0 }} {{ request.crypto }}<br>{{ ((request.tx3 / request.btc_value) * 100).toFixed(2) }} <i class="fas fa-percent"></i></span>
+                <label>Received:</label><span>{{ intOrZero(request.tx3) }} {{ request.crypto }}<br>{{ ((request.tx3 / request.btc_value) * 100).toFixed(2) }} <i class="fas fa-percent"></i></span>
               </div>
             </td>
           </tr>
@@ -173,31 +173,36 @@
 <script setup>
 import { ref, computed, watch, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
-import { useStore } from 'vuex';
+import { useMainStore } from '@/stores';
+import { storeToRefs } from 'pinia';
 import DateRangePicker from 'vue3-daterange-picker';
 
 const route = useRoute();
-const store = useStore();
+const store = useMainStore();
 
-const session = computed(() => store.getters['session']);
-const fingerprint = computed(() => store.getters['fingerprint']);
-const user = computed(() => store.getters['user']);
-const keyiv = computed(() => store.getters['keyiv']);
-const keyivId = computed(() => store.getters['keyivId']);
-const activeStore = computed(() => store.getters['activeStore']);
-const stores = computed(() => store.getters['stores']);
+// Store state with storeToRefs for reactivity
+const {
+  fingerprint,
+  user,
+  keyiv,
+  keyivId,
+  stores,
+  epoch,
+  time
+} = storeToRefs(store);
+
+// Computed properties
 const currentStore = computed(() => stores.value ? stores.value.find((sto) => `${sto.store_id.substring(0, 5)}${sto.store_id.substring(sto.store_id.length - 5)}` === route.params.storeId10) : false);
 
+// Reactive state
 const message = ref(false);
 const working = ref(true);
 const spinning = ref(true);
 const viewing = ref(20);
 const filter = ref(false);
-const filters = ref(['expired', 'confirmed', 'receiving', 'partial', '1 conf.', '2 confs']);
 const requests = ref(false);
 const count = ref(0);
 const active = ref(false);
-const statistics = ref(false);
 const dateRange = ref({ startDate: false, endDate: false });
 const modal = ref(false);
 const descriptionTypeExisting = ref(false);
@@ -213,8 +218,6 @@ const select = ref([
 ]);
 const confirmedCreatedAddress = ref(false);
 const copied = ref(true);
-const epoch = computed(() => store.getters['epoch']);
-const time = computed(() => store.getters['time']);
 
 const storeManagementClass = computed(() => {
   if (working.value && spinning.value) {
@@ -248,43 +251,6 @@ const newRequestCheck = computed(() => {
   return issues > 0 ? false : true;
 });
 
-const requestsActive = computed(() => {
-  let activeRequest = false;
-  if (requests.value && active.value) {
-    activeRequest = requests.value[active.value];
-  }
-  return activeRequest;
-});
-
-const reportName = computed(() => `F18Pay Report for Store: ${_decode(currentStore.value.store_name)} ::${dateRange.value.startDate} to ${dateRange.value.endDate} ::${filter.value ? filter.value : 'unfiltered'}`);
-
-const statisticsOrganised = computed(() => {
-  let array = [];
-
-  if (statistics.value.average) {
-    let average = Number(statistics.value.average.sum) / Number(statistics.value.average.count);
-    average = average < 0.001 ? average.toFixed(6) : average.toFixed(3);
-    average = !isNaN(average) ? average : 0;
-    array.push({ name: 'Average value ' + currentStore.value.network, value: average });
-  }
-
-  if (statistics.value.statuses) {
-    let total = 0;
-    for (const stat of statistics.value.statuses) {
-      array.push({ name: capitalise(stat.status), value: stat.count });
-      total += Number(stat.count);
-    }
-    array.push({ name: 'Total', value: total });
-  }
-  if (statistics.value.max) {
-    let value = Number(statistics.value.max);
-    value = value < 0.001 ? value.toFixed(6) : value.toFixed(3);
-    array.push({ name: 'Highest value ' + currentStore.value.network, value: value });
-  }
-
-  return array;
-});
-
 function _null() {
   return false;
 }
@@ -293,36 +259,16 @@ function _decode(string) {
   return decodeURIComponent(decodeURI(string));
 }
 
-function dateTime() {
-  let currentdate = new Date();
-  return (
-    currentdate.getFullYear() +
-    '-' +
-    +((currentdate.getMonth() + 1) <= 9 ? '0' + (currentdate.getMonth() + 1) : currentdate.getMonth() + 1) +
-    '-' +
-    (currentdate.getDate() <= 9 ? '0' + currentdate.getDate() : currentdate.getDate()) +
-    '-' +
-    ' ' +
-    currentdate.getHours() +
-    ':' +
-    currentdate.getMinutes() +
-    ':' +
-    currentdate.getSeconds()
-  );
-}
-
 function modernSelect(index, value) {
   select.value[index].selected = value;
   select.value[index].open = false;
 }
 
-function capitalise(string) {
-  return string.charAt(0).toUpperCase() + string.slice(1);
-}
+const intOrZero = (value) => Math.trunc(Number(value) || 0);
 
-async function copyCode(copied) {
+async function copyCode(textToCopy) {
   let workspace = document.getElementById('copy_to_clipboard_workspace');
-  workspace.value = copied;
+  workspace.value = textToCopy;
   workspace.focus();
   workspace.select();
   try {
@@ -340,17 +286,17 @@ async function getPaymentRequests() {
   spinning.value = true;
 
   active.value = false;
-  const username = await store.dispatch('encrypt', {
+  const username = await store.encrypt({
     string: user.value,
-    keyiv: keyiv.value,
+    keyiv: keyiv.value
   });
-  const storeName = await store.dispatch('encrypt', {
+  const storeName = await store.encrypt({
     string: encodeURIComponent(encodeURI(currentStore.value.store_name)),
-    keyiv: keyiv.value,
+    keyiv: keyiv.value
   });
-  const storeId = await store.dispatch('encrypt', {
+  const storeId = await store.encrypt({
     string: currentStore.value.store_id,
-    keyiv: keyiv.value,
+    keyiv: keyiv.value
   });
 
   Date.prototype.yyyymmdd = function () {
@@ -391,9 +337,9 @@ async function getPaymentRequests() {
     .then(async (data) => {
       if (data.proceed == true) {
         count.value = data.count;
-        requests.value = JSON.parse(await store.dispatch('decrypt', {
+        requests.value = JSON.parse(await store.decrypt({
           string: data.requests,
-          keyiv: keyiv.value,
+          keyiv: keyiv.value
         }));
         dateRange.value.endDate = data.now;
         working.value = false;
@@ -433,29 +379,29 @@ async function doNewRequest() {
   let requestDescription = descriptionTypeExisting.value && select.value[0].selected ? select.value[0].selected : !descriptionTypeExisting.value && description.value ? description.value : false;
 
   if (requestValue && currency && emailAddress && requestDescription) {
-    const username = await store.dispatch('encrypt', {
+    const username = await store.encrypt({
       string: user.value,
-      keyiv: keyiv.value,
+      keyiv: keyiv.value
     });
-    const storeId = await store.dispatch('encrypt', {
+    const storeId = await store.encrypt({
       string: currentStore.value.store_id,
-      keyiv: keyiv.value,
+      keyiv: keyiv.value
     });
-    const encryptedDescription = await store.dispatch('encrypt', {
+    const encryptedDescription = await store.encrypt({
       string: encodeURIComponent(encodeURI(requestDescription)),
-      keyiv: keyiv.value,
+      keyiv: keyiv.value
     });
-    const encryptedEmail = await store.dispatch('encrypt', {
+    const encryptedEmail = await store.encrypt({
       string: emailAddress,
-      keyiv: keyiv.value,
+      keyiv: keyiv.value
     });
-    const encryptedValue = await store.dispatch('encrypt', {
+    const encryptedValue = await store.encrypt({
       string: requestValue,
-      keyiv: keyiv.value,
+      keyiv: keyiv.value
     });
-    const encryptedCurrency = await store.dispatch('encrypt', {
+    const encryptedCurrency = await store.encrypt({
       string: currency,
-      keyiv: keyiv.value,
+      keyiv: keyiv.value
     });
 
     await fetch(import.meta.env.VITE_APP_APPLICATION_ENDPOINT + '/store-requests-create-new', {
@@ -479,9 +425,9 @@ async function doNewRequest() {
       .then(async (data) => {
         if (data.proceed == true) {
           if (data.extra == 'viewAddress') {
-            let decrypted = JSON.parse(await store.dispatch('decrypt', {
+            let decrypted = JSON.parse(await store.decrypt({
               string: data.address,
-              keyiv: keyiv.value,
+              keyiv: keyiv.value
             }));
             confirmedCreatedAddress.value = decrypted;
             working.value = false;

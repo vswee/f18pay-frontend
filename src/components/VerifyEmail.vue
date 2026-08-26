@@ -36,184 +36,192 @@
 </div>
 </template>
 
-<script>
-import {
-  mapGetters
-} from 'vuex';
+<script setup>
+import { ref, onBeforeMount } from 'vue';
+import { useRouter } from 'vue-router';
+import { useMainStore } from '@/stores';
+import { storeToRefs } from 'pinia';
+import { apiUrl } from '@/utils/api';
 
-export default {
-  name: "VerifyEmail",
-  data() {
-    return {
-      type: "verify",
-      code: "",
-      keyiv: false,
-      message: false,
-      working: false,
-      serverMessage: false,
-      usernameManual: "",
-      usernameManualConfirmedBool: false,
-    };
-  },
-  computed: {
-    ...mapGetters({
-      fingerprint: 'fingerprint',
-      session: 'session',
-      username: 'user',
-      keyivId: 'keyivId',
-      keyivIfIDSet: 'keyiv',
-    })
-  },
-  methods: {
-    async checkUsername() {
-      this.message = false;
-      this.working = true;
-      if (!this.usernameManual || this.usernameManual.length == 0) {
-        this.message = "Please enter your email address"
-      } else {
-        const username = await this.$store.dispatch('encrypt', {
-          string: this.usernameManual,
-          keyiv: this.keyiv
-        });
-        fetch(import.meta.env.VITE_APP_APPLICATION_ENDPOINT + '/check-username-for-activation', {
-          method: 'POST', // or 'PUT'
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            username: username,
-            keyivId: this.keyivId
-          }),
-        })
-          .then((response) => response.json())
-          .then((data) => {
-            this.usernameManualConfirmedBool = data.usernameConfirmed
-            this.message = data.debug ? data.debug : false;
-            if (data.usernameConfirmed == true) {
-              this.$store.commit("setUser", this.usernameManual);
-            }
-            this.working = false
-          })
-          .catch((error) => {
-            this.message = this.message + ' \nError: ' + error + '\n';
-            console.error("Error:", error);
-          });
-      }
-    },
-    async checkCode() {
-      this.message = false;
-      this.working = true;
-      if (this.code.length >= 6 && (this.username || this.usernameManual)) {
-        const username = await this.$store.dispatch('encrypt', {
-          string: this.username,
-          keyiv: this.keyiv
-        });
-        fetch(import.meta.env.VITE_APP_APPLICATION_ENDPOINT + '/code-verify', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            username: username,
-            code: this.code,
-            keyivId: this.keyivId
-          }),
-        })
-          .then((response) => response.json())
-          .then((data) => {
-            this.message = data.debug ? data.debug : false
-            if (data.proceed == true) {
-              this.$store.commit("setUser", this.username);
-              this.$store.commit("setFingerprint", data.fingerprint);
-              this.$router.push({
-                name: 'dashboard'
-              });
-            }
-            this.working = false
-          })
-          .catch((error) => {
-            this.message = this.message + ' \nError: ' + error + '\n';
-            console.error("Error:", error);
-          });
-      } else {
-        this.message = "Invalid code entered. Try again."
-        this.working = false
+const router = useRouter();
+const store = useMainStore();
 
-      }
-    },
-    async getNewCode() {
-      this.message = false;
-      this.working = true;
-      if (this.username || this.usernameManual) {
-        let username = false
-        if (this.username) {
-          username = await this.$store.dispatch('encrypt', {
-            string: this.username,
-            keyiv: this.keyiv
-          });
-        } else {
-          username = await this.$store.dispatch('encrypt', {
-            string: this.usernameManual,
-            keyiv: this.keyiv
-          });
-        }
-        fetch(import.meta.env.VITE_APP_APPLICATION_ENDPOINT + '/request-new-code', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            username: username,
-            keyivId: this.keyivId
-          }),
-        })
-          .then((response) => response.json())
-          .then((data) => {
-            this.message = data.debug ? data.debug : false
-            if (data.proceed == true) {
-              this.message = "If email is valid a new code will be sent immediately."
-            }
-            this.working = false
-          })
-          .catch((error) => {
-            this.message = this.message + ' \nError: ' + error + '\n';
-            console.error("Error:", error);
-          });
-      } else {
-        this.message = "Email missing. Refresh this page to try again."
-        this.working = false
+// Reactive state
+const code = ref("");
+const keyivLocal = ref(false);
+const message = ref(false);
+const working = ref(false);
+const serverMessage = ref(false);
+const usernameManual = ref("");
+const usernameManualConfirmedBool = ref(false);
 
-      }
+// Store state with storeToRefs for reactivity
+const { session, user: username, keyivId, keyiv: keyivIfIDSet } = storeToRefs(store);
+
+// Methods
+const checkUsername = async () => {
+  message.value = false;
+  working.value = true;
+
+  if (!usernameManual.value || usernameManual.value.length === 0) {
+    message.value = "Please enter your email address";
+    working.value = false;
+    return;
+  }
+
+  try {
+    const encryptedUsername = await store.encrypt({
+      string: usernameManual.value,
+      keyiv: keyivLocal.value
+    });
+
+    const response = await fetch(apiUrl('/check-username-for-activation'), {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        username: encryptedUsername,
+        keyivId: keyivId.value
+      }),
+    });
+
+    const data = await response.json();
+    usernameManualConfirmedBool.value = data.usernameConfirmed;
+    message.value = data.debug ? data.debug : false;
+
+    if (data.usernameConfirmed === true) {
+      store.setUser(usernameManual.value);
     }
-  },
-  mounted() { },
-  async created() {
-    if (this.session) {
-      this.$router.push('dashboard');
-      return
+  } catch (error) {
+    message.value = `Error: ${error}`;
+    console.error("Error:", error);
+  } finally {
+    working.value = false;
+  }
+};
+
+const checkCode = async () => {
+  message.value = false;
+  working.value = true;
+
+  if (code.value.length < 6 || (!username.value && !usernameManual.value)) {
+    message.value = "Invalid code entered. Try again.";
+    working.value = false;
+    return;
+  }
+
+  try {
+    const encryptedUsername = await store.encrypt({
+      string: username.value,
+      keyiv: keyivLocal.value
+    });
+
+    const response = await fetch(apiUrl('/code-verify'), {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        username: encryptedUsername,
+        code: code.value,
+        keyivId: keyivId.value
+      }),
+    });
+
+    const data = await response.json();
+    message.value = data.debug ? data.debug : false;
+
+    if (data.proceed === true) {
+      store.setUser(username.value);
+      store.setFingerprint(data.fingerprint);
+      router.push({ name: 'dashboard' });
     }
-    if (!this.keyivId) {
-      fetch(import.meta.env.VITE_APP_APPLICATION_ENDPOINT + "/get-keyiv", {
+  } catch (error) {
+    message.value = `Error: ${error}`;
+    console.error("Error:", error);
+  } finally {
+    working.value = false;
+  }
+};
+
+const getNewCode = async () => {
+  message.value = false;
+  working.value = true;
+
+  if (!username.value && !usernameManual.value) {
+    message.value = "Email missing. Refresh this page to try again.";
+    working.value = false;
+    return;
+  }
+
+  try {
+    let encryptedUsername;
+
+    if (username.value) {
+      encryptedUsername = await store.encrypt({
+        string: username.value,
+        keyiv: keyivLocal.value
+      });
+    } else {
+      encryptedUsername = await store.encrypt({
+        string: usernameManual.value,
+        keyiv: keyivLocal.value
+      });
+    }
+
+    const response = await fetch(apiUrl('/request-new-code'), {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        username: encryptedUsername,
+        keyivId: keyivId.value
+      }),
+    });
+
+    const data = await response.json();
+    message.value = data.debug ? data.debug : false;
+
+    if (data.proceed === true) {
+      message.value = "If email is valid a new code will be sent immediately.";
+    }
+  } catch (error) {
+    message.value = `Error: ${error}`;
+    console.error("Error:", error);
+  } finally {
+    working.value = false;
+  }
+};
+
+// Lifecycle hooks
+onBeforeMount(async () => {
+  if (session.value) {
+    router.push({ name: 'dashboard' });
+    return;
+  }
+
+  if (!keyivId.value) {
+    try {
+      const response = await fetch(apiUrl('/get-keyiv'), {
         headers: {
           "Content-Type": "multipart/form-data",
         },
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          this.serverMessage = data.debug ? data.debug : false;
-          this.keyiv = data.keyiv
-          this.keyivId = data.keyivId
-          this.$store.commit("setKeyivId", [data.keyivId, data.keyiv]);
-        })
-        .catch((error) => {
-          this.message = this.message + ' \nError: ' + error + '\n';
-          console.error("Error:", error);
-        });
-    } else {
-      this.keyiv = this.keyivIfIDSet
+      });
+
+      const data = await response.json();
+      serverMessage.value = data.debug ? data.debug : false;
+      keyivLocal.value = data.keyiv;
+      store.setKeyivId([data.keyivId, data.keyiv]);
+    } catch (error) {
+      message.value = `Error: ${error}`;
+      console.error("Error:", error);
     }
-  },
-};
+  } else {
+    keyivLocal.value = keyivIfIDSet.value;
+  }
+});
 </script>
 
 <style lang="scss">

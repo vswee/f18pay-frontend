@@ -1,33 +1,52 @@
-/* eslint-disable no-undef */
 import { defineConfig } from "vite";
 import { fileURLToPath, URL } from 'node:url'
-import vue from '@vitejs/plugin-vue' // vue 3
-// import { createVuePlugin as vue } from "vite-plugin-vue2";
+import vue from '@vitejs/plugin-vue'
 import git from 'git-rev-sync'
- // https://vitejs.dev/config/
- export default defineConfig({
-   plugins: [
+
+const resolveGitHash = () => {
+  try {
+    return git.tag() || git.short() || process.env.VITE_APP_GIT_HASH || '';
+  } catch {
+    return process.env.VITE_APP_GIT_HASH || '';
+  }
+};
+
+// https://vitejs.dev/config/
+export default defineConfig({
+  plugins: [
     vue(),
-   ],
-   resolve: {
-     alias: {
-       '@': fileURLToPath(new URL('./src', import.meta.url)),
-     },
-   },
-   build: {
-    commonjsOptions: {
-       esmExternals: true,
-       transformMixedEsModules: true,
-    },
-    optimizeDeps: {
-      include: ['snapshot'], // Specify dependencies to include in the optimized bundle
-      // exclude: ['vue'], // Specify dependencies to exclude from optimization
+  ],
+  resolve: {
+    alias: {
+      '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
   },
-  
-     server: {
-      port: 3001,
+  build: {
+    target: 'esnext',
+    minify: 'terser',
+    terserOptions: {
+      compress: {
+        drop_console: true,
+      },
     },
- });
-
-process.env.VITE_APP_GIT_HASH = git.tag()
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'vendor': [
+            'vue',
+            'vue-router',
+            'pinia',
+            'chart.js',
+            'vue-chartjs',
+          ],
+        },
+      },
+    },
+  },
+  server: {
+    port: 3001,
+  },
+  define: {
+    'process.env.VITE_APP_GIT_HASH': JSON.stringify(resolveGitHash()),
+  },
+});

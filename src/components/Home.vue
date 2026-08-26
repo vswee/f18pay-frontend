@@ -102,19 +102,15 @@
 </div>
 </template>
 
-<script>
-import {
-  mapGetters
-} from 'vuex';
-export default {
-  name: 'home',
-  computed: {
-    ...mapGetters({
-      base_url: 'url',
-    })
-  },
-}
+<script setup>
+defineOptions({ name: 'HomePage' });
 
+import { useMainStore } from '@/stores';
+import { storeToRefs } from 'pinia';
+
+const store = useMainStore();
+const { getURL } = storeToRefs(store);
+const base_url = getURL;
 </script>
 
 <style lang="scss">

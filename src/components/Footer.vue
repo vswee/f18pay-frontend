@@ -1,5 +1,5 @@
 <template lang="">
-<div id="footer" :class="session?'sessioned':''">
+<div id="footer" :class="session?'sessioned':''" v-if="!demoMode">
   <a class="btn help" @click="help=true" v-if="session && !help"><i class="fas fa-exclamation-circle"></i></a>
   <a class="btn help" @click="help=false" v-if="session && help"><i class="fas fa-times"></i></a>
   <div class="footer-inner" v-if="(session && help) || !session">
@@ -18,23 +18,17 @@
 </div>
 </template>
 
-<script>
-import {
-  mapGetters
-} from 'vuex';
-export default {
-  data() {
-    return {
-      help: false,
-    }
-  },
-  computed: {
-    ...mapGetters({
-      session: 'session',
-    })
-  },
-  name: "Footer"
-}
+<script setup>
+defineOptions({ name: 'SiteFooter' });
+
+import { ref } from 'vue';
+import { useMainStore } from '@/stores';
+import { storeToRefs } from 'pinia';
+
+const help = ref(false);
+const demoMode = typeof window !== 'undefined' && window.localStorage.getItem('f18_demo_mode') === '1';
+const store = useMainStore();
+const { session } = storeToRefs(store);
 </script>
 
 <style lang="scss" scoped>

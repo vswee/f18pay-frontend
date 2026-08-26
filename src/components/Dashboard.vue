@@ -1,9 +1,15 @@
 <template>
   <div class="dashboard-root">
-    <template v-if="storesStores[0]?.store_id || stores[0]?.store_id">
+    <template v-if="fetchingStores">
+      <div class="form working fetching-stores" aria-live="polite">
+        <h1>Fetching stores details</h1>
+        <p>Please wait while we load your stores.</p>
+      </div>
+    </template>
+    <template v-else-if="storesStores?.[0]?.store_id">
       <div class="stores" v-if="!$route.params.storeId10">
         <router-link
-          v-for="(store, index) in stores"
+          v-for="(store, index) in storesStores"
           :key="store.store_id"
           :class="store.deleted == 1 ? 'store-tile disabled' : 'store-tile active'"
           :style="'animation-delay:' + (index + 1) / 10 + 's;'"
@@ -53,75 +59,119 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from 'vue';
-import { useStore } from 'vuex';
-import { useRouter, useRoute } from 'vue-router';
+defineOptions({ name: 'DashboardPage' });
+
+import { onMounted, ref, watch } from 'vue';
+import { useMainStore } from '@/stores';
+import { storeToRefs } from 'pinia';
+import { useRoute, useRouter } from 'vue-router';
 import { parseImgSrc } from '@/utils/fn.js';
+import { apiUrl } from '@/utils/api';
 
-const store = useStore();
-const router = useRouter();
+const store = useMainStore();
 const route = useRoute();
+const router = useRouter();
 
-const stores = ref([]);
-const storesStores = computed(() => store.getters.stores);
-const activeStore = computed(() => store.getters.activeStore);
-const storeView = computed(() => store.getters.storeView);
-const user = computed(() => store.getters.user);
-const keyiv = computed(() => store.getters.keyiv);
-const keyivId = computed(() => store.getters.keyivId);
-const fingerprint = computed(() => store.getters.fingerprint);
+const fetchingStores = ref(true);
+const storesLoadInFlight = ref(null);
+
+// Use storeToRefs to maintain reactivity when destructuring
+const {
+  stores: storesStores,
+  activeStore,
+  storeView,
+  user,
+  keyiv,
+  keyivId,
+  fingerprint
+} = storeToRefs(store);
 
 const fetchStores = async () => {
-  const username = await store.dispatch('encrypt', {
-    string: user.value,
-    keyiv: keyiv.value,
-  });
-  await fetch(`${import.meta.env.VITE_APP_APPLICATION_ENDPOINT}/stores`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      username,
-      fingerprint: fingerprint.value,
-      keyivId: keyivId.value,
-    }),
-  })
-    .then((response) => response.json())
-    .then((data) => {
-      if (data.proceed) {
-        stores.value = data.stores;
-        store.commit('setStores', data.stores);
-        if (!storeView.value) {
-          store.commit('setStoreView', 'overview');
-        }
-      } else {
-        console.error('Failed to fetch stores');
-      }
-    })
-    .catch((error) => {
-      console.error('Error:', error);
+  try {
+    const username = await store.encrypt({
+      string: user.value,
+      keyiv: keyiv.value,
     });
+
+    const response = await fetch(apiUrl('/stores'), {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        username,
+        fingerprint: fingerprint.value,
+        keyivId: keyivId.value,
+      }),
+    });
+
+    const data = await response.json();
+
+    if (data.proceed && Array.isArray(data.stores)) {
+      store.setStores(data.stores);
+
+      if (!storeView.value) {
+        store.setStoreView('overview');
+      }
+      return true;
+    } else {
+      console.error('Failed to fetch stores');
+    }
+  } catch (error) {
+    console.error('Error:', error);
+  }
+
+  return false;
 };
 
 const newStore = () => {
-  store.commit('setStoreModalView', 'new');
+  store.setStoreModalView('new');
+};
+
+const loadStoresForDashboard = async () => {
+  if (storesLoadInFlight.value) {
+    return storesLoadInFlight.value;
+  }
+
+  storesLoadInFlight.value = (async () => {
+    fetchingStores.value = true;
+    store.setWorking(true);
+
+    try {
+      const sessionValid = await store.verifySession(false);
+
+      if (!sessionValid) {
+        if (router.currentRoute.value.name !== 'home') {
+          router.push({ name: 'home' });
+        }
+        return;
+      }
+
+      // Keep both independent reads: either successful response updates Pinia.
+      await Promise.allSettled([fetchStores(), store.getStores()]);
+    } finally {
+      store.setWorking(false);
+      fetchingStores.value = false;
+      storesLoadInFlight.value = null;
+    }
+  })();
+
+  return storesLoadInFlight.value;
 };
 
 onMounted(async () => {
-  const session = await store.dispatch('verifySession');
-  if (!session) {
-    if (router.currentRoute.value.name !== 'home') {
-      router.push({ name: 'home' });
-    }
-  } else {
-    fetchStores();
-  }
-
-  store.dispatch('getStores');
+  await loadStoresForDashboard();
 
   if (!activeStore.value) {
-    store.commit('setViewTitle', 'Dashboard');
+    store.setViewTitle('Dashboard');
+  }
+});
+
+watch(() => route.name, async (routeName, previousRouteName) => {
+  if (routeName === 'dashboard' && previousRouteName && previousRouteName !== 'dashboard') {
+    if (!Array.isArray(storesStores.value) || storesStores.value.length === 0) {
+      await loadStoresForDashboard();
+    }
   }
 });
 </script>

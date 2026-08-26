@@ -110,7 +110,7 @@
                 <label>Address:</label><a target="_blank"
                   :href="'https://www.blockchain.com/btc/address/' + invoice.address">{{ invoice.address }} <i
                     class="fas fa-external-link-square-alt"></i></a>
-                <label>Received:</label><span>{{ invoice.tx3 | 0 }}
+                <label>Received:</label><span>{{ intOrZero(invoice.tx3) }}
                   {{ invoice.crypto }}<br>{{ ((invoice.tx3 / invoice.btc_value) * 100).toFixed(2) }} <i
                     class="fas fa-percent"></i></span>
               </div>
@@ -126,20 +126,20 @@
 
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue';
-import { useStore } from 'vuex';
+import { useMainStore } from '@/stores';
+import { storeToRefs } from 'pinia';
 import { useRoute } from 'vue-router';
 import DateRangePicker from 'vue3-daterange-picker';
-import { PDFDocument, rgb } from 'pdf-lib';
 
-const store = useStore();
+const store = useMainStore();
 const route = useRoute();
 
+// Reactive state
 const storeNameProxy = ref(false);
 const message = ref(false);
 const working = ref(true);
 const spinning = ref(true);
 const viewing = ref(20);
-const total = ref(false);
 const queryFilter = ref(false);
 const invoices = ref([]);
 const count = ref(0);
@@ -148,19 +148,16 @@ const statistics = ref({});
 const dateRange = ref({ startDate: false, endDate: false });
 const select = ref([{ open: false, selected: false, options: ['expired', 'confirmed', 'receiving', 'partial', '1 confirmation', '2 confirmations'] }]);
 
-const session = computed(() => store.getters['session']);
-const fingerprint = computed(() => store.getters['fingerprint']);
-const user = computed(() => store.getters['user']);
-const keyiv = computed(() => store.getters['keyiv']);
-const keyivId = computed(() => store.getters['keyivId']);
-const activeStore = computed(() => store.getters['activeStore']);
-const stores = computed(() => store.getters['stores']);
-const time = computed(() => store.getters['time']);
-const epoch = computed(() => store.getters['epoch']);
-
-const invoicesActive = computed(() => invoices.value && active.value !== false ? invoices.value[active.value] : false);
-
-const reportName = computed(() => `F18Pay Report for Store: ${_decode(currentStore.value.store_name)} :: ${dateRange.value.startDate} to ${dateRange.value.endDate} :: ${queryFilter.value || 'unfiltered'}`);
+// Store state with storeToRefs for reactivity
+const {
+  fingerprint,
+  user,
+  keyiv,
+  keyivId,
+  stores,
+  time,
+  epoch
+} = storeToRefs(store);
 
 const statisticsOrganised = computed(() => {
   const array = [];
@@ -207,10 +204,11 @@ const init = async () => {
     await getInvoiceStatistics();
     await getInvoices();
   } catch (e) { console.log("INIT ERROR:", e) }
-  store.dispatch('headerUIAppend', [
-    { id: '.refresh-button', fn: getInvoices },
-    // { id: '.download-file', fn: downloadFile },
-  ]);
+  // TODO: Implement headerUIAppend in Pinia store if needed
+  // store.headerUIAppend([
+  //   { id: '.refresh-button', fn: getInvoices },
+  //   // { id: '.download-file', fn: downloadFile },
+  // ]);
 };
 
 const modernSelect = (index, value) => {
@@ -218,36 +216,9 @@ const modernSelect = (index, value) => {
   select.value[index].open = false;
 };
 
-const dateTime = () => {
-  const currentdate = new Date();
-  return `${currentdate.getFullYear()}-${((currentdate.getMonth() + 1) <= 9 ? '0' : '') + (currentdate.getMonth() + 1)}-${(currentdate.getDate() <= 9 ? '0' : '') + currentdate.getDate()} ${currentdate.getHours()}:${currentdate.getMinutes()}:${currentdate.getSeconds()}`;
-};
-
-const downloadFile = async () => {
-  const content = document.querySelector('.invoice-list').innerHTML;
-  const pdfDoc = await PDFDocument.create();
-  const page = pdfDoc.addPage();
-  const { width, height } = page.getSize();
-  const fontSize = 30;
-
-  page.drawText(content, {
-    x: 50,
-    y: height - 4 * fontSize,
-    size: fontSize,
-    color: rgb(0, 0, 0),
-  });
-
-  const pdfBytes = await pdfDoc.save();
-  const blob = new Blob([pdfBytes], { type: 'application/pdf' });
-  const link = document.createElement('a');
-  link.href = URL.createObjectURL(blob);
-  link.download = 'document.pdf';
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-};
-
 const capitalise = (string) => string.charAt(0).toUpperCase() + string.slice(1);
+
+const intOrZero = (value) => Math.trunc(Number(value) || 0);
 
 const getInvoiceStatistics = async () => {
   if(!currentStore.value || !user.value || !keyiv.value){return}
@@ -302,7 +273,7 @@ const getInvoices = async () => {
   if (queryFilter.value) {
     invoicesFetchBody.filter = queryFilter.value;
   }
-  
+
   await fetch(`${import.meta.env.VITE_APP_APPLICATION_ENDPOINT}/store-invoices`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -389,7 +360,7 @@ const _null = () => false;
 onMounted(init);
 watch([viewing, queryFilter], getInvoices);
 watch(working, () => {
-  store.commit('setWorking', working.value);
+  store.setWorking(working.value);
 });
 watch(currentStore, init);
 </script>

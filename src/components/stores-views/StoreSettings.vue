@@ -1,14 +1,14 @@
 <template lang="">
   <div :class="working?'store-management no-click':'store-management'">
     <div :class="working?'form page working':'form page'" @click.stop="_null()">
-  
+
       <h1><span>Manage Store</span><a class="btn" @click="saveSettings()">Save</a></h1>
-  
+
       <div class="message" v-if="message"><i class="fas fa-exclamation-circle"></i> {{message}}</div>
       <div class="form-section">
         <h2 class="accordian-trigger" @click="accordianIndexSet(0)">Store Identity <i :class="accordianIndex==0?'fas fa-caret-down':'fas fa-caret-right'"></i></h2>
         <div class="accordian-sect" v-if="accordianIndex==0">
-  
+
           <div class="sub-sect">
             <label for="storeName">Store Name</label>
             <span class="help-text">This name will appear on invoices, financial reports and on the F18 Pay Dashboard.</span>
@@ -40,22 +40,22 @@
             <span class="help-text">Primary and Secondary / Accent Store colours.</span>
           </div>
         </div>
-  
+
         <h2 class="accordian-trigger" @click="accordianIndexSet(1)">Optional <i :class="accordianIndex==1?'fas fa-caret-down':'fas fa-caret-right'"></i></h2>
         <div class="accordian-sect" v-if="accordianIndex==1">
           <div class="sub-sect">
-            <label for="storeName">Store URL</label>          
+            <label for="storeName">Store URL</label>
             <span class="help-text">Set an optional web address for your store.</span>
-  
+
             <input v-model="url" type="text" placeholder="https://www.example.com..." />
-  
+
           </div>
           <div class="sub-sect">
-            <label for="storeName">Store Email</label>          
+            <label for="storeName">Store Email</label>
             <span class="help-text">Set an optional email address for your store.</span>
-  
+
             <input v-model="email" type="text" placeholder="store@example.com..." />
-  
+
           </div>
         </div>
         <div class="flex">
@@ -63,194 +63,222 @@
           <a v-if="deleted==0" class="btn severe" @click="deleted=1">Disable Store</a>
           <a v-if="deleted==1" class="btn good" @click="deleted=0">Enable Store</a>
         </div>
-  
+
       </div>
     </div>
-  
+
   </div>
   </template>
 
-<script>
-import {
-  mapGetters
-} from 'vuex';
-import { parseImgSrc } from '@/utils/fn.js'
-export default {
-  name: "StoreSettings",
-  components: [
-  ],
-  data() {
-    return {
-      storeNameProxy: false,
-      storeLogoProxy: false,
-      storePrimaryProxy: '',
-      storeSecondaryProxy: '',
-      message: false,
-      working: false,
-      accordianIndex: 0,
-      deleted: false,
-      confirmAddresses: false,
-      addressesForConfirmation: false,
-      email: false,
-      url: false,
-      confirmCode: false,
-      code: '',
-      imageChanged: false,
+<script setup>
+import { ref, computed, watch, onMounted } from 'vue';
+import { useRoute } from 'vue-router';
+import { useMainStore } from '@/stores';
+import { storeToRefs } from 'pinia';
+import { parseImgSrc } from '@/utils/fn.js';
+
+// Reactive state
+const storeNameProxy = ref(false);
+const storeLogoProxy = ref(false);
+const storePrimaryProxy = ref('');
+const storeSecondaryProxy = ref('');
+const message = ref(false);
+const working = ref(false);
+const accordianIndex = ref(0);
+const deleted = ref(false);
+const email = ref(false);
+const url = ref(false);
+const imageChanged = ref(false);
+
+// Store state with storeToRefs for reactivity
+const route = useRoute();
+const store = useMainStore();
+const {
+  fingerprint,
+  user,
+  keyiv,
+  keyivId,
+  stores
+} = storeToRefs(store);
+
+// Computed properties
+const currentStore = computed(() => {
+  let current = false;
+  if (stores.value) {
+    for (const sto of stores.value) {
+      if (`${sto.store_id.substring(0, 5)}${sto.store_id.substring(sto.store_id.length - 5)}` === route.params.storeId10) {
+        current = sto;
+        break;
+      }
     }
-  },
-  watch: {
-    deleted() {
-      this.saveSettings()
-    },
-    working() {
-      this.$store.commit("setWorking", this.working);
-    },
-    currentStore() {
-      this.init()
-    },
-  },
-  computed: {
-    ...mapGetters({
-      session: 'session',
-      fingerprint: 'fingerprint',
-      user: 'user',
-      keyiv: 'keyiv',
-      keyivId: 'keyivId',
-      activeStore: 'activeStore',
-      stores: 'stores',
-    }),
-    currentStore() {
-      let current = false;
-      if (this.stores) {
-        for (const sto of this.stores) {
-          if (`${sto.store_id.substring(0, 5)}${sto.store_id.substring(sto.store_id.length - 5)}` === this.$route.params.storeId10) {
-            current = sto;
-            break;
-          }
+    return current;
+  }
+  return false;
+});
+
+const storeName = computed({
+  get: () => !storeNameProxy.value ? _decode(currentStore.value.store_name) : storeNameProxy.value,
+  set: (value) => { storeNameProxy.value = value; }
+});
+
+// Watchers
+watch(deleted, () => {
+  saveSettings();
+});
+
+watch(working, (newValue) => {
+  store.setWorking(newValue);
+});
+
+watch(currentStore, () => {
+  init();
+});
+
+// Methods
+const init = () => {
+  const headerSpace = document.querySelector('.dynamic-cta-header-space');
+  if (headerSpace) {
+    headerSpace.innerHTML = '';
+  }
+
+  const imageInput = document.getElementById("imageInput");
+  if (imageInput) {
+    imageInput.addEventListener("change", function() {
+      if (this.files && this.files[0]) {
+        if (this.files[0].size > 40000) {
+          message.value = `File too large. Icons are limited to 40KB. Your provided file is ${this.files[0].size / 1000}KB`;
+          console.log("File too large:", this.files[0].size);
         }
-        return current;
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          storeLogoProxy.value = e.target.result;
+        };
+
+        reader.readAsDataURL(this.files[0]);
+        imageChanged.value = true;
       }
-      return false
-    },
-    storeName: {
-      get() {
-        return !this.storeNameProxy ? this._decode(this.currentStore.store_name) : this.storeNameProxy;
+    });
+  }
+
+  if (currentStore.value) {
+    url.value = currentStore.value.url || '';
+    email.value = currentStore.value.email || '';
+    deleted.value = !currentStore.value.deleted ? 0 : currentStore.value.deleted;
+
+    if (currentStore.value.store_logo) {
+      storeLogoProxy.value = parseImgSrc(currentStore.value.store_logo);
+    }
+
+    if (currentStore.value.store_colour) {
+      storePrimaryProxy.value = "#" + currentStore.value.store_colour;
+    }
+
+    if (currentStore.value.store_accent_colour) {
+      storeSecondaryProxy.value = "#" + currentStore.value.store_accent_colour;
+    }
+  }
+
+  // TODO: Implement headerUIAppend in Pinia store if needed
+  // store.headerUIAppend([{
+  //   id: '#saveButton',
+  //   fn: saveSettings,
+  // }]);
+};
+
+const _decode = (string) => {
+  return decodeURIComponent(decodeURI(string));
+};
+
+const _null = () => {
+  return false;
+};
+
+const uploadNewImage = () => {
+  document.getElementById("imageInput").click();
+};
+
+const accordianIndexSet = (number) => {
+  accordianIndex.value = accordianIndex.value === number ? -1 : number;
+};
+
+const saveSettings = async () => {
+  if (!currentStore.value || !currentStore.value.store_id) {
+    return;
+  }
+
+  working.value = true;
+  message.value = '';
+
+  try {
+    const username = await store.encrypt({
+      string: user.value,
+      keyiv: keyiv.value
+    });
+
+    const encryptedStoreName = await store.encrypt({
+      string: encodeURIComponent(encodeURI(storeName.value)),
+      keyiv: keyiv.value
+    });
+
+    const encryptedUrl = await store.encrypt({
+      string: url.value,
+      keyiv: keyiv.value
+    });
+
+    const encryptedEmail = await store.encrypt({
+      string: email.value,
+      keyiv: keyiv.value
+    });
+
+    const updateStoreSettingsBody = {
+      username: username,
+      storeName: encryptedStoreName,
+      storePrimaryColour: storePrimaryProxy.value.replace("#", ""),
+      storeSecondaryColour: storeSecondaryProxy.value.replace("#", ""),
+      fingerprint: fingerprint.value,
+      keyivId: keyivId.value,
+      store_id: currentStore.value.store_id,
+      disabled: deleted.value,
+      url: encryptedUrl,
+      email: encryptedEmail,
+    };
+
+    if (imageChanged.value) {
+      updateStoreSettingsBody.logo = storeLogoProxy.value;
+    }
+
+    const response = await fetch(`${import.meta.env.VITE_APP_APPLICATION_ENDPOINT}/store-settings-bulk`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
       },
-      set(value) {
-        this.storeNameProxy = value
+      body: JSON.stringify(updateStoreSettingsBody),
+    });
+
+    const data = await response.json();
+    message.value = data.debug ? data.debug : false;
+
+    if (data.proceed === true) {
+      if (!data.extra && data.currentStore) {
+        store.getStores();
+        store.setActiveStore(data.currentStore);
       }
-    },
-  },
-  mounted() {
-    this.init()
-  },
-  methods: {
-    init() {
-      let t = this;
-      document.querySelector('.dynamic-cta-header-space') && (document.querySelector('.dynamic-cta-header-space').innerHTML = '')
-      document.getElementById("imageInput").addEventListener("change", function () {
-        if (this.files && this.files[0]) {
-          if (this.files[0].size > 40000) {
-            t.message = `File too large. Icons are limited to 40KB. Your provided file is ${this.files[0].size / 1000}KB`
-            console.log("File too large:", this.files[0].size)
-          }
-          let reader = new FileReader();
-          reader.onload = function (e) {
-            t.storeLogoProxy = e.target.result
-          }
-          reader.readAsDataURL(this.files[0]);
-          this.imageChanged = true
-        }
-      })
-      this.url = this.currentStore.url || '';
-      this.email = this.currentStore.email || '';
-      this.deleted = !this.currentStore.deleted ? 0 : this.currentStore.deleted;
-      if (this.currentStore.store_logo) { this.storeLogoProxy = this.parseImgSrc(this.currentStore.store_logo) }
-      if (this.currentStore.store_colour) { this.storePrimaryProxy = "#" + this.currentStore.store_colour }
-      if (this.currentStore.store_accent_colour) { this.storeSecondaryProxy = "#" + this.currentStore.store_accent_colour }
+    } else {
+      message.value = data.debug ? data.debug : "There was a problem with the information provided.";
+    }
+  } catch (error) {
+    message.value = `Error: ${error}`;
+    console.error("Error:", error);
+  } finally {
+    working.value = false;
+  }
+};
 
-      this.$store.dispatch('headerUIAppend', [{
-        id: '#saveButton',
-        fn: this.saveSettings,
-      }]);
-
-
-    },
-    parseImgSrc,
-    _decode(string) {
-      let decoded = decodeURIComponent(decodeURI(string));
-      return decoded
-    },
-    _null() {
-      return false
-    },
-    uploadNewImage() {
-      document.getElementById("imageInput").click();
-    },
-    accordianIndexSet(number) {
-      this.accordianIndex = this.accordianIndex == number ? -1 : number;
-    },
-    async saveSettings() {
-      //COMPLETE
-      if(!this.currentStore.store_id){return}
-      this.working = true;
-      this.message = ''
-      const username = await this.$store.dispatch('encrypt', {
-        string: this.user,
-        keyiv: this.keyiv
-      });
-      const storeName = await this.$store.dispatch('encrypt', {
-        string: encodeURIComponent(encodeURI(this.storeName)),
-        keyiv: this.keyiv
-      });
-      const url = await this.$store.dispatch('encrypt', {
-        string: this.url,
-        keyiv: this.keyiv
-      });
-      const email = await this.$store.dispatch('encrypt', {
-        string: this.email,
-        keyiv: this.keyiv
-      });
-      const updateStoreSettingsBody = {
-        username: username,
-        storeName: storeName,
-        storePrimaryColour: this.storePrimaryProxy.replace("#", ""),
-        storeSecondaryColour: this.storeSecondaryProxy.replace("#", ""),
-        fingerprint: this.fingerprint,
-        keyivId: this.keyivId,
-        store_id: this.currentStore.store_id,
-        disabled: this.deleted,
-        url: url,
-        email: email,
-      }
-      if (this.imageChanged) { updateStoreSettingsBody.logo = this.storeLogoProxy }
-      await fetch(import.meta.env.VITE_APP_APPLICATION_ENDPOINT + "/store-settings-bulk", {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(updateStoreSettingsBody),
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          this.message = data.debug ? data.debug : false
-          if (data.proceed == true) {
-            if (!data.extra && data.currentStore) {
-              this.$store.dispatch('getStores')
-              this.$store.commit("setActiveStore", data.currentStore);
-            }
-          } else {
-            this.message = data.debug ? data.debug : "There was a problem with the information provided."
-          }
-          this.working = false;
-        })
-        .catch((error) => {
-          this.message = this.message + ' \nError: ' + error + '\n';
-          console.error("Error:", error);
-        });
-    },
-  },
-}
+// Lifecycle hooks
+onMounted(() => {
+  init();
+});
 </script>
 
 <style lang="">
