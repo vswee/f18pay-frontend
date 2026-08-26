@@ -6,8 +6,6 @@ const nowIso = now.toISOString();
 const nowEpoch = Math.floor(now.getTime() / 1000);
 const currentYear = now.getFullYear();
 
-const transparentGif = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==';
-
 const encodeSvg = (svg) => `data:image/svg+xml;base64,${btoa(svg)}`;
 
 const makeLogo = (label, colorA, colorB) => {
@@ -219,6 +217,25 @@ export const demoKeyDownloadRows = Array.from({ length: 10 }, (_, index) => ({
   private_key: `L1${String(index + 1).padStart(2, '0')}demoPrivateKey${String(index + 1).padStart(2, '0')}XXXXXXXXXXXXXXXX`,
 }));
 
+export const demoApiKeys = [
+  {
+    id: 1,
+    nickname: 'btcpayserver',
+    keyPrefix: 'f18_demo_9f7b',
+    permissions: [
+      'btcpay.store.canviewinvoices',
+      'btcpay.store.cancreateinvoice',
+      'btcpay.store.canmodifyinvoices',
+      'btcpay.store.canviewstoresettings',
+      'btcpay.store.webhooks.canmodifywebhooks',
+      'btcpay.store.cancreatenonapprovedpullpayments',
+    ],
+    created: '2026-06-18T12:00:00.000Z',
+    lastUsed: '2026-06-18T12:30:00.000Z',
+    revoked: null,
+  },
+];
+
 export const demoRouteTitles = {
   dashboard: 'Dashboard',
   account: 'Account Management',
@@ -306,7 +323,7 @@ const buildPublicInvoice = ({ store_id, currency, price, redirectURL, invoice_id
   };
 };
 
-export const getDemoResponse = async (pathname, body = {}, method = 'GET') => {
+export const getDemoResponse = async (pathname, body = {}) => {
   switch (pathname) {
     case '/get-keyiv':
       return jsonResponse({ keyivId: demoKeyivId, keyiv: demoKeyiv, debug: 'Demo credentials loaded' });
@@ -412,6 +429,26 @@ export const getDemoResponse = async (pathname, body = {}, method = 'GET') => {
         extra: 'downloadFile',
         keys: JSON.stringify(demoKeyDownloadRows),
       });
+
+    case '/store-api-keys':
+      return jsonResponse({ proceed: true, keys: demoApiKeys });
+
+    case '/store-api-keys-create':
+      return jsonResponse({
+        proceed: true,
+        key: {
+          id: 2,
+          nickname: body.nickname || 'btcpayserver',
+          keyPrefix: 'f18_demo_new1',
+          permissions: body.permissions || [],
+          created: nowIso,
+          secret: 'f18_demo_new_key_7f8d2c1a',
+        },
+        debug: 'API key created. Copy it now; the full key will not be shown again.',
+      });
+
+    case '/store-api-keys-revoke':
+      return jsonResponse({ proceed: true, debug: 'API key revoked.' });
 
     case '/store-settings-bulk':
       return jsonResponse({ proceed: true, currentStore: demoStores[0].store_id });

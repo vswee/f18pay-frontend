@@ -90,6 +90,50 @@
         </div>
       </div>
 
+      <h2 class="accordian-trigger" @click="accordianIndexSet(3)">API Credentials <i :class="accordianIndex==3?'fas fa-caret-down':'fas fa-caret-right'"></i></h2>
+      <div class="accordian-sect" v-if="accordianIndex==3">
+        <div class="sub-sect">
+          <label>Generate a store API key</label>
+          <span class="help-text">Use a separate key for each integration. Keys are limited to this store and the full secret is shown only once.</span>
+          <input v-model="apiKeyNickname" type="text" maxlength="100" placeholder="btcpayserver" @keyup.enter="createApiKey()" />
+          <label class="api-permissions-label">Permissions</label>
+          <div class="api-permissions">
+            <label v-for="permission in apiPermissionOptions" :key="permission.value" class="api-permission">
+              <input v-model="apiKeyPermissions" type="checkbox" :value="permission.value" />
+              <span>{{ permission.label }}</span>
+            </label>
+          </div>
+          <a class="btn" :class="apiKeyWorking ? 'working' : ''" @click="createApiKey()">Generate API key</a>
+        </div>
+
+        <div v-if="apiKeyMessage" class="message"><i class="fas fa-info-circle"></i> {{ apiKeyMessage }}</div>
+
+        <div v-if="generatedApiKey" class="sub-sect api-key-reveal">
+          <label>Copy this API key now</label>
+          <span class="help-text">For Invoice Ninja, use it as <code>Authorization: token &lt;key&gt;</code>. F18 Pay cannot display the full secret again.</span>
+          <div class="api-key-secret">{{ generatedApiKey.secret }}</div>
+          <div class="flex">
+            <a class="btn" @click="copyApiKey()">{{ apiKeyCopied ? 'Copied' : 'Copy API key' }} <i v-if="apiKeyCopied" class="fas fa-check"></i></a>
+            <a class="btn sec" @click="generatedApiKey = false">Dismiss</a>
+          </div>
+        </div>
+
+        <div class="sub-sect api-key-list" v-if="apiKeys.length">
+          <label>Existing API keys</label>
+          <div v-for="apiKey in apiKeys" :key="apiKey.id" class="api-key-row" :class="apiKey.revoked ? 'revoked' : ''">
+            <div>
+              <strong>{{ apiKey.nickname }}</strong>
+              <span class="help-text">{{ apiKey.keyPrefix }}… · created {{ formatApiKeyDate(apiKey.created) }}</span>
+            </div>
+            <a v-if="!apiKey.revoked" class="btn severe" @click="revokeApiKey(apiKey)">Revoke</a>
+            <span v-else class="help-text">Revoked</span>
+          </div>
+        </div>
+        <div v-else-if="!apiKeyWorking" class="sub-sect">
+          <span class="help-text">No API keys have been created for this store.</span>
+        </div>
+      </div>
+
       <h2 class="accordian-trigger" @click="accordianIndexSet(1)">Payment Page <i :class="accordianIndex==1?'fas fa-caret-down':'fas fa-caret-right'"></i></h2>
       <div class="accordian-sect" v-if="accordianIndex==1">
         <div class="sub-sect" v-if="accordianIndex==1">
@@ -141,6 +185,7 @@ import { ref, computed, watch, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { useMainStore } from '@/stores';
 import { storeToRefs } from 'pinia';
+import { apiUrl } from '@/utils/api';
 
 // Reactive state
 const modal = ref({
@@ -161,6 +206,21 @@ const text = ref(false);
 const text2 = ref(false);
 const settingPaymentPage = ref(false);
 const settingEmailRequired = ref(false);
+const apiKeys = ref([]);
+const apiKeyNickname = ref('');
+const apiKeyWorking = ref(false);
+const apiKeyMessage = ref('');
+const generatedApiKey = ref(false);
+const apiKeyCopied = ref(false);
+const apiPermissionOptions = [
+  { value: 'btcpay.store.canviewinvoices', label: 'View invoices' },
+  { value: 'btcpay.store.cancreateinvoice', label: 'Create invoices' },
+  { value: 'btcpay.store.canmodifyinvoices', label: 'Modify invoices' },
+  { value: 'btcpay.store.canviewstoresettings', label: 'View store' },
+  { value: 'btcpay.store.webhooks.canmodifywebhooks', label: 'Modify webhooks' },
+  { value: 'btcpay.store.cancreatenonapprovedpullpayments', label: 'Create non-approved pull payments' },
+];
+const apiKeyPermissions = ref(apiPermissionOptions.map((permission) => permission.value));
 const select = ref([{
   open: false,
   selected: 'USD',
@@ -224,6 +284,9 @@ watch(working, (newValue) => {
 
 watch(currentStore, () => {
   init();
+  if (accordianIndex.value === 3) {
+    loadApiKeys();
+  }
 });
 
 // Methods
@@ -362,6 +425,121 @@ const _null = () => {
 
 const accordianIndexSet = (number) => {
   accordianIndex.value = accordianIndex.value === number ? -1 : number;
+  if (accordianIndex.value === 3) {
+    loadApiKeys();
+  }
+};
+
+const apiKeyRequest = async (path, body = {}) => {
+  const username = await store.encrypt({
+    string: user.value,
+    keyiv: keyiv.value
+  });
+
+  const response = await fetch(apiUrl(path), {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      fingerprint: fingerprint.value,
+      username,
+      keyivId: keyivId.value,
+      store_id: currentStore.value.store_id,
+      ...body,
+    }),
+  });
+  return response.json();
+};
+
+const loadApiKeys = async () => {
+  if (!currentStore.value) {
+    return;
+  }
+
+  apiKeyWorking.value = true;
+  apiKeyMessage.value = '';
+  try {
+    const data = await apiKeyRequest('/store-api-keys');
+    if (data.proceed) {
+      apiKeys.value = data.keys || [];
+    } else {
+      apiKeyMessage.value = data.debug || 'Unable to load API credentials.';
+    }
+  } catch (error) {
+    apiKeyMessage.value = 'Unable to load API credentials.';
+    console.error(error);
+  } finally {
+    apiKeyWorking.value = false;
+  }
+};
+
+const createApiKey = async () => {
+  if (!apiKeyNickname.value.trim() || !apiKeyPermissions.value.length || apiKeyWorking.value) {
+    apiKeyMessage.value = 'Enter a nickname and select at least one permission.';
+    return;
+  }
+
+  apiKeyWorking.value = true;
+  apiKeyMessage.value = '';
+  apiKeyCopied.value = false;
+  try {
+    const data = await apiKeyRequest('/store-api-keys-create', {
+      nickname: apiKeyNickname.value.trim(),
+      permissions: apiKeyPermissions.value,
+    });
+    if (data.proceed && data.key) {
+      generatedApiKey.value = data.key;
+      apiKeyNickname.value = '';
+      apiKeyMessage.value = data.debug || '';
+      await loadApiKeys();
+    } else {
+      apiKeyMessage.value = data.debug || 'Unable to create API credentials.';
+    }
+  } catch (error) {
+    apiKeyMessage.value = 'Unable to create API credentials.';
+    console.error(error);
+  } finally {
+    apiKeyWorking.value = false;
+  }
+};
+
+const revokeApiKey = async (apiKey) => {
+  if (!window.confirm(`Revoke the API key “${apiKey.nickname}”? Integrations using it will stop working.`)) {
+    return;
+  }
+
+  apiKeyWorking.value = true;
+  apiKeyMessage.value = '';
+  try {
+    const data = await apiKeyRequest('/store-api-keys-revoke', { key_id: apiKey.id });
+    apiKeyMessage.value = data.debug || '';
+    if (data.proceed) {
+      await loadApiKeys();
+    }
+  } catch (error) {
+    apiKeyMessage.value = 'Unable to revoke API credentials.';
+    console.error(error);
+  } finally {
+    apiKeyWorking.value = false;
+  }
+};
+
+const copyApiKey = async () => {
+  if (!generatedApiKey.value?.secret) {
+    return;
+  }
+
+  try {
+    await navigator.clipboard.writeText(generatedApiKey.value.secret);
+    apiKeyCopied.value = true;
+  } catch (error) {
+    apiKeyMessage.value = 'Copy failed. Select the key manually.';
+    console.error(error);
+  }
+};
+
+const formatApiKeyDate = (date) => {
+  if (!date) return 'never';
+  return new Date(date).toLocaleDateString();
 };
 
 const closeModal = () => {
@@ -393,5 +571,69 @@ onMounted(() => {
 
 .button-preview {
   margin: 2rem 0 1rem 0;
+}
+
+.api-permissions-label {
+  margin-top: 1rem;
+}
+
+.api-permissions {
+  display: grid;
+  gap: 0.5rem;
+  margin: 0.75rem 0 1rem;
+}
+
+.api-permission {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+}
+
+.api-permission input {
+  width: auto;
+}
+
+.api-key-reveal {
+  border: 1px solid var(--green);
+  background: var(--green-bg);
+}
+
+.api-key-secret {
+  overflow-wrap: anywhere;
+  margin: 0.75rem 0;
+  padding: 0.75rem;
+  color: var(--white);
+  background: var(--input-background);
+  font-family: "Fira Code", "Courier New", monospace;
+  font-size: 0.8rem;
+}
+
+.api-key-list {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.api-key-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.75rem;
+  border: 1px solid var(--dark);
+}
+
+.api-key-row > div {
+  display: grid;
+  gap: 0.25rem;
+  min-width: 0;
+}
+
+.api-key-row .help-text {
+  overflow-wrap: anywhere;
+}
+
+.api-key-row.revoked {
+  opacity: 0.55;
 }
 </style>
