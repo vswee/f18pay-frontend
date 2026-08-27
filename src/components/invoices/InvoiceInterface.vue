@@ -275,7 +275,8 @@ const updateCountdown = () => {
 const layout = () => {
   const invoiceElement = document.getElementById('invoice')
   if (!invoiceElement) return
-  state.qrCodeWidth = Math.max(180, Math.min(280, invoiceElement.clientWidth - 96))
+  const heightLimit = window.innerHeight <= 640 ? 168 : window.innerHeight <= 760 ? 200 : window.innerHeight <= 900 ? 240 : 280
+  state.qrCodeWidth = Math.max(168, Math.min(280, invoiceElement.clientWidth - 96, heightLimit))
 }
 
 const closeWindow = () => window.close()
@@ -391,6 +392,17 @@ onBeforeUnmount(() => {
 .invoice-footer strong { color: #70798a; }
 .copy-workspace { position: fixed; top: 100vh; width: 1px; height: 1px; opacity: 0; }
 
+@media (max-height: 760px) {
+  .invoice-page { padding-top: 12px; padding-bottom: 12px; }
+  .invoice-header { padding-top: 16px; padding-bottom: 14px; }
+  .status-card { padding-top: 11px; padding-bottom: 12px; }
+  .invoice-content { padding-top: 18px; padding-bottom: 10px; }
+  .amount-card { margin-top: 14px; margin-bottom: 16px; padding: 14px; }
+  .invoice-details { margin-top: 12px; margin-bottom: 14px; }
+  .qr-frame { margin-top: 10px; margin-bottom: 12px; padding: 12px; }
+  .invoice-footer { padding-top: 10px; padding-bottom: 14px; }
+}
+
 @media (max-width: 420px) {
   .invoice-page { padding: 0; }
   .invoice-shell { min-height: 100vh; border: 0; border-radius: 0; }
@@ -402,5 +414,14 @@ onBeforeUnmount(() => {
   .network-pill { padding: 5px 7px; font-size: 10px; }
   .amount-card { margin: 18px 0; padding: 14px; border-radius: 14px; }
   .amount-value { font-size: 24px; }
+}
+
+@media (max-width: 420px) and (max-height: 760px) {
+  .invoice-header, .invoice-content, .success-panel { padding-left: 18px; padding-right: 18px; }
+  .status-card { padding-left: 18px; padding-right: 18px; }
+  .invoice-content { padding-top: 14px; }
+  .amount-card { margin-top: 12px; margin-bottom: 14px; padding: 12px; }
+  .invoice-details { margin-top: 10px; margin-bottom: 12px; }
+  .qr-frame { margin-top: 8px; margin-bottom: 10px; padding: 10px; }
 }
 </style>
