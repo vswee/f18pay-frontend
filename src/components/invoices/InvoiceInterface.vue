@@ -96,7 +96,7 @@
 
         <div v-else-if="requiresEmail" class="email-panel">
           <h2 class="payment-heading">Email required</h2>
-          <form :action="`?${window.location.search}`" method="post">
+          <form :action="currentSearch" method="post">
             <input name="email" type="email" class="form-input" placeholder="mail@example.com" required />
             <p class="help-text">This store requires a valid email address before you can proceed.</p>
             <button class="primary-button" type="submit">Continue <span>→</span></button>
@@ -143,6 +143,7 @@ import f18Logo from '../../assets/logo.svg'
 
 const props = defineProps({ invoiceData: { type: Object, default: () => ({}) } })
 const invoice = reactive({ ...(props.invoiceData || {}) })
+const currentSearch = typeof window !== 'undefined' ? window.location.search : ''
 const selectedPaymentOption = ref(0)
 const copiedAddress = ref(false)
 const state = reactive({
