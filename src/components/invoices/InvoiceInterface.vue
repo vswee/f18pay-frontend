@@ -3,10 +3,9 @@
     <section id="invoice" class="invoice-shell" :style="themeStyle">
       <header class="invoice-header">
         <div class="brand-lockup">
-          <span class="brand-mark" aria-hidden="true">F</span>
+          <img class="brand-mark" :src="f18Logo" alt="F18 Pay" />
           <span class="brand-name">F18 Pay</span>
         </div>
-        <span class="secure-label"><span class="secure-dot"></span> Secure checkout</span>
       </header>
 
       <section class="status-card" :class="{ expired: !state.verifyInvoiceValidTime }" aria-live="polite">
@@ -66,24 +65,27 @@
           </div>
         </section>
 
-        <dl class="invoice-details">
-          <div v-if="invoice.tx2" class="detail-row">
-            <dt>Reference</dt>
-            <dd>{{ invoice.tx2 }}</dd>
-          </div>
-          <div v-if="invoice.fiatValue" class="detail-row">
-            <dt>Invoice value</dt>
-            <dd>{{ invoice.fiatValue }} {{ invoice.fiatShortName }}</dd>
-          </div>
-          <div v-if="activePaymentOption.exchange" class="detail-row">
-            <dt>Exchange rate</dt>
-            <dd>1 {{ activePaymentOption.crypto }} = {{ activePaymentOption.exchange }} {{ invoice.fiatShortName }}</dd>
-          </div>
-          <div v-if="Number(activePaymentOption.fee || 0) > 0" class="detail-row">
-            <dt>Network fee</dt>
-            <dd>{{ formatCryptoAmount(0, activePaymentOption.fee) }} {{ activePaymentOption.crypto }}</dd>
-          </div>
-        </dl>
+        <details class="invoice-details">
+          <summary><span>Invoice details</span><span class="details-toggle">View details <span aria-hidden="true">⌄</span></span></summary>
+          <dl class="detail-list">
+            <div v-if="invoice.tx2" class="detail-row">
+              <dt>Reference</dt>
+              <dd>{{ invoice.tx2 }}</dd>
+            </div>
+            <div v-if="invoice.fiatValue" class="detail-row">
+              <dt>Invoice value</dt>
+              <dd>{{ invoice.fiatValue }} {{ invoice.fiatShortName }}</dd>
+            </div>
+            <div v-if="activePaymentOption.exchange" class="detail-row">
+              <dt>Exchange rate</dt>
+              <dd>1 {{ activePaymentOption.crypto }} = {{ activePaymentOption.exchange }} {{ invoice.fiatShortName }}</dd>
+            </div>
+            <div v-if="Number(activePaymentOption.fee || 0) > 0" class="detail-row">
+              <dt>Network fee</dt>
+              <dd>{{ formatCryptoAmount(0, activePaymentOption.fee) }} {{ activePaymentOption.crypto }}</dd>
+            </div>
+          </dl>
+        </details>
 
         <div v-if="!state.verifyInvoiceValidTime" class="response expired-response">
           <h2>What happened?</h2>
@@ -93,7 +95,7 @@
         <div v-else-if="requiresEmail" class="email-panel">
           <div class="payment-heading">
             <span class="step-number">1</span>
-            <div><p class="eyebrow">Before you continue</p><h2>Email required</h2></div>
+            <h2>Email required</h2>
           </div>
           <form :action="`?${window.location.search}`" method="post">
             <input name="email" type="email" class="form-input" placeholder="mail@example.com" required />
@@ -105,21 +107,20 @@
         <section v-else class="payment-panel" aria-labelledby="scan-heading">
           <div class="payment-heading">
             <span class="step-number">1</span>
-            <div><p class="eyebrow">Pay with {{ activePaymentOption.crypto }}</p><h2 id="scan-heading">Scan to pay</h2></div>
+            <h2 id="scan-heading">Scan to pay</h2>
+            <span class="payment-label">{{ activePaymentOption.crypto }}</span>
           </div>
-          <p class="instruction">Scan the QR code with your wallet, or copy the address below.</p>
           <div class="qr-frame">
             <QrcodeVue :value="qrCode" :size="state.qrCodeWidth" level="H" foreground="#111827" />
           </div>
           <div class="address-field">
-            <span class="address-label">Wallet address</span>
+            <span class="address-label">or copy wallet address</span>
             <span class="address-value">{{ activePaymentOption.address }}</span>
             <button type="button" class="copy-button" @click="copyAddress">
               <span>{{ copiedAddress ? 'Copied' : 'Copy' }}</span>
             </button>
           </div>
           <a id="payLink" :href="payLink" class="primary-button wallet-button">Open in wallet <span>↗</span></a>
-          <p class="security-note"><span>✓</span> Your payment is verified on the blockchain.</p>
         </section>
       </section>
 
@@ -142,6 +143,7 @@
 <script setup>
 import { computed, defineProps, onBeforeUnmount, onMounted, reactive, ref } from 'vue'
 import QrcodeVue from 'qrcode.vue'
+import f18Logo from '../../assets/logo.svg'
 
 const props = defineProps({ invoiceData: { type: Object, default: () => ({}) } })
 const invoice = reactive({ ...(props.invoiceData || {}) })
@@ -327,11 +329,9 @@ onBeforeUnmount(() => {
 
 .invoice-header, .invoice-content, .success-panel { padding-left: 28px; padding-right: 28px; }
 .invoice-header { display: flex; justify-content: space-between; align-items: center; padding-top: 25px; padding-bottom: 22px; }
-.brand-lockup, .secure-label, .status-heading, .merchant-row, .section-heading, .payment-heading, .security-note { display: flex; align-items: center; }
-.brand-mark { display: grid; place-items: center; width: 28px; height: 28px; margin-right: 8px; border-radius: 9px; background: var(--primary); color: #fff; font-weight: 800; font-size: 16px; }
+.brand-lockup, .status-heading, .merchant-row, .section-heading, .payment-heading { display: flex; align-items: center; }
+.brand-mark { display: block; width: 28px; height: 28px; margin-right: 8px; }
 .brand-name { color: #222b3f; font-size: 16px; font-weight: 750; letter-spacing: -.02em; }
-.secure-label { gap: 6px; color: #6a7283; font-size: 11px; font-weight: 650; }
-.secure-dot { width: 6px; height: 6px; border-radius: 50%; background: #42b883; }
 .status-card { padding: 14px 28px 16px; background: var(--primary-soft); color: var(--primary); }
 .status-card.expired { background: #f8eaea; color: #b54747; }
 .status-heading { gap: 8px; font-size: 13px; }
@@ -364,13 +364,23 @@ onBeforeUnmount(() => {
 .option-amount { margin-left: auto; color: #687184; font-size: 11px; white-space: nowrap; }
 .option-check { display: grid; place-items: center; width: 18px; height: 18px; border: 1px solid #dfe2e9; border-radius: 50%; color: transparent; font-size: 11px; }
 .payment-option.selected .option-check { border-color: var(--primary); background: var(--primary); color: #fff; }
-.invoice-details { display: grid; gap: 10px; margin: 22px 0 24px; padding: 16px 0; border-top: 1px solid #eef0f4; border-bottom: 1px solid #eef0f4; }
+.invoice-details { margin: 18px 0 20px; border-top: 1px solid #eef0f4; border-bottom: 1px solid #eef0f4; }
+.invoice-details summary { display: flex; align-items: center; justify-content: space-between; padding: 13px 0; color: #687184; font-size: 11px; font-weight: 750; cursor: pointer; list-style: none; }
+.invoice-details summary::-webkit-details-marker { display: none; }
+.invoice-details summary::after { content: '+'; color: var(--primary); font-size: 15px; font-weight: 500; }
+.invoice-details[open] summary::after { content: '−'; }
+.details-toggle { margin-left: auto; margin-right: 10px; color: #a0a6b2; font-size: 10px; font-weight: 600; }
+.details-toggle span { display: inline-block; transition: transform .2s ease; }
+.invoice-details[open] .details-toggle span { transform: rotate(180deg); }
+.detail-list { display: grid; gap: 10px; margin: 0; padding: 0 0 14px; }
 .detail-row { display: flex; justify-content: space-between; gap: 20px; color: #81899a; font-size: 11px; }
 .detail-row dd { margin: 0; color: #354055; font-weight: 650; text-align: right; }
 .payment-panel, .email-panel { padding-top: 2px; }
-.payment-heading { gap: 10px; }
+.payment-heading { gap: 9px; margin-bottom: 12px; }
+.payment-heading h2 { margin: 0; font-size: 14px; }
+.payment-label { margin-left: auto; color: #8992a1; font-size: 10px; font-weight: 750; text-transform: uppercase; }
 .step-number { display: grid; place-items: center; width: 25px; height: 25px; border-radius: 8px; background: var(--primary); color: #fff; font-size: 11px; font-weight: 800; }
-.instruction, .response p, .success-panel > p:not(.eyebrow) { margin: 12px 0 18px; color: #747e90; font-size: 12px; line-height: 1.55; }
+.response p, .success-panel > p:not(.eyebrow) { margin: 12px 0 18px; color: #747e90; font-size: 12px; line-height: 1.55; }
 .qr-frame { display: grid; place-items: center; margin: 15px auto 17px; padding: 18px; width: fit-content; border: 1px solid #eef0f4; border-radius: 18px; background: #fff; box-shadow: 0 8px 24px rgba(31, 38, 61, .06); }
 .qr-frame :deep(canvas), .qr-frame :deep(svg) { display: block; max-width: 100%; height: auto; }
 .address-field { display: grid; grid-template-columns: 1fr auto; gap: 5px 10px; align-items: center; padding: 12px 13px; border: 1px solid #e4e7ed; border-radius: 12px; }
@@ -380,8 +390,6 @@ onBeforeUnmount(() => {
 .primary-button { display: flex; align-items: center; justify-content: center; gap: 10px; box-sizing: border-box; width: 100%; margin-top: 12px; padding: 13px 16px; border: 0; border-radius: 11px; background: var(--primary); color: #fff; font-size: 13px; font-weight: 750; text-decoration: none; cursor: pointer; transition: filter .2s ease, transform .2s ease; }
 .primary-button:hover { filter: brightness(.94); transform: translateY(-1px); }
 .wallet-button { margin-top: 10px; }
-.security-note { justify-content: center; gap: 6px; margin: 14px 0 0; color: #8992a1; font-size: 10px; }
-.security-note span { color: #42a879; font-weight: 800; }
 .expired-response { margin: 15px 0 0; padding: 16px; border-radius: 13px; background: #fff5f5; }
 .response h2 { margin: 0; color: #923f3f; font-size: 14px; }
 .email-panel { margin-top: 8px; }
