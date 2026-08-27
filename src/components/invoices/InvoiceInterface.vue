@@ -23,7 +23,6 @@
         <div class="merchant-row">
           <span class="merchant-avatar">{{ merchantInitial }}</span>
           <div>
-            <p class="eyebrow">Payment request</p>
             <h1>{{ activeStoreName }}</h1>
           </div>
           <span class="network-pill">{{ activePaymentOption.crypto || 'Crypto' }}</span>
