@@ -184,6 +184,11 @@ const paymentOptions = computed(() => invoice.paymentOptions?.length ? invoice.p
 const activePaymentOption = computed(() => paymentOptions.value[selectedPaymentOption.value] || paymentOptions.value[0] || basePaymentOption.value)
 const activeStoreName = computed(() => decodeText(activePaymentOption.value.storeName || invoice.storeName || 'F18 Pay'))
 const merchantInitial = computed(() => activeStoreName.value.charAt(0).toUpperCase() || 'F')
+const pageTitle = computed(() => {
+  const storeName = activeStoreName.value.trim()
+  return `Invoice - ${storeName.length > 24 ? `${storeName.slice(0, 24).trimEnd()}...` : storeName}`
+})
+const updateDocumentTitle = () => { document.title = pageTitle.value }
 const fiatAmount = computed(() => invoice.fiatValue || '')
 const isPaid = computed(() => Number(state.statusInt) >= 2)
 const requiresEmail = computed(() => activePaymentOption.value.requiresEmail === true || activePaymentOption.value.requiresEmail === 1 || invoice.requiresEmail === true || invoice.requiresEmail === 1)
@@ -215,7 +220,10 @@ const qrCode = computed(() => paymentUri.value)
 const payLink = computed(() => paymentUri.value)
 
 const selectPaymentOption = (index) => {
-  if (paymentOptions.value[index]) selectedPaymentOption.value = index
+  if (paymentOptions.value[index]) {
+    selectedPaymentOption.value = index
+    updateDocumentTitle()
+  }
 }
 
 const copyAddress = async () => {
@@ -282,6 +290,7 @@ const layout = () => {
 const closeWindow = () => window.close()
 
 onMounted(() => {
+  updateDocumentTitle()
   layout()
   window.addEventListener('resize', layout)
   state.timingFunction = window.setInterval(updateCountdown, 1000)
