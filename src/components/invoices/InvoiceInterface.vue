@@ -403,7 +403,8 @@ onBeforeUnmount(() => {
 @media (max-height: 760px) {
   .invoice-page { padding-top: 12px; padding-bottom: 12px; }
   .invoice-header { padding-top: 16px; padding-bottom: 14px; }
-  .status-card { padding-top: 11px; padding-bottom: 12px; }
+  .status-card { position: relative; padding-top: 11px; padding-bottom: 12px; }
+  .status-card .progress-track { position: absolute; right: 0; bottom: 0; left: 0; height: 2px; margin-top: 0; border-radius: 0; }
   .invoice-content { padding-top: 18px; padding-bottom: 10px; }
   .amount-card { margin-top: 8px; margin-bottom: 10px; padding: 10px 12px; }
   .amount-value { font-size: 20px; }
