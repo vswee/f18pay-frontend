@@ -112,6 +112,7 @@
             </button>
           </div>
           <a id="payLink" :href="payLink" class="primary-button wallet-button">Open in wallet <span>↗</span></a>
+          <button type="button" class="primary-button secondary-button" @click="openSupport">Contact support <span>→</span></button>
         </section>
       </section>
 
@@ -237,6 +238,10 @@ const copyAddress = async () => {
   }
   copiedAddress.value = true
   window.setTimeout(() => { copiedAddress.value = false }, 1800)
+}
+
+const openSupport = () => {
+  if (window.$chatwoot?.toggle) window.$chatwoot.toggle('open')
 }
 
 const invoiceStatus = async () => {
@@ -386,6 +391,8 @@ onBeforeUnmount(() => {
 .primary-button { display: flex; align-items: center; justify-content: center; gap: 10px; box-sizing: border-box; width: 100%; margin-top: 12px; padding: 13px 16px; border: 0; border-radius: 11px; background: var(--primary); color: #fff; font-size: 13px; font-weight: 750; text-decoration: none; cursor: pointer; transition: filter .2s ease, transform .2s ease; }
 .primary-button:hover { filter: brightness(.94); transform: translateY(-1px); }
 .wallet-button { margin-top: 10px; }
+.secondary-button { margin-top: 8px; border: 1px solid var(--primary-border); background: transparent; color: var(--primary); }
+.secondary-button:hover { background: var(--primary-soft); filter: none; }
 .expired-response { margin: 15px 0 0; padding: 16px; border-radius: 13px; background: #fff5f5; }
 .response h2 { margin: 0; color: #923f3f; font-size: 14px; }
 .email-panel { margin-top: 8px; }
@@ -439,13 +446,13 @@ onBeforeUnmount(() => {
 }
 
 @media (max-height: 640px) {
-  .amount-card { margin-top: 5px; margin-bottom: 7px; padding: 8px 10px; }
+  .amount-card { margin-top: 5px; margin-bottom: 7px; padding: 10px 12px; }
   .amount-value { font-size: 18px; }
   .fiat-value { margin-top: 4px; font-size: 11px; }
 }
 
 @media (max-width: 420px) and (max-height: 640px) {
-  .amount-card { margin-top: 4px; margin-bottom: 6px; padding: 6px 8px; }
+  .amount-card { margin-top: 4px; margin-bottom: 6px; padding: 10px 12px; }
   .amount-value { font-size: 16px; }
 }
 </style>

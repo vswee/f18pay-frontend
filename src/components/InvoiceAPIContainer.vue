@@ -1,7 +1,7 @@
 <template lang="">
   <div>
     <router-view></router-view>
-    <ChatWoot />
+    <ChatWoot :hide-message-bubble="true" />
   </div>
 </template>
 <script>

@@ -3,38 +3,44 @@
 </template>
 
 <script>
-const demoMode = typeof window !== 'undefined'
-  && (window.location.search.includes('demo=1') || window.localStorage.getItem('f18_demo_mode') === '1');
-
-if (!demoMode) {
-  window.chatwootSettings = {
-    hideMessageBubble: false,
-    position: "right",
-    locale: "en",
-    type: "expanded_bubble",
-    launcherTitle: "Get support"
-  };
-
-  (function (d, t) {
-    try {
-      var BASE_URL = "https://chatwoot.flat18.co.uk";
-      var g = d.createElement(t), s = d.getElementsByTagName(t)[0];
-      g.src = BASE_URL + "/packs/js/sdk.js";
-      g.defer = true;
-      g.async = true;
-      s.parentNode.insertBefore(g, s);
-      g.onload = function () {
-        window.chatwootSDK.run({
-          websiteToken: 'ANNVbgEzAvFv7Ai5rLTPBfmw',
-          baseUrl: BASE_URL
-        })
-      }
-    } catch (e) { console.log("Error setting up chatwoot") }
-  })(document, "script");
-}
-
-
 export default {
   name: "ChatWoot",
+  props: {
+    hideMessageBubble: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  mounted() {
+    const demoMode = typeof window !== 'undefined'
+      && (window.location.search.includes('demo=1') || window.localStorage.getItem('f18_demo_mode') === '1');
+
+    if (demoMode || document.getElementById('chatwoot-sdk')) return;
+
+    window.chatwootSettings = {
+      hideMessageBubble: this.hideMessageBubble,
+      position: "right",
+      locale: "en",
+      type: "expanded_bubble",
+      launcherTitle: "Get support"
+    };
+
+    try {
+      const baseUrl = "https://chatwoot.flat18.co.uk";
+      const script = document.createElement('script');
+      const firstScript = document.getElementsByTagName('script')[0];
+      script.id = 'chatwoot-sdk';
+      script.src = `${baseUrl}/packs/js/sdk.js`;
+      script.defer = true;
+      script.async = true;
+      firstScript.parentNode.insertBefore(script, firstScript);
+      script.onload = () => {
+        window.chatwootSDK.run({
+          websiteToken: 'ANNVbgEzAvFv7Ai5rLTPBfmw',
+          baseUrl
+        });
+      };
+    } catch (e) { console.log("Error setting up chatwoot") }
+  },
 };
 </script>
