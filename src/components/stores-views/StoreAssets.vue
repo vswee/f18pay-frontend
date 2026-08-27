@@ -122,9 +122,9 @@
             <div class="api-key-detail">
               <div>
                 <strong>Store ID</strong>
-                <code>{{ currentStore.store_id }}</code>
+                <code>{{ storeCode }}</code>
               </div>
-              <button class="btn sec" type="button" @click="copyApiDetail(currentStore.store_id, 'storeId')">
+              <button class="btn sec" type="button" @click="copyApiDetail(storeCode, 'storeId')">
                 {{ apiDetailCopied === 'storeId' ? 'Copied' : 'Copy' }} <i v-if="apiDetailCopied === 'storeId'" class="fas fa-check"></i>
               </button>
             </div>
@@ -225,7 +225,7 @@ import { ref, computed, watch, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { useMainStore } from '@/stores';
 import { storeToRefs } from 'pinia';
-import { apiUrl, getApplicationEndpoint } from '@/utils/api';
+import { apiUrl } from '@/utils/api';
 
 // Reactive state
 const modal = ref({
@@ -291,16 +291,20 @@ const {
   user,
   keyiv,
   keyivId,
-  activeStore,
   stores,
   url: base_url
 } = storeToRefs(store);
 
 // Computed properties
-const apiInstanceUrl = computed(() => getApplicationEndpoint());
+const apiInstanceUrl = computed(() => typeof window !== 'undefined' ? window.location.origin : 'https://pay.flat18.co.uk');
 
 const storeCode = computed(() => {
-  return activeStore.value.substr(0, 4) + currentStore.value.store_id_int + activeStore.value.substr(activeStore.value.length - 4);
+  const store = currentStore.value;
+  if (!store?.store_id || !store?.store_id_int) {
+    return '';
+  }
+
+  return `${store.store_id.slice(0, 4)}${store.store_id_int}${store.store_id.slice(-4)}`;
 });
 
 const random = computed(() => {
