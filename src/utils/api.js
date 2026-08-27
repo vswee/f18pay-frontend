@@ -1,4 +1,5 @@
 const LOCAL_HOSTNAMES = new Set(['localhost', '127.0.0.1', '::1']);
+const PRODUCTION_APPLICATION_ENDPOINT = 'https://f18-pay-backend.vercel.app';
 
 const stripTrailingSlash = (value) => String(value || '').replace(/\/+$/, '');
 
@@ -25,7 +26,7 @@ export const getApplicationEndpoint = () => {
     const configuredUrl = new URL(configured);
 
     if (isLocalHostname(configuredUrl.hostname) && !isLocalHostname(window.location.hostname)) {
-      return stripTrailingSlash(window.location.origin);
+      return PRODUCTION_APPLICATION_ENDPOINT;
     }
   } catch {
     // Leave non-URL values untouched so custom deployment targets still work.
