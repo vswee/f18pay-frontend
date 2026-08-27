@@ -2,7 +2,6 @@
   <div class="home-page">
     <section class="home-hero home-shell">
       <div class="hero-copy">
-        <p class="eyebrow"><span class="eyebrow-dot"></span> Open, practical crypto payments</p>
         <h1>Take crypto payments without handing over the keys.</h1>
         <p class="hero-lede">
           F18 Pay gives you a simple way to create stores, issue invoices, and accept BTC and ETH payments while your funds go straight to your wallet.
