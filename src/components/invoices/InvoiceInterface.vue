@@ -396,5 +396,11 @@ onBeforeUnmount(() => {
   .invoice-shell { min-height: 100vh; border: 0; border-radius: 0; }
   .invoice-header, .invoice-content, .success-panel { padding-left: 22px; padding-right: 22px; }
   .status-card { padding-left: 22px; padding-right: 22px; }
+  .merchant-row { gap: 8px; }
+  .merchant-avatar { flex-basis: 34px; width: 34px; height: 34px; border-radius: 10px; font-size: 14px; }
+  .merchant-row h1 { font-size: 15px; }
+  .network-pill { padding: 5px 7px; font-size: 10px; }
+  .amount-card { margin: 18px 0; padding: 14px; border-radius: 14px; }
+  .amount-value { font-size: 24px; }
 }
 </style>
