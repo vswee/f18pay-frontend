@@ -16,49 +16,56 @@
       </div>
 
       <template v-else-if="currentStore">
-        <section class="linked-store-panel">
-          <div>
-            <span class="help-text">Current store</span>
-            <h2>{{ decode(currentStore.store_name) }} <small :class="'badge ' + currentStore.network">{{ currentStore.network.toUpperCase() }}</small></h2>
-          </div>
-          <div v-if="link" class="linked-store-current">
-            <span class="linked-store-label">Linked to</span>
-            <strong>{{ decode(link.store_name) }}</strong>
-            <small :class="'badge ' + link.network">{{ link.network.toUpperCase() }}</small>
-            <div class="link-actions">
-              <button class="link-menu-trigger" type="button" aria-label="Linked store options"
-                :aria-expanded="linkMenuOpen" @click.stop="linkMenuOpen = !linkMenuOpen">
-                <i class="fas fa-ellipsis-v" aria-hidden="true"></i>
-              </button>
-              <div v-if="linkMenuOpen" class="link-menu" role="menu">
-                <button type="button" role="menuitem" @click="goToLinkedStore">Go to store</button>
-                <button type="button" role="menuitem" @click="removeLink">Remove link</button>
-              </div>
-            </div>
-          </div>
-          <span v-else class="help-text">No additional payment currency is linked.</span>
-        </section>
-
-        <h2 class="section-title">Available stores</h2>
-        <div class="store-link-grid">
-          <article v-for="candidate in candidates" :key="candidate.store_id_int"
-            :class="['store-link-tile', { disabled: !canLink(candidate), selected: candidate.store_id_int === link?.store_id_int }]"
-            :title="candidate.is_linked_elsewhere ? 'Remove the other link to be able to link to this store.' : undefined">
-            <div class="store-link-heading">
+        <div class="form-section">
+          <h2 class="accordian-trigger" @click="accordianOpen = !accordianOpen">
+            Link stores <i :class="accordianOpen ? 'fas fa-caret-down' : 'fas fa-caret-right'"></i>
+          </h2>
+          <div v-if="accordianOpen" class="accordian-sect">
+            <section class="linked-store-panel">
               <div>
-                <h3>{{ decode(candidate.store_name) }}</h3>
-                <span :class="'badge ' + candidate.network">{{ candidate.network.toUpperCase() }}</span>
+                <span class="help-text">Current store</span>
+                <h2>{{ decode(currentStore.store_name) }} <small :class="'badge ' + currentStore.network">{{ currentStore.network.toUpperCase() }}</small></h2>
               </div>
-              <i class="fas fa-link" aria-hidden="true"></i>
+              <div v-if="link" class="linked-store-current">
+                <span class="linked-store-label">Linked to</span>
+                <strong>{{ decode(link.store_name) }}</strong>
+                <small :class="'badge ' + link.network">{{ link.network.toUpperCase() }}</small>
+                <div class="link-actions">
+                  <button class="link-menu-trigger" type="button" aria-label="Linked store options"
+                    :aria-expanded="linkMenuOpen" @click.stop="linkMenuOpen = !linkMenuOpen">
+                    <i class="fas fa-ellipsis-v" aria-hidden="true"></i>
+                  </button>
+                  <div v-if="linkMenuOpen" class="link-menu" role="menu">
+                    <button type="button" role="menuitem" @click="goToLinkedStore">Go to store</button>
+                    <button type="button" role="menuitem" @click="removeLink">Remove link</button>
+                  </div>
+                </div>
+              </div>
+              <span v-else class="help-text">No additional payment currency is linked.</span>
+            </section>
+
+            <h2 class="section-title">Available stores</h2>
+            <div class="store-link-grid">
+              <article v-for="candidate in candidates" :key="candidate.store_id_int"
+                :class="['store-link-tile', { disabled: !canLink(candidate), selected: candidate.store_id_int === link?.store_id_int }]"
+                :title="candidate.is_linked_elsewhere ? 'Remove the other link to be able to link to this store.' : undefined">
+                <div class="store-link-heading">
+                  <div>
+                    <h3>{{ decode(candidate.store_name) }}</h3>
+                    <span :class="'badge ' + candidate.network">{{ candidate.network.toUpperCase() }}</span>
+                  </div>
+                  <i class="fas fa-link" aria-hidden="true"></i>
+                </div>
+                <p v-if="candidate.store_id_int === link?.store_id_int" class="link-state">Linked to this store</p>
+                <p v-else-if="candidate.is_linked_elsewhere" class="link-state">Already linked to another store</p>
+                <p v-else-if="candidate.deleted !== 0" class="link-state">Disabled store</p>
+                <p v-else-if="candidate.network === currentStore.network" class="link-state">Same default currency</p>
+                <button v-else class="btn" type="button" :disabled="!canLink(candidate)" @click="createLink(candidate)">
+                  Link this store
+                </button>
+              </article>
             </div>
-            <p v-if="candidate.store_id_int === link?.store_id_int" class="link-state">Linked to this store</p>
-            <p v-else-if="candidate.is_linked_elsewhere" class="link-state">Already linked to another store</p>
-            <p v-else-if="candidate.deleted !== 0" class="link-state">Disabled store</p>
-            <p v-else-if="candidate.network === currentStore.network" class="link-state">Same default currency</p>
-            <button v-else class="btn" type="button" :disabled="!canLink(candidate)" @click="createLink(candidate)">
-              Link this store
-            </button>
-          </article>
+          </div>
         </div>
       </template>
     </div>
@@ -84,6 +91,7 @@ const messageType = ref('')
 const link = ref(null)
 const linkMenuOpen = ref(false)
 const candidates = ref([])
+const accordianOpen = ref(true)
 
 const currentStore = computed(() => (stores.value || []).find((item) => {
   const publicRouteId = `${item.store_id.substring(0, 5)}${item.store_id.substring(item.store_id.length - 5)}`
