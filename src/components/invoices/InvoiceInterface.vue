@@ -35,7 +35,6 @@
             <p class="amount-value">{{ cryptoAmount }} <span>{{ activePaymentOption.crypto }}</span></p>
             <p v-if="fiatAmount" class="fiat-value">≈ {{ fiatAmount }} {{ invoice.fiatShortName }}</p>
           </div>
-          <span class="amount-symbol">{{ cryptoSymbol }}</span>
         </div>
 
         <section v-if="paymentOptions.length > 1" class="payment-methods" aria-labelledby="payment-method-heading">
@@ -66,7 +65,7 @@
         </section>
 
         <details class="invoice-details">
-          <summary><span>Invoice details</span><span class="details-toggle">View details <span aria-hidden="true">⌄</span></span></summary>
+          <summary><span>Invoice details</span><span class="details-toggle">View details</span></summary>
           <dl class="detail-list">
             <div v-if="invoice.tx2" class="detail-row">
               <dt>Reference</dt>
@@ -93,10 +92,7 @@
         </div>
 
         <div v-else-if="requiresEmail" class="email-panel">
-          <div class="payment-heading">
-            <span class="step-number">1</span>
-            <h2>Email required</h2>
-          </div>
+          <h2 class="payment-heading">Email required</h2>
           <form :action="`?${window.location.search}`" method="post">
             <input name="email" type="email" class="form-input" placeholder="mail@example.com" required />
             <p class="help-text">This store requires a valid email address before you can proceed.</p>
@@ -105,11 +101,7 @@
         </div>
 
         <section v-else class="payment-panel" aria-labelledby="scan-heading">
-          <div class="payment-heading">
-            <span class="step-number">1</span>
-            <h2 id="scan-heading">Scan to pay</h2>
-            <span class="payment-label">{{ activePaymentOption.crypto }}</span>
-          </div>
+          <h2 id="scan-heading" class="payment-heading">Scan to pay</h2>
           <div class="qr-frame">
             <QrcodeVue :value="qrCode" :size="state.qrCodeWidth" level="H" foreground="#111827" />
           </div>
@@ -196,7 +188,6 @@ const fiatAmount = computed(() => invoice.fiatValue || '')
 const isPaid = computed(() => Number(state.statusInt) >= 2)
 const requiresEmail = computed(() => activePaymentOption.value.requiresEmail === true || activePaymentOption.value.requiresEmail === 1 || invoice.requiresEmail === true || invoice.requiresEmail === 1)
 const cryptoSymbolFor = (crypto) => String(crypto || '').toUpperCase() === 'BTC' ? '₿' : String(crypto || '₿').slice(0, 1).toUpperCase()
-const cryptoSymbol = computed(() => cryptoSymbolFor(activePaymentOption.value.crypto))
 
 const numericAmount = (value) => Number(value || 0)
 const formatCryptoAmount = (amount, fee = 0) => {
@@ -329,7 +320,7 @@ onBeforeUnmount(() => {
 
 .invoice-header, .invoice-content, .success-panel { padding-left: 28px; padding-right: 28px; }
 .invoice-header { display: flex; justify-content: space-between; align-items: center; padding-top: 25px; padding-bottom: 22px; }
-.brand-lockup, .status-heading, .merchant-row, .section-heading, .payment-heading { display: flex; align-items: center; }
+.brand-lockup, .status-heading, .merchant-row, .section-heading { display: flex; align-items: center; }
 .brand-mark { display: block; width: 28px; height: 28px; margin-right: 8px; }
 .brand-name { color: #222b3f; font-size: 16px; font-weight: 750; letter-spacing: -.02em; }
 .status-card { padding: 14px 28px 16px; background: var(--primary-soft); color: var(--primary); }
@@ -350,7 +341,6 @@ onBeforeUnmount(() => {
 .amount-value { margin: 7px 0 0; color: #161d2d; font-size: 30px; font-weight: 800; letter-spacing: -.055em; line-height: 1; }
 .amount-value span { margin-left: 4px; color: var(--primary); font-size: 14px; letter-spacing: 0; }
 .fiat-value { margin: 8px 0 0; color: #687184; font-size: 12px; }
-.amount-symbol { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 14px; background: var(--primary); color: #fff; font-size: 25px; font-weight: 700; }
 .payment-methods { padding-top: 2px; }
 .section-heading { justify-content: space-between; margin-bottom: 11px; }
 .method-count { color: #9299a8; font-size: 11px; }
@@ -376,10 +366,7 @@ onBeforeUnmount(() => {
 .detail-row { display: flex; justify-content: space-between; gap: 20px; color: #81899a; font-size: 11px; }
 .detail-row dd { margin: 0; color: #354055; font-weight: 650; text-align: right; }
 .payment-panel, .email-panel { padding-top: 2px; }
-.payment-heading { gap: 9px; margin-bottom: 12px; }
-.payment-heading h2 { margin: 0; font-size: 14px; }
-.payment-label { margin-left: auto; color: #8992a1; font-size: 10px; font-weight: 750; text-transform: uppercase; }
-.step-number { display: grid; place-items: center; width: 25px; height: 25px; border-radius: 8px; background: var(--primary); color: #fff; font-size: 11px; font-weight: 800; }
+.payment-heading { margin: 0 0 10px; color: #8992a1; font-size: 10px; font-weight: 800; letter-spacing: .06em; line-height: 1.2; text-transform: uppercase; }
 .response p, .success-panel > p:not(.eyebrow) { margin: 12px 0 18px; color: #747e90; font-size: 12px; line-height: 1.55; }
 .qr-frame { display: grid; place-items: center; margin: 15px auto 17px; padding: 18px; width: fit-content; border: 1px solid #eef0f4; border-radius: 18px; background: #fff; box-shadow: 0 8px 24px rgba(31, 38, 61, .06); }
 .qr-frame :deep(canvas), .qr-frame :deep(svg) { display: block; max-width: 100%; height: auto; }
