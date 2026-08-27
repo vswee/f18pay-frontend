@@ -397,7 +397,8 @@ onBeforeUnmount(() => {
   .invoice-header { padding-top: 16px; padding-bottom: 14px; }
   .status-card { padding-top: 11px; padding-bottom: 12px; }
   .invoice-content { padding-top: 18px; padding-bottom: 10px; }
-  .amount-card { margin-top: 14px; margin-bottom: 16px; padding: 14px; }
+  .amount-card { margin-top: 8px; margin-bottom: 10px; padding: 10px 12px; }
+  .amount-value { font-size: 20px; }
   .invoice-details { margin-top: 12px; margin-bottom: 14px; }
   .qr-frame { margin-top: 10px; margin-bottom: 12px; padding: 12px; }
   .invoice-footer { padding-top: 10px; padding-bottom: 14px; }
@@ -420,8 +421,20 @@ onBeforeUnmount(() => {
   .invoice-header, .invoice-content, .success-panel { padding-left: 18px; padding-right: 18px; }
   .status-card { padding-left: 18px; padding-right: 18px; }
   .invoice-content { padding-top: 14px; }
-  .amount-card { margin-top: 12px; margin-bottom: 14px; padding: 12px; }
+  .amount-card { margin-top: 6px; margin-bottom: 8px; padding: 8px 10px; }
+  .amount-value { font-size: 18px; }
   .invoice-details { margin-top: 10px; margin-bottom: 12px; }
   .qr-frame { margin-top: 8px; margin-bottom: 10px; padding: 10px; }
+}
+
+@media (max-height: 640px) {
+  .amount-card { margin-top: 5px; margin-bottom: 7px; padding: 8px 10px; }
+  .amount-value { font-size: 18px; }
+  .fiat-value { margin-top: 4px; font-size: 11px; }
+}
+
+@media (max-width: 420px) and (max-height: 640px) {
+  .amount-card { margin-top: 4px; margin-bottom: 6px; padding: 6px 8px; }
+  .amount-value { font-size: 16px; }
 }
 </style>
