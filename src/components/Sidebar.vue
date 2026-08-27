@@ -80,6 +80,8 @@
                   @click="walletView()"><i class="fas fa-wallet"></i><span class="collapsible">Wallet</span></a>
                 <a :class="`${currentRouteName == 'StoreAssets' ? 'active-bar' : ''} sidebar-shortcut`"
                   @click="assetsView()"><i class="fas fa-code"></i><span class="collapsible">Payment Assets</span></a>
+                <a :class="`${currentRouteName == 'StoreLinking' ? 'active-bar' : ''} sidebar-shortcut`"
+                  @click="linkingView()"><i class="fas fa-link"></i><span class="collapsible">Store Linking</span></a>
                 <a :class="`${currentRouteName == 'Invoices' ? 'active-bar' : ''} sidebar-shortcut`"
                   @click="invoicesView()"><i class="fas fa-file-invoice"></i><span
                     class="collapsible">Invoices</span></a>
@@ -263,6 +265,11 @@ const walletView = () => {
 const assetsView = () => {
   store.setViewTitle('Payment Assets');
   router.push({ name: 'StoreAssets', params: { storeId10: route.params.storeId10 } });
+};
+
+const linkingView = () => {
+  store.setViewTitle('Store Linking');
+  router.push({ name: 'StoreLinking', params: { storeId10: route.params.storeId10 } });
 };
 
 const invoicesView = () => {

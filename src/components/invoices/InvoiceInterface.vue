@@ -37,6 +37,14 @@
           <span id="countdown-time" v-if="state.minutes && state.seconds">{{ state.minutes }}:{{ state.seconds }}</span>
         </div>
         <div id="breakdown">
+          <div v-if="invoice.paymentOptions && invoice.paymentOptions.length > 1" class="payment-options" aria-label="Payment options">
+            <span class="payment-options-label">Pay with</span>
+            <button v-for="(option, index) in invoice.paymentOptions" :key="option.id || option.storeId"
+              type="button" :class="['payment-option', { selected: selectedPaymentOption === index }]"
+              @click="selectPaymentOption(index)">
+              {{ option.crypto }} <small>{{ option.storeName }}</small>
+            </button>
+          </div>
           <input class="more-less" type="checkbox" checked="checked" />
           <span class="more-less-icon"></span>
           <span class="pri"><b class="store-name">{{ decodeURI(decodeURIComponent(invoice.storeName)) }}</b></span>
@@ -146,7 +154,8 @@ const props = defineProps({
   invoiceData: Object
 });
 
-const invoice = props?.invoiceData
+const invoice = reactive({ ...(props?.invoiceData || {}) })
+const selectedPaymentOption = ref(0)
 
 const state = reactive({
   error: false,
@@ -187,6 +196,7 @@ const invoiceStatus = async () => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         invoice_id: invoice.invoiceId,
+        payment_option_id: invoice.paymentOptions?.[selectedPaymentOption.value]?.id || undefined,
       })
     })
     const data = await response.json()
@@ -207,6 +217,23 @@ const invoiceStatus = async () => {
 }
 
 const payLink = ref('');
+
+const selectPaymentOption = (index) => {
+  const option = invoice.paymentOptions?.[index]
+  if (!option) return
+  selectedPaymentOption.value = index
+  invoice.cryptoShortName = option.crypto
+  invoice.address = option.address
+  invoice.btc_value = option.amount
+  invoice.total = Number(option.amount) + Number(option.fee || 0)
+  invoice.fee = option.fee
+  invoice.exchange = option.exchange
+  invoice.storeName = option.storeName
+  invoice.store = { colour: option.storeColour || invoice.store.colour, accent_colour: option.storeAccentColour || invoice.store.accent_colour }
+  invoice.currencyLongName = option.crypto === 'BTC' ? 'Bitcoin' : option.crypto === 'ETH' ? 'Ether' : option.crypto
+  invoice.qrCode = `${option.crypto === 'BTC' ? 'bitcoin' : 'eth'}:${option.address}?amount=${Number(invoice.total).toFixed(16)}&label=${encodeURIComponent(option.storeName)}&message=${invoice.tx2 || ''}`
+  payLink.value = `${option.crypto === 'BTC' ? 'bitcoin' : 'eth'}:${option.address}?amount=${Number(invoice.total).toFixed(16)}&label=${encodeURIComponent(option.storeName)}&message=${invoice.tx2 || ''}`
+}
 
 
 
@@ -283,11 +310,46 @@ onMounted(() => {
 
     layout()
 
-    payLink.value = `${invoice.cryptoShortName === 'BTC' ? 'bitcoin' : 'eth'}:${invoice.address}?amount=${Number(invoice.btc_value).toFixed(16)}&label=${encodeURIComponent(invoice.storeName)}&message=${invoice.tx2}`;
+    if (invoice.paymentOptions?.length) {
+      selectPaymentOption(0)
+    } else {
+      payLink.value = `${invoice.cryptoShortName === 'BTC' ? 'bitcoin' : 'eth'}:${invoice.address}?amount=${Number(invoice.btc_value).toFixed(16)}&label=${encodeURIComponent(invoice.storeName)}&message=${invoice.tx2}`;
+    }
   } catch (e) { console.log(e) }
 });
 </script>
 
 <style scoped lang="scss">
 @import 'src/assets/css/invoice-style';
+
+.payment-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem;
+  align-items: center;
+  margin: 1rem 0;
+}
+
+.payment-options-label {
+  flex-basis: 100%;
+  font-weight: 600;
+}
+
+.payment-option {
+  border: 1px solid var(--primary-2, #4780fa);
+  border-radius: 999px;
+  padding: .55rem .8rem;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.payment-option.selected {
+  background: var(--primary, #4780fa);
+  color: var(--text, #fff);
+}
+
+.payment-option small {
+  opacity: .8;
+}
 </style>

@@ -70,6 +70,7 @@
             <td class="mono">
               <div>
                 <span>{{ invoice.invoice_id.substr(0, 6) }}</span>
+                <small v-if="invoice.is_reference" class="invoice-reference-badge">Reference</small>
               </div>
             </td>
             <td>
@@ -97,6 +98,13 @@
           <tr v-if="active == key" class="list-item active" :key="key + 'ex'">
             <td colSpan="5" class="border-bottom-right border-bottom-left">
               <div class="inline-table-notes">
+                <template v-if="invoice.is_reference">
+                  <label>Origin store:</label>
+                  <router-link :to="{ name: 'StoreSummary', params: { storeId10: invoice.origin_store_id10 } }" @click.stop>
+                    {{ _decode(invoice.origin_store_name) }} <i class="fas fa-external-link-square-alt"></i>
+                  </router-link>
+                  <p class="help-text">This is a payment reference. Open the origin store to manage the invoice and view its transaction.</p>
+                </template>
                 <label v-if="invoice.reqToken">Attached to Payment Request:</label><span v-if="invoice.reqToken">{{
                   invoice.reqToken.substr(0, 6) }}</span>
                 <label v-if="invoice.reqEmail">Payment Request Email:</label><span v-if="invoice.reqEmail">{{
@@ -497,5 +505,14 @@ watch(currentStore, init);
       }
     }
   }
+}
+
+.invoice-reference-badge {
+  display: inline-block;
+  margin-left: .5rem;
+  color: var(--green-2);
+  font-family: Rubik, sans-serif;
+  font-size: .7rem;
+  text-transform: uppercase;
 }
 </style>

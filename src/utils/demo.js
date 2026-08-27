@@ -91,6 +91,10 @@ export const demoStores = [
   },
 ];
 
+const demoStoreLinks = new Map();
+demoStoreLinks.set('4812', '9367');
+demoStoreLinks.set('9367', '4812');
+
 export const demoActiveStoreId = demoStores[0].store_id;
 
 export const demoInvoiceValues = [
@@ -276,7 +280,11 @@ const jsonResponse = (payload) => new Response(JSON.stringify(payload), {
   },
 });
 
-const withStore = (storeId) => demoStores.find((store) => `${store.store_id.substring(0, 5)}${store.store_id.substring(store.store_id.length - 5)}` === storeId || store.store_id === storeId) || demoStores[0];
+const withStore = (storeId) => demoStores.find((store) => {
+  const legacyId = `${store.store_id.substring(0, 5)}${store.store_id.substring(store.store_id.length - 5)}`;
+  const publicId = `${store.store_id.substring(0, 4)}${store.store_id_int}${store.store_id.substring(store.store_id.length - 4)}`;
+  return legacyId === storeId || publicId === storeId || store.store_id === storeId || String(store.store_id_int) === String(storeId);
+}) || demoStores[0];
 
 const buildPublicInvoice = ({ store_id, currency, price, redirectURL, invoice_id }) => {
   const store = withStore(store_id || demoActiveStoreId);
@@ -324,6 +332,58 @@ const buildPublicInvoice = ({ store_id, currency, price, redirectURL, invoice_id
 };
 
 export const getDemoResponse = async (pathname, body = {}, method = 'GET') => {
+  if (pathname === '/store-links') {
+    const current = withStore(body.store_id);
+    const linkedId = demoStoreLinks.get(String(current.store_id_int));
+    const linked = linkedId ? demoStores.find((item) => String(item.store_id_int) === String(linkedId)) : null;
+    return jsonResponse({
+      proceed: true,
+      currentStore: {
+        store_id_int: current.store_id_int,
+        store_id10: `${current.store_id.substring(0, 4)}${current.store_id_int}${current.store_id.substring(current.store_id.length - 4)}`,
+        store_name: current.store_name,
+        network: current.network,
+      },
+      link: linked ? {
+        link_id: `demo-link-${current.store_id_int}`,
+        store_id_int: linked.store_id_int,
+        store_id10: `${linked.store_id.substring(0, 4)}${linked.store_id_int}${linked.store_id.substring(linked.store_id.length - 4)}`,
+        store_name: linked.store_name,
+        network: linked.network,
+        deleted: linked.deleted,
+      } : null,
+      candidates: demoStores.map((candidate) => {
+        const candidateLink = demoStoreLinks.get(String(candidate.store_id_int));
+        return {
+          store_id_int: candidate.store_id_int,
+          store_id: candidate.store_id,
+          store_id10: `${candidate.store_id.substring(0, 4)}${candidate.store_id_int}${candidate.store_id.substring(candidate.store_id.length - 4)}`,
+          store_name: candidate.store_name,
+          network: candidate.network,
+          deleted: candidate.deleted,
+          is_linked_elsewhere: Boolean(candidateLink && String(candidateLink) !== String(linkedId)),
+          linked_to_name: candidateLink ? demoStores.find((item) => String(item.store_id_int) === String(candidateLink))?.store_name || null : null,
+        };
+      }),
+    });
+  }
+
+  if (pathname === '/store-links-create') {
+    const current = withStore(body.store_id);
+    const linked = withStore(body.linked_store_id);
+    demoStoreLinks.set(String(current.store_id_int), linked.store_id_int);
+    demoStoreLinks.set(String(linked.store_id_int), current.store_id_int);
+    return jsonResponse({ proceed: true, debug: 'Stores linked successfully.' });
+  }
+
+  if (pathname === '/store-links-remove') {
+    const current = withStore(body.store_id);
+    const linked = withStore(body.linked_store_id);
+    demoStoreLinks.delete(String(current.store_id_int));
+    demoStoreLinks.delete(String(linked.store_id_int));
+    return jsonResponse({ proceed: true, debug: 'Store link removed.' });
+  }
+
   if (pathname.startsWith('/api/v1/stores/') && pathname.endsWith('/webhooks')) {
     if (method === 'POST') {
       return jsonResponse({
@@ -402,7 +462,20 @@ export const getDemoResponse = async (pathname, body = {}, method = 'GET') => {
       return jsonResponse({ proceed: true, fingerprint: demoFingerprint, debug: 'Password updated successfully' });
 
     case '/stores':
-      return jsonResponse({ proceed: true, stores: demoStores });
+      return jsonResponse({
+        proceed: true,
+        stores: demoStores.map((item) => {
+          const linkedId = demoStoreLinks.get(String(item.store_id_int));
+          const linked = demoStores.find((candidate) => String(candidate.store_id_int) === String(linkedId));
+          return linked ? {
+            ...item,
+            linked_store_id_int: linked.store_id_int,
+            linked_store_name: linked.store_name,
+            linked_store_network: linked.network,
+            linked_store_id10: `${linked.store_id.substring(0, 4)}${linked.store_id_int}${linked.store_id.substring(linked.store_id.length - 4)}`,
+          } : item;
+        }),
+      });
 
     case '/store-invoice-values':
       return jsonResponse({ proceed: true, invoiceValues: demoInvoiceValues });

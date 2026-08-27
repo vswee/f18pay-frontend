@@ -37,6 +37,9 @@
               {{ store.network.toUpperCase() }}
             </small>
           </span>
+          <span v-if="store.linked_store_name" class="linked-store-badge">
+            <i class="fas fa-link"></i> Linked to {{ decodeURIComponent(decodeURI(store.linked_store_name)) }}
+          </span>
           <span>{{ store.zpub ? 'External' : 'Internal' }} wallet</span>
           <span :class="'badge active-' + store.deleted">
             {{ store.deleted == 1 ? 'Disabled' : 'Active' }}
@@ -242,6 +245,14 @@ watch(() => route.name, async (routeName, previousRouteName) => {
   .store-value {
     display: flex;
     gap: 5px;
+  }
+
+  .linked-store-badge {
+    color: var(--green-2);
+    font-size: .78rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 }
 </style>

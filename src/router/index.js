@@ -16,6 +16,7 @@ import WalletSettings from '@/components/stores-views/WalletSettings.vue';
 import StoreAssets from '@/components/stores-views/StoreAssets.vue';
 import InvoicesManager from '@/components/stores-views/InvoicesManager.vue';
 import PaymentRequest from '@/components/stores-views/PaymentRequest.vue';
+import StoreLinking from '@/components/stores-views/StoreLinking.vue';
 import InvoiceAPI from '../components/invoices/InvoiceAPI.vue'
 
 if(window.location.protocol != 'https:') {
@@ -38,6 +39,7 @@ const routes = [
       { path: 'manage-store/:storeId10', name: 'StoreSettings', component: StoreSettings },
       { path: 'manage-store-wallet/:storeId10', name: 'WalletSettings', component: WalletSettings },
       { path: 'store-assets/:storeId10', name: 'StoreAssets', component: StoreAssets },
+      { path: 'store-linking/:storeId10', name: 'StoreLinking', component: StoreLinking },
       { path: 'store-invoices/:storeId10', name: 'Invoices', component: InvoicesManager },
       { path: 'store-payment-requests/:storeId10', name: 'PaymentRequest', component: PaymentRequest },
     ], meta: { title: 'Dashboard', description: 'Manage your dashboard efficiently!' }
