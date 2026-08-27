@@ -201,16 +201,37 @@ onMounted(loadLinks)
 }
 
 .linked-store-current {
-  display: flex;
-  gap: .55rem;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: .45rem .75rem;
   align-items: center;
-  flex-wrap: wrap;
-  justify-content: flex-end;
+  min-width: min(100%, 280px);
+  padding: .85rem 1rem;
+  border: 1px solid var(--shadow-20);
+  border-radius: 10px;
+  background: var(--shadow-5);
 }
 
 .linked-store-current .help-text {
-  flex-basis: 100%;
-  text-align: right;
+  grid-column: 1 / -1;
+  text-align: left;
+}
+
+.linked-store-current strong {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.linked-store-current .badge {
+  justify-self: end;
+}
+
+.linked-store-current .btn {
+  grid-column: 1 / -1;
+  width: 100%;
+  margin-top: .2rem;
 }
 
 .section-title {
@@ -218,7 +239,8 @@ onMounted(loadLinks)
 }
 
 .store-link-grid {
-  display: grid;
+  display: flex;
+  flex-wrap: wrap;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 1rem;
 }
@@ -257,5 +279,16 @@ onMounted(loadLinks)
 .store-link-tile .btn {
   align-self: flex-start;
   margin-top: auto;
+}
+
+@media (max-width: 640px) {
+  .linked-store-panel {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .linked-store-current {
+    min-width: 0;
+  }
 }
 </style>
