@@ -286,8 +286,46 @@ const withStore = (storeId) => demoStores.find((store) => {
   return legacyId === storeId || publicId === storeId || store.store_id === storeId || String(store.store_id_int) === String(storeId);
 }) || demoStores[0];
 
+const publicStoreId = (store) => `${store.store_id.substring(0, 4)}${store.store_id_int}${store.store_id.substring(store.store_id.length - 4)}`;
+const demoPublicInvoices = new Map();
+
+const buildDemoPaymentOption = ({ invoiceId, store, invoiceValue, currency }) => {
+  const isEth = store.network === 'eth';
+  const exchange = isEth ? '3225.14' : '57922.11';
+  const crypto = isEth ? 'ETH' : 'BTC';
+  const amount = Number((invoiceValue / Number(exchange)).toFixed(8));
+  const address = isEth
+    ? `0x${store.store_id_int}DemoAddress${String(invoiceValue).replace('.', '')}`.slice(0, 42)
+    : `bc1q${store.store_id_int}demoaddress${String(invoiceValue).replace('.', '')}`.slice(0, 42);
+
+  return {
+    id: `demo-option-${invoiceId}-${store.store_id_int}`,
+    storeId: publicStoreId(store),
+    storeName: store.store_name,
+    network: store.network,
+    crypto,
+    currency,
+    exchange,
+    amount: amount.toFixed(8),
+    address,
+    fee: isEth ? '0' : '0.00001240',
+    status: 1,
+    tx3: '',
+    storeColour: store.store_colour,
+    storeAccentColour: store.store_accent_colour,
+    requiresEmail: store.require_email === '1',
+  };
+};
+
 const buildPublicInvoice = ({ store_id, currency, price, redirectURL, invoice_id }) => {
   const store = withStore(store_id || demoActiveStoreId);
+  if (invoice_id && demoPublicInvoices.has(invoice_id)) {
+    const existingInvoice = demoPublicInvoices.get(invoice_id);
+    return {
+      ...existingInvoice,
+      redirectURL: redirectURL || existingInvoice.redirectURL,
+    };
+  }
   const fiat = currency || 'GBP';
   const amount = Number(price || 49.95);
   const exchange = store.network === 'eth' ? '3225.14' : '57922.11';
@@ -297,7 +335,9 @@ const buildPublicInvoice = ({ store_id, currency, price, redirectURL, invoice_id
   const created = Math.floor(nowEpoch - 180);
   const end = created + 900;
 
-  return {
+  const linkedId = demoStoreLinks.get(String(store.store_id_int));
+  const linkedStore = linkedId ? demoStores.find((candidate) => String(candidate.store_id_int) === String(linkedId)) : null;
+  const invoice = {
     invoiceId,
     storeName: store.store_name,
     currencyLongName: cryptoShortName === 'BTC' ? 'Bitcoin' : 'Ethereum',
@@ -329,6 +369,12 @@ const buildPublicInvoice = ({ store_id, currency, price, redirectURL, invoice_id
     statusInt: 0,
     requiresEmail: false,
   };
+
+  invoice.paymentOptions = [store, linkedStore]
+    .filter(Boolean)
+    .map((optionStore) => buildDemoPaymentOption({ invoiceId, store: optionStore, invoiceValue: amount, currency: fiat }));
+  demoPublicInvoices.set(invoiceId, invoice);
+  return invoice;
 };
 
 export const getDemoResponse = async (pathname, body = {}, method = 'GET') => {
