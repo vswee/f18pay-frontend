@@ -62,6 +62,10 @@
                 </template>
               </div>
               <div class="sidebar-shortcuts" v-if="$route.params.storeId10 && storeList[0]?.store_id">
+                <a class="sidebar-shortcut" @click="allStores()">
+                  <i class="fas fa-th"></i>
+                  <span class="collapsible">All stores</span>
+                </a>
                 <a :class="`${currentRouteName == 'StoreSummary' ? 'active-bar' : ''} sidebar-shortcut`"
                   @click="openStore($route.params.storeId10)"><i class="fas fa-chart-area"></i><span
                     class="collapsible">Store
@@ -235,6 +239,13 @@ const openStore = (id) => {
   storeId10.value = id.substring(0, 5) + id.substring(id.length - 5);
   store.setViewTitle('Store Overview');
   router.push({ name: 'StoreSummary', params: { storeId10: storeId10.value } });
+};
+
+const allStores = () => {
+  store.setActiveStore(false);
+  store.setStoreView(false);
+  store.setViewTitle('Dashboard');
+  router.push({ name: 'dashboard' });
 };
 
 const settingsView = () => {
