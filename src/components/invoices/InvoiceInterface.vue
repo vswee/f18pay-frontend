@@ -64,7 +64,7 @@
         </section>
 
         <details class="invoice-details">
-          <summary><span>Invoice details</span><span class="details-toggle">View details</span></summary>
+          <summary><span>Invoice details</span></summary>
           <dl class="detail-list">
             <div v-if="invoice.tx2" class="detail-row">
               <dt>Reference</dt>
@@ -409,6 +409,7 @@ onBeforeUnmount(() => {
   .amount-card { margin-top: 8px; margin-bottom: 10px; padding: 10px 12px; }
   .amount-value { font-size: 20px; }
   .invoice-details { margin-top: 12px; margin-bottom: 14px; }
+  .invoice-details:not([open]) summary { padding-top: 7px; padding-bottom: 7px; }
   .qr-frame { margin-top: 10px; margin-bottom: 12px; padding: 12px; }
   .invoice-footer { padding-top: 10px; padding-bottom: 14px; }
 }
@@ -433,6 +434,7 @@ onBeforeUnmount(() => {
   .amount-card { margin-top: 6px; margin-bottom: 8px; padding: 8px 10px; }
   .amount-value { font-size: 18px; }
   .invoice-details { margin-top: 10px; margin-bottom: 12px; }
+  .invoice-details:not([open]) summary { padding-top: 5px; padding-bottom: 5px; }
   .qr-frame { margin-top: 8px; margin-bottom: 10px; padding: 10px; }
 }
 
