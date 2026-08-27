@@ -220,7 +220,6 @@ const base_url = getURL;
 .hero-proof i { margin-right: 6px; color: var(--green); }
 
 .hero-visual { position: relative; min-height: 500px; display: grid; place-items: center; isolation: isolate; }
-.hero-visual::before { content: ''; position: absolute; width: 90%; height: 75%; border: 1px solid var(--accent-bg); border-radius: 50%; transform: rotate(-18deg); z-index: -1; }
 .visual-glow { position: absolute; border-radius: 50%; filter: blur(50px); opacity: 0.32; z-index: -2; }
 .visual-glow-one { width: 220px; height: 220px; top: 5%; right: 3%; background: var(--accent); }
 .visual-glow-two { width: 180px; height: 180px; bottom: 8%; left: 4%; background: var(--green); }
