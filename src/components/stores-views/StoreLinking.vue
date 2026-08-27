@@ -188,10 +188,7 @@ onMounted(loadLinks)
 }
 
 .linked-store-panel {
-  display: flex;
-  justify-content: space-between;
-  gap: 1rem;
-  align-items: center;
+  display: block;
   margin: 1.5rem 0;
 }
 
@@ -201,19 +198,21 @@ onMounted(loadLinks)
 }
 
 .linked-store-current {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: .45rem .75rem;
+  display: flex;
+  gap: .55rem .75rem;
   align-items: center;
-  min-width: min(100%, 280px);
-  padding: .85rem 1rem;
+  width: fit-content;
+  max-width: 100%;
+  margin-top: .75rem;
+  padding: .45rem .65rem;
   border: 1px solid var(--shadow-20);
   border-radius: 10px;
   background: var(--shadow-5);
+  flex-wrap: wrap;
 }
 
 .linked-store-current .help-text {
-  grid-column: 1 / -1;
+  flex: 0 0 auto;
   text-align: left;
 }
 
@@ -229,9 +228,8 @@ onMounted(loadLinks)
 }
 
 .linked-store-current .btn {
-  grid-column: 1 / -1;
-  width: 100%;
-  margin-top: .2rem;
+  margin: 0;
+  padding: .4rem .7rem;
 }
 
 .section-title {
@@ -283,12 +281,11 @@ onMounted(loadLinks)
 
 @media (max-width: 640px) {
   .linked-store-panel {
-    align-items: stretch;
-    flex-direction: column;
+    display: block;
   }
 
   .linked-store-current {
-    min-width: 0;
+    width: 100%;
   }
 }
 </style>
