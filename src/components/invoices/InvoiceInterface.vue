@@ -36,7 +36,11 @@
           </div>
         </div>
 
-        <section v-if="paymentOptions.length > 1" class="payment-methods" aria-labelledby="payment-method-heading">
+        <details v-if="paymentOptions.length > 1" class="payment-methods">
+          <summary>
+            <span>Payment method</span>
+            <span class="payment-method-selection">{{ activePaymentOption.crypto }} · {{ decodeText(activePaymentOption.storeName || activeStoreName) }}</span>
+          </summary>
           <div class="section-heading">
             <div>
               <p class="eyebrow">Payment method</p>
@@ -61,7 +65,7 @@
               <span class="option-check" aria-hidden="true">✓</span>
             </button>
           </div>
-        </section>
+        </details>
 
         <details class="invoice-details">
           <summary><span>Invoice details</span></summary>
@@ -355,7 +359,12 @@ onBeforeUnmount(() => {
 .amount-value { margin: 7px 0 0; color: #161d2d; font-size: 30px; font-weight: 800; letter-spacing: -.055em; line-height: 1; }
 .amount-value span { margin-left: 4px; color: var(--primary); font-size: 14px; letter-spacing: 0; }
 .fiat-value { margin: 8px 0 0; color: #687184; font-size: 12px; }
-.payment-methods { padding-top: 2px; }
+.payment-methods { margin: 0 0 18px; border-top: 1px solid #eef0f4; border-bottom: 1px solid #eef0f4; }
+.payment-methods summary { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 13px 0; color: #687184; font-size: 11px; font-weight: 750; cursor: pointer; list-style: none; }
+.payment-methods summary::-webkit-details-marker { display: none; }
+.payment-methods summary::after { content: '+'; flex: 0 0 auto; color: var(--primary); font-size: 15px; font-weight: 500; }
+.payment-methods[open] summary::after { content: '−'; }
+.payment-method-selection { overflow: hidden; margin-left: auto; color: #354055; font-size: 11px; font-weight: 650; text-overflow: ellipsis; white-space: nowrap; }
 .section-heading { justify-content: space-between; margin-bottom: 11px; }
 .method-count { color: #9299a8; font-size: 11px; }
 .payment-option-list { display: grid; gap: 8px; }
@@ -415,8 +424,8 @@ onBeforeUnmount(() => {
   .invoice-content { padding-top: 18px; padding-bottom: 10px; }
   .amount-card { margin-top: 8px; margin-bottom: 10px; padding: 10px 12px; }
   .amount-value { font-size: 20px; }
-  .invoice-details { margin-top: 12px; margin-bottom: 14px; }
-  .invoice-details:not([open]) summary { padding-top: 7px; padding-bottom: 7px; }
+  .invoice-details, .payment-methods { margin-top: 12px; margin-bottom: 14px; }
+  .invoice-details:not([open]) summary, .payment-methods:not([open]) summary { padding-top: 7px; padding-bottom: 7px; }
   .qr-frame { margin-top: 10px; margin-bottom: 12px; padding: 12px; }
   .invoice-footer { padding-top: 10px; padding-bottom: 14px; }
 }
@@ -440,8 +449,8 @@ onBeforeUnmount(() => {
   .invoice-content { padding-top: 14px; }
   .amount-card { margin-top: 6px; margin-bottom: 8px; padding: 8px 10px; }
   .amount-value { font-size: 18px; }
-  .invoice-details { margin-top: 10px; margin-bottom: 12px; }
-  .invoice-details:not([open]) summary { padding-top: 5px; padding-bottom: 5px; }
+  .invoice-details, .payment-methods { margin-top: 10px; margin-bottom: 12px; }
+  .invoice-details:not([open]) summary, .payment-methods:not([open]) summary { padding-top: 5px; padding-bottom: 5px; }
   .qr-frame { margin-top: 8px; margin-bottom: 10px; padding: 10px; }
 }
 
