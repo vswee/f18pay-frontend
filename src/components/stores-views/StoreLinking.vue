@@ -22,10 +22,19 @@
             <h2>{{ decode(currentStore.store_name) }} <small :class="'badge ' + currentStore.network">{{ currentStore.network.toUpperCase() }}</small></h2>
           </div>
           <div v-if="link" class="linked-store-current">
-            <span class="help-text">Linked to</span>
+            <span class="linked-store-label">Linked to</span>
             <strong>{{ decode(link.store_name) }}</strong>
             <small :class="'badge ' + link.network">{{ link.network.toUpperCase() }}</small>
-            <button class="btn sec" type="button" @click="removeLink">Remove link</button>
+            <div class="link-actions">
+              <button class="link-menu-trigger" type="button" aria-label="Linked store options"
+                :aria-expanded="linkMenuOpen" @click.stop="linkMenuOpen = !linkMenuOpen">
+                <i class="fas fa-ellipsis-v" aria-hidden="true"></i>
+              </button>
+              <div v-if="linkMenuOpen" class="link-menu" role="menu">
+                <button type="button" role="menuitem" @click="goToLinkedStore">Go to store</button>
+                <button type="button" role="menuitem" @click="removeLink">Remove link</button>
+              </div>
+            </div>
           </div>
           <span v-else class="help-text">No additional payment currency is linked.</span>
         </section>
@@ -58,12 +67,13 @@
 
 <script setup>
 import { computed, onMounted, ref, watch } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import { useMainStore } from '@/stores'
 import { apiUrl } from '@/utils/api'
 
 const route = useRoute()
+const router = useRouter()
 const store = useMainStore()
 const { stores, user, keyiv, keyivId, fingerprint } = storeToRefs(store)
 
@@ -72,6 +82,7 @@ const working = ref(false)
 const message = ref('')
 const messageType = ref('')
 const link = ref(null)
+const linkMenuOpen = ref(false)
 const candidates = ref([])
 
 const currentStore = computed(() => (stores.value || []).find((item) => {
@@ -106,6 +117,7 @@ const loadLinks = async () => {
     const data = await response.json()
     if (!data.proceed) throw new Error(data.debug || 'Unable to load store links.')
     link.value = data.link || null
+    linkMenuOpen.value = false
     candidates.value = Array.isArray(data.candidates) ? data.candidates : []
   } catch (error) {
     messageType.value = ''
@@ -113,6 +125,16 @@ const loadLinks = async () => {
   } finally {
     loading.value = false
   }
+}
+
+const goToLinkedStore = () => {
+  const linkedStore = (stores.value || []).find((item) => String(item.store_id_int) === String(link.value?.store_id_int))
+  if (!linkedStore) return
+  linkMenuOpen.value = false
+  router.push({
+    name: 'StoreSummary',
+    params: { storeId10: `${linkedStore.store_id.substring(0, 5)}${linkedStore.store_id.substring(linkedStore.store_id.length - 5)}` },
+  })
 }
 
 const canLink = (candidate) => Boolean(currentStore.value && !link.value && candidate.store_id_int !== currentStore.value.store_id_int
@@ -199,37 +221,86 @@ onMounted(loadLinks)
 
 .linked-store-current {
   display: flex;
-  gap: .55rem .75rem;
+  gap: .5rem;
   align-items: center;
-  width: fit-content;
+  width: min(100%, 420px);
   max-width: 100%;
+  box-sizing: border-box;
   margin-top: .75rem;
   padding: .45rem .65rem;
   border: 1px solid var(--shadow-20);
   border-radius: 10px;
   background: var(--shadow-5);
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
 }
 
-.linked-store-current .help-text {
+.linked-store-label {
   flex: 0 0 auto;
   text-align: left;
 }
 
 .linked-store-current strong {
   min-width: 0;
+  flex: 1 1 auto;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .linked-store-current .badge {
-  justify-self: end;
+  flex: 0 0 auto;
 }
 
-.linked-store-current .btn {
-  margin: 0;
-  padding: .4rem .7rem;
+.link-actions {
+  position: relative;
+  flex: 0 0 auto;
+}
+
+.link-menu-trigger {
+  display: grid;
+  place-items: center;
+  width: 1.8rem;
+  height: 1.8rem;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.link-menu-trigger:hover,
+.link-menu-trigger:focus-visible {
+  background: var(--shadow-20);
+}
+
+.link-menu {
+  position: absolute;
+  z-index: 5;
+  top: calc(100% + .35rem);
+  right: 0;
+  display: grid;
+  min-width: 140px;
+  padding: .3rem;
+  border: 1px solid var(--shadow-20);
+  border-radius: 8px;
+  background: var(--black);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, .18);
+}
+
+.link-menu button {
+  border: 0;
+  padding: .55rem .65rem;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.link-menu button:hover,
+.link-menu button:focus-visible {
+  border-radius: 5px;
+  background: var(--shadow-20);
 }
 
 .section-title {
