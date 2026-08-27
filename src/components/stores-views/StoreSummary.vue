@@ -4,10 +4,15 @@
   <h2>{{currentStore.sum || '0.00'}} {{currentStore.network.toUpperCase()}}</h2>
   <small :class="currentStore.deleted==1?'status bad':'status good'">{{currentStore.deleted==1?'Disabled':'Active'}}</small>
   <p class="help-text"><i class="fas fa-info-circle"></i> F18Pay only monitors incoming transactions on addresses generated on the platform.<br>Your store balance will not reflect any outgoing transactions (sweeps, spends).</p>
-  <div v-if="chart.chartData" class="subsect">
+  <div class="subsect">
     <h3>Invoice Statistics</h3>
     <p class="help-text">Displays paid v total invoices generated over the last 6 months.</p>
-    <bar-chart v-if="chart.chartData && !chartDestroy" class="graph"></bar-chart>
+    <div v-if="fetchingStatistics" class="form working statistics-loading" role="status" aria-live="polite">
+      <i class="fas fa-spinner fa-spin" aria-hidden="true"></i>
+      <span>Loading statistics</span>
+    </div>
+    <bar-chart v-else-if="chart.chartData && !chartDestroy" class="graph"></bar-chart>
+    <p v-else class="statistics-empty">No invoice statistics available yet.</p>
   </div>
 </div>
 </template>
@@ -28,9 +33,10 @@ const invoice_values = ref(false)
 const invoice_values2 = ref(false)
 const invoice_dates = ref(false)
 const chartDestroy = ref(false)
+const fetchingStatistics = ref(true)
 
 // Store state with storeToRefs for reactivity
-const { fingerprint, user, keyiv, keyivId, activeStore, chart, stores } = storeToRefs(store)
+const { fingerprint, user, keyiv, keyivId, chart, stores } = storeToRefs(store)
 
 // Computed properties
 const currentStore = computed(() => {
@@ -53,7 +59,6 @@ const init = () => {
   if (headerSpace) {
     headerSpace.innerHTML = ''
   }
-  fetchInvoiceValues(activeStore.value)
 }
 
 const _decode = (string) => {
@@ -61,6 +66,14 @@ const _decode = (string) => {
 }
 
 const fetchInvoiceValues = async (id) => {
+  const storeId = typeof id === 'string' ? id : id?.store_id
+
+  if (!storeId) {
+    fetchingStatistics.value = false
+    return
+  }
+
+  fetchingStatistics.value = true
   chartDestroy.value = true
   store.setChart({
     chartData: false,
@@ -82,7 +95,7 @@ const fetchInvoiceValues = async (id) => {
         username: username,
         fingerprint: fingerprint.value,
         keyivId: keyivId.value,
-        storeId: id,
+        storeId: storeId,
       }),
     })
 
@@ -95,7 +108,7 @@ const fetchInvoiceValues = async (id) => {
       const arrayDates = []
       const year = new Date().getFullYear()
 
-      if (data.invoiceValues.length > 0) {
+      if (data.invoiceValues?.length > 0) {
         for (const invoice of data.invoiceValues) {
           const value = invoice.count ? Number(invoice.count) : 0
           const value2 = invoice.count2 ? Number(invoice.count2) : 0
@@ -155,19 +168,18 @@ const fetchInvoiceValues = async (id) => {
     }
   } catch (error) {
     console.error("Error:", error)
+  } finally {
+    fetchingStatistics.value = false
   }
 }
 
 // Watchers
-watch(currentStore, (val) => {
-  fetchInvoiceValues(val)
+watch(currentStore, (val, previousVal) => {
+  if (val?.store_id && val.store_id !== previousVal?.store_id) {
+    fetchInvoiceValues(val.store_id)
+  }
   init()
-})
-
-watch(() => route.path, () => {
-  fetchInvoiceValues(activeStore.value)
-  init()
-})
+}, { immediate: true })
 
 // Lifecycle hooks
 onMounted(() => {
@@ -175,6 +187,25 @@ onMounted(() => {
 })
 </script>
 
-<style lang="">
+<style lang="scss" scoped>
+.statistics-loading {
+  align-items: center;
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+  margin: 1rem 0 0;
+  min-height: 8rem;
+  padding: 1.5rem;
+  width: auto;
+}
 
+.statistics-loading .fa-spinner {
+  color: var(--accent-2);
+}
+
+.statistics-empty {
+  margin: 1rem 0 0;
+  opacity: 0.7;
+  text-align: center;
+}
 </style>
