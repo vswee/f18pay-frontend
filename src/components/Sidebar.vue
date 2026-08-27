@@ -7,18 +7,25 @@
             <div :class="`${sidebarCollapse ? 'sidebar' : ''}' sidebar collapse'`">
               <a :class="`${sidebarCollapse ? 'collapse-sidebar collapsed' : ''}' collapse-sidebar'`"
                 @click="toggleCollapse()" :title="!sidebarCollapse ? 'Expand sidebar.' : 'Collapse sidebar.'"></a>
+
+                                  <div class="sidebar-shortcuts" v-if="$route.params.storeId10 && storeList[0]?.store_id">
+                    <a class="sidebar-shortcut" @click="allStores()">
+                      <i class="fas fa-th"></i>
+                      <span class="collapsible">All stores</span>
+                    </a>
+                  </div>
               <div
                 :class="[storesDropdown ? 'sidebar-shortcuts dropdown open store-length-' + storeList.length : 'sidebar-shortcuts dropdown store-length-' + storeList.length]"
                 @click="storesDropdown = !storesDropdown">
                 <template v-if="(!activeStore)">
                   <template v-if="storeList.length > 1">
-                  <div class="sidebar-shortcut active">
-                    <i class="fas fa-th"></i>
-                    <span class="collapsible"><span class="text"> Select Store </span></span>
-                  </div>
-                </template>
-                <template v-else>
-                </template>
+                    <div class="sidebar-shortcut active">
+                      <i class="fas fa-th"></i>
+                      <span class="collapsible"><span class="text"> Select Store </span></span>
+                    </div>
+                  </template>
+                  <template v-else>
+                  </template>
                 </template>
                 <template v-else>
                   <div class="sidebar-shortcut active">
@@ -62,10 +69,6 @@
                 </template>
               </div>
               <div class="sidebar-shortcuts" v-if="$route.params.storeId10 && storeList[0]?.store_id">
-                <a class="sidebar-shortcut" @click="allStores()">
-                  <i class="fas fa-th"></i>
-                  <span class="collapsible">All stores</span>
-                </a>
                 <a :class="`${currentRouteName == 'StoreSummary' ? 'active-bar' : ''} sidebar-shortcut`"
                   @click="openStore($route.params.storeId10)"><i class="fas fa-chart-area"></i><span
                     class="collapsible">Store
@@ -90,15 +93,9 @@
                     {{ storeList.length == 0 ? 'First' : 'New' }} Store</span></a>
               </div>
               <div class="sidebar-footer">
-                <button
-                  class="sidebar-drawer-toggle"
-                  :class="accountRouteActive ? 'active-bar' : ''"
-                  type="button"
-                  aria-controls="sidebar-footer-drawer"
-                  :aria-expanded="footerDrawerOpen"
-                  @click="footerDrawerOpen = !footerDrawerOpen"
-                  title="Toggle account shortcuts"
-                >
+                <button class="sidebar-drawer-toggle" :class="accountRouteActive ? 'active-bar' : ''" type="button"
+                  aria-controls="sidebar-footer-drawer" :aria-expanded="footerDrawerOpen"
+                  @click="footerDrawerOpen = !footerDrawerOpen" title="Toggle account shortcuts">
                   <i class="fas fa-user-cog"></i>
                   <span class="collapsible">Account shortcuts</span>
                   <i :class="footerDrawerOpen ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" aria-hidden="true"></i>
@@ -106,16 +103,21 @@
                 <Transition name="sidebar-drawer">
                   <div id="sidebar-footer-drawer" class="sidebar-drawer" v-show="footerDrawerOpen">
                     <div class="sidebar-shortcuts sidebar-account">
-                      <router-link class="sidebar-shortcut" :class="currentRouteName == 'account' ? 'active-bar' : ''" :to="{ name: 'account' }">
+                      <router-link class="sidebar-shortcut" :class="currentRouteName == 'account' ? 'active-bar' : ''"
+                        :to="{ name: 'account' }">
                         <i class="fas fa-id-card"></i>
                         <span class="collapsible">Account Management</span>
                       </router-link>
                       <div class="sidebar-account-email collapsible">{{ user }}</div>
-                      <router-link class="sidebar-shortcut" :class="currentRouteName == 'account-security' ? 'active-bar' : ''" :to="{ name: 'account-security' }">
+                      <router-link class="sidebar-shortcut"
+                        :class="currentRouteName == 'account-security' ? 'active-bar' : ''"
+                        :to="{ name: 'account-security' }">
                         <i class="fas fa-shield-alt"></i>
                         <span class="collapsible">Security settings</span>
                       </router-link>
-                      <router-link class="sidebar-shortcut" :class="currentRouteName == 'account-password' ? 'active-bar' : ''" :to="{ name: 'account-password' }">
+                      <router-link class="sidebar-shortcut"
+                        :class="currentRouteName == 'account-password' ? 'active-bar' : ''"
+                        :to="{ name: 'account-password' }">
                         <i class="fas fa-key"></i>
                         <span class="collapsible">Change password</span>
                       </router-link>
@@ -127,24 +129,24 @@
                   </div>
                 </Transition>
                 <div class="sidebar-build-info">
-                    <a class="sidebar-info-link" href="https://github.com/vswee/f18pay-frontend" target="_blank"
-                      rel="noopener" title="F18 Pay Github">
-                      <i class="fab fa-github"></i>
-                      <span class="collapsible">F18 Pay project</span>
-                    </a>
-                    <a class="sidebar-info-link" href="https://flat18.co.uk/privacy" target="_blank"
-                      rel="noopener" title="Flat18 Umbrella Privacy Policy">
-                      <i class="fas fa-shield-alt"></i>
-                      <span class="collapsible">Privacy policy</span>
-                    </a>
-                    <span class="sidebar-build-line" :title="`Build ${buildIdentifier}`">
-                      <i class="fas fa-code-branch"></i>
-                      <span class="collapsible">Build {{ buildIdentifier }}</span>
-                    </span>
-                    <span class="sidebar-build-line" :title="`Environment: ${buildEnvironment}`">
-                      <i class="fas fa-server"></i>
-                      <span class="collapsible">{{ buildEnvironment }}</span>
-                    </span>
+                  <a class="sidebar-info-link" href="https://github.com/vswee/f18pay-frontend" target="_blank"
+                    rel="noopener" title="F18 Pay Github">
+                    <i class="fab fa-github"></i>
+                    <span class="collapsible">F18 Pay project</span>
+                  </a>
+                  <a class="sidebar-info-link" href="https://flat18.co.uk/privacy" target="_blank" rel="noopener"
+                    title="Flat18 Umbrella Privacy Policy">
+                    <i class="fas fa-shield-alt"></i>
+                    <span class="collapsible">Privacy policy</span>
+                  </a>
+                  <span class="sidebar-build-line" :title="`Build ${buildIdentifier}`">
+                    <i class="fas fa-code-branch"></i>
+                    <span class="collapsible">Build {{ buildIdentifier }}</span>
+                  </span>
+                  <span class="sidebar-build-line" :title="`Environment: ${buildEnvironment}`">
+                    <i class="fas fa-server"></i>
+                    <span class="collapsible">{{ buildEnvironment }}</span>
+                  </span>
                 </div>
               </div>
             </div>
@@ -316,8 +318,10 @@ const logout = () => {
         .sidebar-inner-wrapper-inner {
           position: static;
           height: 100%;
+
           .sidebar {
-            display: flex; flex-direction: column;
+            display: flex;
+            flex-direction: column;
             transition: 0.05s linear;
 
             &:not(.collapse) {
@@ -519,6 +523,7 @@ const logout = () => {
   }
 
   @media (prefers-reduced-motion: reduce) {
+
     .sidebar-drawer-enter-active,
     .sidebar-drawer-leave-active {
       transition-duration: 1ms;
