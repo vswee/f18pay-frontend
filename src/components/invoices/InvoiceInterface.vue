@@ -32,6 +32,7 @@
           <div>
             <p class="eyebrow">Amount due</p>
             <p class="amount-value">{{ cryptoAmount }} <span>{{ activePaymentOption.crypto }}</span></p>
+            <p v-if="Number(activePaymentOption.fee || 0) > 0" class="fee-note">Includes {{ formatCryptoAmount(0, activePaymentOption.fee) }} {{ activePaymentOption.crypto }} network fee</p>
             <p v-if="fiatAmount" class="fiat-value">≈ {{ fiatAmount }} {{ invoice.fiatShortName }}</p>
           </div>
         </div>
@@ -43,7 +44,6 @@
           </summary>
           <div class="section-heading">
             <div>
-              <p class="eyebrow">Payment method</p>
               <h2 id="payment-method-heading">Choose how to pay</h2>
             </div>
             <span class="method-count">{{ paymentOptions.length }} options</span>
@@ -98,7 +98,7 @@
           <h2 class="payment-heading">Email required</h2>
           <form :action="currentSearch" method="post">
             <input name="email" type="email" class="form-input" placeholder="mail@example.com" required />
-            <p class="help-text">This store requires a valid email address before you can proceed.</p>
+            <p class="help-text">{{ activeStoreName }} requires a valid email address before you can proceed.</p>
             <button class="primary-button" type="submit">Continue <span>→</span></button>
           </form>
         </div>
@@ -342,13 +342,13 @@ onBeforeUnmount(() => {
 .brand-lockup, .status-heading, .merchant-row, .section-heading { display: flex; align-items: center; }
 .brand-mark { display: block; width: 28px; height: 28px; margin-right: 8px; }
 .brand-name { color: #222b3f; font-size: 16px; font-weight: 750; letter-spacing: -.02em; }
-.status-card { padding: 14px 28px 16px; background: var(--primary-soft); color: var(--primary); }
+.status-card { padding: 12px 28px 13px; background: var(--primary-soft); color: var(--primary); }
 .status-card.expired { background: #f8eaea; color: #b54747; }
 .status-heading { gap: 8px; font-size: 13px; }
 .status-indicator { width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
 .status-indicator.spinning { box-shadow: 0 0 0 4px var(--primary-border); }
 .countdown-time { margin-left: auto; font-variant-numeric: tabular-nums; font-weight: 750; }
-.progress-track { height: 3px; margin-top: 12px; overflow: hidden; border-radius: 3px; background: rgba(91, 69, 214, .13); }
+.progress-track { height: 2px; margin-top: 9px; overflow: hidden; border-radius: 3px; background: rgba(91, 69, 214, .13); }
 .progress-value { display: block; height: 100%; border-radius: inherit; background: var(--primary); transition: width .4s ease; }
 .invoice-content { padding-top: 26px; padding-bottom: 18px; }
 .merchant-row { gap: 12px; }
@@ -359,6 +359,7 @@ onBeforeUnmount(() => {
 .amount-card { display: flex; align-items: center; justify-content: space-between; margin: 24px 0 23px; padding: 20px; border-radius: 17px; background: linear-gradient(135deg, var(--primary-soft), var(--accent-soft)); }
 .amount-value { margin: 7px 0 0; color: #161d2d; font-size: 30px; font-weight: 800; letter-spacing: -.055em; line-height: 1; }
 .amount-value span { margin-left: 4px; color: var(--primary); font-size: 14px; letter-spacing: 0; }
+.fee-note { margin: 8px 0 0; color: #687184; font-size: 10px; }
 .fiat-value { margin: 8px 0 0; color: #687184; font-size: 12px; }
 .payment-methods { margin: 0 0 18px; border-top: 1px solid #eef0f4; border-bottom: 1px solid #eef0f4; }
 .payment-methods summary { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 13px 0; color: #687184; font-size: 11px; font-weight: 750; cursor: pointer; list-style: none; }
@@ -420,7 +421,7 @@ onBeforeUnmount(() => {
 @media (max-height: 760px) {
   .invoice-page { padding-top: 12px; padding-bottom: 12px; }
   .invoice-header { padding-top: 16px; padding-bottom: 14px; }
-  .status-card { position: relative; padding-top: 11px; padding-bottom: 12px; }
+  .status-card { position: relative; padding-top: 10px; padding-bottom: 11px; }
   .status-card .progress-track { position: absolute; right: 0; bottom: 0; left: 0; height: 2px; margin-top: 0; border-radius: 0; }
   .invoice-content { padding-top: 18px; padding-bottom: 10px; }
   .amount-card { margin-top: 8px; margin-bottom: 10px; padding: 10px 12px; }
