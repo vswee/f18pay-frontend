@@ -413,9 +413,9 @@ onBeforeUnmount(() => {
   .invoice-footer { padding-top: 10px; padding-bottom: 14px; }
 }
 
-@media (max-width: 420px) {
+@media (max-width: 600px) {
   .invoice-page { padding: 0; }
-  .invoice-shell { min-height: 100vh; border: 0; border-radius: 0; }
+  .invoice-shell { width: 100%; max-width: none; min-height: 100vh; border: 0; border-radius: 0; }
   .invoice-header, .invoice-content, .success-panel { padding-left: 22px; padding-right: 22px; }
   .status-card { padding-left: 22px; padding-right: 22px; }
   .merchant-row { gap: 8px; }
