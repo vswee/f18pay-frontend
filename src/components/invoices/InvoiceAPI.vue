@@ -64,6 +64,7 @@ async function fetchExistingInvoice({ invoice_id, redirectURL }) {
 }
 
 onMounted(() => {
+  window.scrollTo(0, 0)
   const { store_id, currency, price, ext, redirectURL, invoice_id } = route.query
   if (invoice_id) {
     fetchExistingInvoice({ invoice_id, redirectURL })
@@ -94,17 +95,12 @@ onMounted(() => {
 
 <style lang="scss" scoped>
 .invoice-wrapper {
-    height: 100%;
-    width: max-content;
-    min-width:120px;
+    width: 100%;
     min-height: 100vh;
     display: flex;
     justify-content: center;
-    align-items: center;
-    position: absolute;
-    top: 0;
-    left: 50%;
-    transform: translateX(-50%);
+    align-items: flex-start;
+    position: relative;
 
   .spin-fresco {
     &::before {
