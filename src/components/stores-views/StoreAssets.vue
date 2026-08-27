@@ -103,6 +103,7 @@
               <span>{{ permission.label }}</span>
             </label>
           </div>
+          <span class="help-text">Keep “Modify store webhooks” selected when the integration needs to register an Invoice Ninja callback.</span>
           <a class="btn" :class="apiKeyWorking ? 'working' : ''" @click="createApiKey()">Generate API key</a>
         </div>
 
@@ -115,6 +116,45 @@
           <div class="flex">
             <a class="btn" @click="copyApiKey()">{{ apiKeyCopied ? 'Copied' : 'Copy API key' }} <i v-if="apiKeyCopied" class="fas fa-check"></i></a>
             <a class="btn sec" @click="generatedApiKey = false">Dismiss</a>
+          </div>
+          <div class="api-key-details">
+            <span class="help-text">Use these values when configuring Invoice Ninja or another BTCPay-compatible integration.</span>
+            <div class="api-key-detail">
+              <div>
+                <strong>Store ID</strong>
+                <code>{{ currentStore.store_id }}</code>
+              </div>
+              <button class="btn sec" type="button" @click="copyApiDetail(currentStore.store_id, 'storeId')">
+                {{ apiDetailCopied === 'storeId' ? 'Copied' : 'Copy' }} <i v-if="apiDetailCopied === 'storeId'" class="fas fa-check"></i>
+              </button>
+            </div>
+            <div class="api-key-detail">
+              <div>
+                <strong>Instance URL</strong>
+                <code>{{ apiInstanceUrl }}</code>
+              </div>
+              <button class="btn sec" type="button" @click="copyApiDetail(apiInstanceUrl, 'instanceUrl')">
+                {{ apiDetailCopied === 'instanceUrl' ? 'Copied' : 'Copy' }} <i v-if="apiDetailCopied === 'instanceUrl'" class="fas fa-check"></i>
+              </button>
+            </div>
+          </div>
+          <div class="api-webhook-setup">
+            <label>Webhook credentials</label>
+            <span class="help-text">Paste the Webhook URL from Invoice Ninja. F18 Pay will register it and return the signing secret once.</span>
+            <input v-model="webhookUrl" type="url" placeholder="https://invoiceninja.example/webhook" @keyup.enter="createWebhook()" />
+            <label class="api-permissions-label">Webhook events</label>
+            <div class="api-permissions">
+              <label v-for="event in webhookEventOptions" :key="event.value" class="api-permission">
+                <input v-model="webhookEvents" type="checkbox" :value="event.value" />
+                <span>{{ event.label }}</span>
+              </label>
+            </div>
+            <a class="btn" :class="webhookWorking ? 'working' : ''" @click="createWebhook()">Register webhook</a>
+            <div v-if="generatedWebhook" class="webhook-secret-reveal">
+              <span class="help-text">Webhook secret — copy this into Invoice Ninja now. It will not be shown again.</span>
+              <div class="api-key-secret">{{ generatedWebhook.secret }}</div>
+              <a class="btn" @click="copyWebhookSecret()">{{ webhookCopied ? 'Copied' : 'Copy webhook secret' }} <i v-if="webhookCopied" class="fas fa-check"></i></a>
+            </div>
           </div>
         </div>
 
@@ -185,7 +225,7 @@ import { ref, computed, watch, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { useMainStore } from '@/stores';
 import { storeToRefs } from 'pinia';
-import { apiUrl } from '@/utils/api';
+import { apiUrl, getApplicationEndpoint } from '@/utils/api';
 
 // Reactive state
 const modal = ref({
@@ -212,12 +252,27 @@ const apiKeyWorking = ref(false);
 const apiKeyMessage = ref('');
 const generatedApiKey = ref(false);
 const apiKeyCopied = ref(false);
+const apiDetailCopied = ref('');
+const webhookUrl = ref('');
+const webhookWorking = ref(false);
+const generatedWebhook = ref(false);
+const webhookCopied = ref(false);
+const webhookEventOptions = [
+  { value: 'InvoiceCreated', label: 'Invoice created' },
+  { value: 'InvoiceReceivedPayment', label: 'Payment received' },
+  { value: 'InvoiceProcessing', label: 'Invoice processing' },
+  { value: 'InvoicePaymentSettled', label: 'Payment settled' },
+  { value: 'InvoiceSettled', label: 'Invoice settled' },
+  { value: 'InvoiceExpired', label: 'Invoice expired' },
+  { value: 'InvoiceInvalid', label: 'Invoice invalid' },
+];
+const webhookEvents = ref(webhookEventOptions.map((event) => event.value));
 const apiPermissionOptions = [
   { value: 'btcpay.store.canviewinvoices', label: 'View invoices' },
   { value: 'btcpay.store.cancreateinvoice', label: 'Create invoices' },
   { value: 'btcpay.store.canmodifyinvoices', label: 'Modify invoices' },
   { value: 'btcpay.store.canviewstoresettings', label: 'View store' },
-  { value: 'btcpay.store.webhooks.canmodifywebhooks', label: 'Modify webhooks' },
+  { value: 'btcpay.store.webhooks.canmodifywebhooks', label: 'Modify store webhooks' },
   { value: 'btcpay.store.cancreatenonapprovedpullpayments', label: 'Create non-approved pull payments' },
 ];
 const apiKeyPermissions = ref(apiPermissionOptions.map((permission) => permission.value));
@@ -242,6 +297,8 @@ const {
 } = storeToRefs(store);
 
 // Computed properties
+const apiInstanceUrl = computed(() => getApplicationEndpoint());
+
 const storeCode = computed(() => {
   return activeStore.value.substr(0, 4) + currentStore.value.store_id_int + activeStore.value.substr(activeStore.value.length - 4);
 });
@@ -537,6 +594,96 @@ const copyApiKey = async () => {
   }
 };
 
+const copyApiDetail = async (value, detail) => {
+  if (!value) {
+    return;
+  }
+
+  try {
+    await navigator.clipboard.writeText(value);
+    apiDetailCopied.value = detail;
+  } catch (error) {
+    apiKeyMessage.value = 'Copy failed. Select the value manually.';
+    console.error(error);
+  }
+};
+
+const createWebhook = async () => {
+  if (webhookWorking.value) {
+    return;
+  }
+
+  if (!generatedApiKey.value?.secret) {
+    apiKeyMessage.value = 'Generate an API key with webhook-management permission first.';
+    return;
+  }
+
+  let parsedUrl;
+  try {
+    parsedUrl = new URL(webhookUrl.value.trim());
+  } catch {
+    parsedUrl = false;
+  }
+  if (!parsedUrl || !['http:', 'https:'].includes(parsedUrl.protocol)) {
+    apiKeyMessage.value = 'Enter a valid HTTP or HTTPS webhook URL.';
+    return;
+  }
+
+  if (!webhookEvents.value.length) {
+    apiKeyMessage.value = 'Select at least one webhook event.';
+    return;
+  }
+
+  webhookWorking.value = true;
+  apiKeyMessage.value = '';
+  webhookCopied.value = false;
+  try {
+    const response = await fetch(apiUrl(`/api/v1/stores/${encodeURIComponent(currentStore.value.store_id)}/webhooks`), {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `token ${generatedApiKey.value.secret}`,
+      },
+      body: JSON.stringify({
+        url: webhookUrl.value.trim(),
+        authorizedEvents: {
+          everything: false,
+          specificEvents: webhookEvents.value,
+        },
+        enabled: true,
+        automaticRedelivery: true,
+      }),
+    });
+    const data = await response.json();
+    if (!response.ok || !data.secret) {
+      apiKeyMessage.value = data.message || 'Unable to register the webhook.';
+      return;
+    }
+
+    generatedWebhook.value = data;
+    webhookUrl.value = '';
+  } catch (error) {
+    apiKeyMessage.value = 'Unable to register the webhook.';
+    console.error(error);
+  } finally {
+    webhookWorking.value = false;
+  }
+};
+
+const copyWebhookSecret = async () => {
+  if (!generatedWebhook.value?.secret) {
+    return;
+  }
+
+  try {
+    await navigator.clipboard.writeText(generatedWebhook.value.secret);
+    webhookCopied.value = true;
+  } catch (error) {
+    apiKeyMessage.value = 'Copy failed. Select the webhook secret manually.';
+    console.error(error);
+  }
+};
+
 const formatApiKeyDate = (date) => {
   if (!date) return 'never';
   return new Date(date).toLocaleDateString();
@@ -607,6 +754,55 @@ onMounted(() => {
   background: var(--input-background);
   font-family: "Fira Code", "Courier New", monospace;
   font-size: 0.8rem;
+}
+
+.api-key-details {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--green);
+}
+
+.api-key-detail {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.75rem;
+  border: 1px solid var(--dark);
+}
+
+.api-key-detail > div {
+  display: grid;
+  gap: 0.25rem;
+  min-width: 0;
+}
+
+.api-key-detail code {
+  overflow-wrap: anywhere;
+  color: var(--white);
+  font-family: "Fira Code", "Courier New", monospace;
+  font-size: 0.8rem;
+}
+
+.api-key-detail .btn {
+  flex: 0 0 auto;
+}
+
+.api-webhook-setup {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--green);
+}
+
+.webhook-secret-reveal {
+  display: grid;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  border: 1px solid var(--green);
 }
 
 .api-key-list {

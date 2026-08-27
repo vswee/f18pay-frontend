@@ -323,7 +323,22 @@ const buildPublicInvoice = ({ store_id, currency, price, redirectURL, invoice_id
   };
 };
 
-export const getDemoResponse = async (pathname, body = {}) => {
+export const getDemoResponse = async (pathname, body = {}, method = 'GET') => {
+  if (pathname.startsWith('/api/v1/stores/') && pathname.endsWith('/webhooks')) {
+    if (method === 'POST') {
+      return jsonResponse({
+        enabled: true,
+        automaticRedelivery: true,
+        url: body.url,
+        authorizedEvents: body.authorizedEvents || { everything: false, specificEvents: [] },
+        id: 'demo-webhook-1',
+        secret: 'f18_demo_webhook_secret_7f7b2c1a',
+      });
+    }
+
+    return jsonResponse([]);
+  }
+
   switch (pathname) {
     case '/get-keyiv':
       return jsonResponse({ keyivId: demoKeyivId, keyiv: demoKeyiv, debug: 'Demo credentials loaded' });
