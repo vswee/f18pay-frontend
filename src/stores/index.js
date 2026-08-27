@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import CryptoJS from 'crypto-js';
 import router from '../router';
-import { apiUrl } from '@/utils/api';
+import { apiUrl, getFrontendBaseUrl } from '@/utils/api';
 import { isDemoMode } from '@/utils/demo';
 
 // Main store for the application
@@ -174,7 +174,7 @@ export const useMainStore = defineStore('main', {
         this.setActiveStore(localStorage.getItem("activeStore"));
       }
 
-      this.setURL(import.meta.env.VITE_APP_BASE_URL);
+      this.setURL(getFrontendBaseUrl());
     },
 
     // Crypto utility functions

@@ -34,6 +34,30 @@ export const getApplicationEndpoint = () => {
   return configured;
 };
 
+export const getFrontendBaseUrl = () => {
+  const configured = stripTrailingSlash(import.meta.env.VITE_APP_BASE_URL || '');
+
+  if (typeof window === 'undefined') {
+    return configured;
+  }
+
+  if (!configured) {
+    return stripTrailingSlash(window.location.origin);
+  }
+
+  try {
+    const configuredUrl = new URL(configured);
+
+    if (isLocalHostname(configuredUrl.hostname) && !isLocalHostname(window.location.hostname)) {
+      return stripTrailingSlash(window.location.origin);
+    }
+  } catch {
+    // Leave non-URL values untouched so custom deployment targets still work.
+  }
+
+  return configured;
+};
+
 export const apiUrl = (path) => {
   const normalizedPath = path.startsWith('/') ? path : `/${path}`;
   return `${getApplicationEndpoint()}${normalizedPath}`;
