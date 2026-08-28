@@ -31,7 +31,7 @@
         <details class="amount-card">
           <summary aria-label="Amount due. Show invoice details">
             <div>
-              <p class="eyebrow">Amount due <span class="info-badge" aria-hidden="true">i</span></p>
+              <div class="eyebrow"><span>Amount due</span><span class="details"><span class="info-badge" aria-hidden="true">i</span></span></div>
               <p class="amount-value">{{ cryptoAmount }} <span>{{ activePaymentOption.crypto }}</span></p>
               <p v-if="Number(activePaymentOption.fee || 0) > 0" class="fee-note">Includes {{ formatCryptoAmount(0, activePaymentOption.fee) }} {{ activePaymentOption.crypto }} network fee</p>
               <p v-if="fiatAmount" class="fiat-value">≈ {{ fiatAmount }} {{ invoice.fiatShortName }}</p>
@@ -356,8 +356,11 @@ onBeforeUnmount(() => {
 .merchant-avatar { display: grid; place-items: center; flex: 0 0 42px; width: 42px; height: 42px; border-radius: 13px; background: var(--accent-soft); color: var(--primary); font-size: 17px; font-weight: 800; }
 .merchant-row h1, .success-panel h1 { margin: 2px 0 0; color: #1b2436; font-size: 17px; line-height: 1.2; letter-spacing: -.025em; }
 .network-pill { margin-left: auto; padding: 6px 9px; border: 1px solid var(--primary-border); border-radius: 99px; color: var(--primary); font-size: 11px; font-weight: 750; }
-.eyebrow { margin: 0; color: #8991a1; font-size: 10px; font-weight: 800; letter-spacing: .1em; line-height: 1.2; text-transform: uppercase; }
-.amount-card { margin: 24px 0 23px; padding: 20px; border-radius: 17px; background: linear-gradient(135deg, var(--primary-soft), var(--accent-soft)); }
+.eyebrow { 
+  display: flex;
+  justify-content: space-between;
+  margin: 0; color: #8991a1; font-size: 10px; font-weight: 800; letter-spacing: .1em; line-height: 1.2; text-transform: uppercase; }
+.amount-card { margin: 24px 0 23px; padding: 15px 20px; border-radius: 17px; background: linear-gradient(135deg, var(--primary-soft), var(--accent-soft)); }
 .amount-card > summary { display: block; list-style: none; cursor: pointer; }
 .amount-card > summary::-webkit-details-marker { display: none; }
 .amount-card > summary:focus, .amount-card > summary:focus-visible, .amount-card > summary:active { border: 0; outline: none; box-shadow: none; }
