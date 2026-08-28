@@ -3,7 +3,7 @@
   <!-- MODAL -->
   <div class="modal" @click="closeModal()" v-if="modal.payload">
     <div class="modal-input">
-      <div :class="working?'form page working':'form page'" @click.stop="">
+      <div class="form page" @click.stop="">
         <h1>{{modal.name}}</h1>
         <div class="message" v-if="message"><i class="fas fa-exclamation-circle"></i> {{message}}</div>
         <div class="form-section">
@@ -18,7 +18,7 @@
     </div>
   </div>
   <!-- MODAL -->
-  <div :class="working?'form page working':'form page'" @click.stop="_null()">
+  <div class="form page" @click.stop="_null()">
     <h1><span>Payment Assets</span></h1>
 
     <div class="message" v-if="message"><i class="fas fa-exclamation-circle"></i> {{message}}</div>

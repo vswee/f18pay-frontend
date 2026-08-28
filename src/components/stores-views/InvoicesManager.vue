@@ -1,6 +1,6 @@
 <template>
   <div :class="storeManagementClass">
-    <div :class="formPageClass" @click.stop="_null">
+    <div class="form page" @click.stop="_null">
       <h1><span>Invoices</span><span :class="'badge ' + currentStore.network">{{ currentStore.network }}</span></h1>
 
       <div class="message" v-if="message"><i class="fas fa-exclamation-circle"></i> {{ message }}</div>
@@ -146,7 +146,6 @@ const route = useRoute();
 const storeNameProxy = ref(false);
 const message = ref(false);
 const working = ref(true);
-const spinning = ref(true);
 const viewing = ref(20);
 const queryFilter = ref(false);
 const invoices = ref([]);
@@ -195,8 +194,7 @@ const range = computed(() => (viewing.value > 20 ? viewing.value - 20 + 1 : 1));
 
 const currentStore = computed(() => stores.value ? stores.value.find((sto) => `${sto.store_id.substring(0, 5)}${sto.store_id.substring(sto.store_id.length - 5)}` === route.params.storeId10) : false);
 
-const storeManagementClass = computed(() => working.value && spinning.value ? 'store-management no-click spin-fresco' : (working.value && !spinning.value ? 'store-management no-click' : 'store-management'));
-const formPageClass = computed(() => working.value ? 'form page working' : 'form page');
+const storeManagementClass = computed(() => working.value ? 'store-management no-click' : 'store-management');
 
 const init = async () => {
   if (currentStore.value) {
@@ -261,7 +259,6 @@ const getInvoices = async () => {
   if(!currentStore.value || !user.value || !keyiv.value){return}
 
   working.value = true;
-  spinning.value = true;
   active.value = false;
   const username = await store.dispatch('encrypt', { string: user.value, keyiv: keyiv.value });
   const storeNameEnc = await store.dispatch('encrypt', { string: encodeURIComponent(encodeURI(storeNameProxy.value)), keyiv: keyiv.value });
@@ -294,7 +291,6 @@ const getInvoices = async () => {
         invoices.value = JSON.parse(await store.dispatch('decrypt', { string: data.invoices, keyiv: keyiv.value }));
         dateRange.value.endDate = data.now;
         working.value = false;
-        spinning.value = false;
         message.value = false
         invoices.value.forEach((invoice) => {
           if (invoice.status == 1) {
@@ -367,9 +363,9 @@ const _null = () => false;
 
 onMounted(init);
 watch([viewing, queryFilter], getInvoices);
-watch(working, () => {
-  store.setWorking(working.value);
-});
+watch(working, (value) => {
+  store.setWorking(value);
+}, { immediate: true });
 watch(currentStore, init);
 </script>
 

@@ -11,7 +11,7 @@
 
     <div v-if="message" class="message account-message" role="alert">{{ message }}</div>
 
-    <div v-if="loading" class="form working account-status" aria-live="polite">
+    <div v-if="loading" class="form account-status" aria-live="polite">
       <h2>Checking your session</h2>
       <p class="help-text">Please wait while we securely prepare this page.</p>
     </div>

@@ -9,7 +9,7 @@
       <i class="fas fa-user-cog account-page-icon" aria-hidden="true"></i>
     </div>
 
-    <div v-if="loading" class="form working account-status" aria-live="polite">
+    <div v-if="loading" class="form account-status" aria-live="polite">
       <h2>Loading account details</h2>
       <p class="help-text">Please wait while we securely fetch your account.</p>
     </div>

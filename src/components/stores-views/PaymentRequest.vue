@@ -2,7 +2,7 @@
   <div :class="storeManagementClass">
     <!-- MODAL -->
     <div class="modal" @click="modal = false" v-if="modal">
-      <div :class="formPageClass" @click.stop="">
+      <div class="form page" @click.stop="">
         <h1>New Payment request</h1>
         <div class="message" v-if="message"><i class="fas fa-exclamation-circle"></i> {{ message }}</div>
         <template v-if="confirmedCreatedAddress">
@@ -89,7 +89,7 @@
       </div>
     </div>
     <!-- MODAL -->
-    <div :class="formPageClass" @click.stop="_null()">
+    <div class="form page" @click.stop="_null()">
       <h1><span>Payment Requests</span><span :class="'badge ' + currentStore.network">{{ currentStore.network }}</span></h1>
       <div class="message" v-if="message"><i class="fas fa-exclamation-circle"></i> {{ message }}</div>
       <div class="flex">
@@ -197,7 +197,6 @@ const currentStore = computed(() => stores.value ? stores.value.find((sto) => `$
 // Reactive state
 const message = ref(false);
 const working = ref(true);
-const spinning = ref(true);
 const viewing = ref(20);
 const filter = ref(false);
 const requests = ref(false);
@@ -220,16 +219,8 @@ const confirmedCreatedAddress = ref(false);
 const copied = ref(true);
 
 const storeManagementClass = computed(() => {
-  if (working.value && spinning.value) {
-    return 'store-management no-click spin-fresco';
-  } else if (working.value && !spinning.value) {
-    return 'store-management no-click';
-  } else {
-    return 'store-management';
-  }
+  return working.value ? 'store-management no-click' : 'store-management';
 });
-
-const formPageClass = computed(() => (working.value ? 'form page working' : 'form page'));
 
 const range = computed(() => (viewing.value > 20 ? viewing.value - 20 + 1 : 1));
 
@@ -283,7 +274,6 @@ async function copyCode(textToCopy) {
 async function getPaymentRequests() {
   if(!currentStore.value || !user.value || !keyiv.value){return}
   working.value = true;
-  spinning.value = true;
 
   active.value = false;
   const username = await store.encrypt({
@@ -343,7 +333,6 @@ async function getPaymentRequests() {
         }));
         dateRange.value.endDate = data.now;
         working.value = false;
-        spinning.value = false;
         message.value = false
 
         for (const request of requests.value) {
@@ -509,9 +498,9 @@ watch(filter, () => {
   getPaymentRequests();
 });
 
-watch(working, () => {
-  store.commit('setWorking', working.value);
-});
+watch(working, (value) => {
+  store.setWorking(value);
+}, { immediate: true });
 
 watch(modal, () => {
   getPaymentRequests();

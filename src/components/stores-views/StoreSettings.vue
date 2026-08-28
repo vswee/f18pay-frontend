@@ -1,6 +1,6 @@
 <template lang="">
   <div :class="working?'store-management no-click':'store-management'">
-    <div :class="working?'form page working':'form page'" @click.stop="_null()">
+    <div class="form page" @click.stop="_null()">
 
       <h1><span>Manage Store</span><a class="btn" @click="saveSettings()">Save</a></h1>
 

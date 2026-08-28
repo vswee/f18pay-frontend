@@ -3,7 +3,7 @@
   <!-- MODAL -->
   <WalletSettingsModal :confirmAddresses="confirmAddresses" :addressesForConfirmation="addressesForConfirmation" :confirmCode="confirmCode" :code="code" :numberOfAddressesToConfirm="numberOfAddressesToConfirm" @setConfirmAddresses="confirmAddresses=false" @setConfirmCode="confirmCode=false" @confirmAddressesMatchWallet="confirmAddressesMatchWallet()" />
   <!-- MODAL -->
-  <div :class="working?'form page working':'form page'" @click.stop="_null()">
+  <div class="form page" @click.stop="_null()">
 
     <h1><span>Wallet</span><span :class="'badge ' + currentStore.network">{{currentStore.network}}</span><a class="btn" @click="saveSettings()">Save</a></h1>
 

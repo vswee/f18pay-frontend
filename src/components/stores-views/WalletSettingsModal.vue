@@ -3,7 +3,7 @@
 <div>
   <div class="modal" @click="closeModal()" v-if="confirmAddresses">
     <div class="modal-input">
-      <div :class="working?'form page working':'form page'" @click.stop="">
+      <div class="form page" @click.stop="">
         <h1>Confirm Addresses</h1>
         <div class="message" v-if="message"><i class="fas fa-exclamation-circle"></i> {{message}}</div>
         <div class="form-section">
@@ -25,7 +25,7 @@
   </div>
   <div class="modal" @click="$emit('setConfirmCode')" v-if="confirmCode">
     <div class="modal-input">
-      <div :class="working?'form page working':'form page'" @click.stop="">
+      <div class="form page" @click.stop="">
         <h1>Confirm Code</h1>
         <div class="message" v-if="message"><i class="fas fa-exclamation-circle"></i> {{message}}</div>
         <div class="form-section" v-if="!downloadFile">

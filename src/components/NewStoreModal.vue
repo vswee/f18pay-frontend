@@ -1,7 +1,7 @@
 <template lang="">
 <div class="modal" @click="closeModal()">
   <div class="modal-input">
-    <div :class="working?'form working':'form'" @click.stop="">
+    <div class="form" @click.stop="">
       <h1>Create New Store</h1>
       <div class="message" v-if="message"><i class="fas fa-exclamation-circle"></i> {{message}}</div>
       <div class="form-section" v-if="!storeNameConfirmed">
@@ -91,7 +91,7 @@
 </template>
 
 <script setup>
-import { ref, onBeforeMount } from 'vue';
+import { ref, onBeforeMount, watch } from 'vue';
 import { useMainStore } from '@/stores';
 import { storeToRefs } from 'pinia';
 
@@ -110,6 +110,10 @@ const zpubOptions = ref(false);
 // Store state with storeToRefs for reactivity
 const store = useMainStore();
 const { fingerprint, user, keyiv, keyivId } = storeToRefs(store);
+
+watch(working, (value) => {
+  store.setWorking(value);
+});
 
 // Lifecycle hooks
 onBeforeMount(() => {
