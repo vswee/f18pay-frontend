@@ -70,7 +70,7 @@ const currentRoutePath = computed(() => route.path);
 
 const headerClasses = computed(() => ({
   header: true,
-  working: session.value && showTitle.value && viewTitle.value && working.value,
+  working: session.value && working.value,
 }));
 
 const dynamicCtaHeaderSpaceClasses = computed(() => ({
@@ -174,14 +174,15 @@ function toggleTheme() {
       content: "";
       display: block;
       position: absolute;
-      height: 2px;
+      height: 3px;
       width: 100%;
       left: 0;
       transition: 0.2s ease;
       background: linear-gradient(90deg, var(--black), var(--accent));
       -webkit-animation: shootingBar 1s ease forwards infinite;
       animation: shootingBar 1s ease forwards infinite;
-      top: 0;
+      top: auto;
+      bottom: 0;
     }
 
     @keyframes shootingBar {

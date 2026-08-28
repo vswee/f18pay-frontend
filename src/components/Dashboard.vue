@@ -1,7 +1,7 @@
 <template>
   <div class="dashboard-root">
     <template v-if="fetchingStores">
-      <div class="form working fetching-stores" aria-live="polite">
+      <div class="form fetching-stores" aria-live="polite">
         <h1>Fetching stores details</h1>
         <p>Please wait while we load your stores.</p>
       </div>
@@ -253,6 +253,23 @@ watch(() => route.name, async (routeName, previousRouteName) => {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+  }
+}
+
+.fetching-stores.form {
+  width: calc(100% + 10vw);
+  max-width: none;
+  margin: -2vw -5vw 0;
+  padding: clamp(2rem, 5vw, 4rem) 5vw;
+  border-radius: 0;
+  box-shadow: none;
+  text-align: center;
+
+  h1,
+  p {
+    width: min(100%, 30rem);
+    margin-right: auto;
+    margin-left: auto;
   }
 }
 </style>

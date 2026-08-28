@@ -10,7 +10,7 @@
         <i :class="messageType === 'success' ? 'fas fa-check-circle' : 'fas fa-info-circle'"></i> {{ message }}
       </div>
 
-      <div v-if="loading" class="form working store-linking-loading" role="status" aria-live="polite">
+      <div v-if="loading" class="form store-linking-loading" role="status" aria-live="polite">
         <i class="fas fa-spinner fa-spin" aria-hidden="true"></i>
         <span>Loading store links</span>
       </div>
@@ -112,10 +112,11 @@ const credentials = async () => ({
   keyivId: keyivId.value,
 })
 
-const loadLinks = async () => {
+const loadLinks = async (preserveWorking = false) => {
   if (!currentStore.value?.store_id) return
   loading.value = true
   message.value = ''
+  if (!preserveWorking) store.setWorking(true)
   try {
     const response = await fetch(apiUrl('/store-links'), {
       method: 'POST',
@@ -132,6 +133,7 @@ const loadLinks = async () => {
     message.value = error.message || 'Unable to load store links.'
   } finally {
     loading.value = false
+    if (!preserveWorking) store.setWorking(false)
   }
 }
 
@@ -151,6 +153,7 @@ const canLink = (candidate) => Boolean(currentStore.value && !link.value && cand
 const createLink = async (candidate) => {
   if (!canLink(candidate)) return
   working.value = true
+  store.setWorking(true)
   message.value = ''
   try {
     const response = await fetch(apiUrl('/store-links-create'), {
@@ -162,18 +165,20 @@ const createLink = async (candidate) => {
     if (!data.proceed) throw new Error(data.debug || 'Unable to link stores.')
     messageType.value = 'success'
     message.value = data.debug || 'Stores linked successfully.'
-    await loadLinks()
+    await loadLinks(true)
   } catch (error) {
     messageType.value = ''
     message.value = error.message || 'Unable to link stores.'
   } finally {
     working.value = false
+    store.setWorking(false)
   }
 }
 
 const removeLink = async () => {
   if (!link.value || !window.confirm(`Remove the link to ${decode(link.value.store_name)}?`)) return
   working.value = true
+  store.setWorking(true)
   message.value = ''
   try {
     const response = await fetch(apiUrl('/store-links-remove'), {
@@ -185,24 +190,48 @@ const removeLink = async () => {
     if (!data.proceed) throw new Error(data.debug || 'Unable to remove store link.')
     messageType.value = 'success'
     message.value = data.debug || 'Store link removed.'
-    await loadLinks()
+    await loadLinks(true)
   } catch (error) {
     messageType.value = ''
     message.value = error.message || 'Unable to remove store link.'
   } finally {
     working.value = false
+    store.setWorking(false)
   }
 }
 
-watch(currentStore, loadLinks)
+watch(currentStore, () => loadLinks())
 onMounted(loadLinks)
 </script>
 
 <style lang="scss" scoped>
+.store-management > .form.page {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.store-management > .form.page > *,
+.store-management .form-section,
+.store-management .accordian-sect {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.store-management .form-section {
+  grid-template-columns: minmax(0, 1fr);
+}
+
 .store-linking-loading {
   display: flex;
   align-items: center;
   gap: .65rem;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
   padding: 1rem;
 }
 
@@ -225,6 +254,7 @@ onMounted(loadLinks)
 .linked-store-panel h2,
 .store-link-tile h3 {
   margin: .35rem 0;
+  overflow-wrap: anywhere;
 }
 
 .linked-store-current {
@@ -316,15 +346,19 @@ onMounted(loadLinks)
 }
 
 .store-link-grid {
-  display: flex;
-  flex-wrap: wrap;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
   gap: 1rem;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
 }
 
 .store-link-tile {
   display: flex;
   flex-direction: column;
+  min-width: 0;
+  max-width: 100%;
   gap: .75rem;
   transition: opacity .2s ease, border-color .2s ease;
 }
@@ -341,6 +375,12 @@ onMounted(loadLinks)
   display: flex;
   justify-content: space-between;
   gap: 1rem;
+  min-width: 0;
+}
+
+.store-link-heading > div {
+  min-width: 0;
+  max-width: 100%;
 }
 
 .store-link-heading > i {
@@ -351,6 +391,7 @@ onMounted(loadLinks)
   margin: 0;
   font-size: .9rem;
   color: var(--grey);
+  overflow-wrap: anywhere;
 }
 
 .store-link-tile .btn {
