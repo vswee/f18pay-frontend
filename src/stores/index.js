@@ -82,10 +82,15 @@ export const useMainStore = defineStore('main', {
     },
 
     setKeyivId(payload) {
-      this.keyivId = payload[0];
-      this.keyiv = payload[1];
-      localStorage.setItem("keyivId", payload[0]);
-      localStorage.setItem("keyiv", payload[1]);
+      const keyivId = Array.isArray(payload) && payload[0] !== undefined
+        ? String(payload[0])
+        : false;
+      const keyiv = Array.isArray(payload) ? payload[1] : false;
+
+      this.keyivId = keyivId;
+      this.keyiv = keyiv;
+      localStorage.setItem("keyivId", keyivId);
+      localStorage.setItem("keyiv", keyiv);
     },
 
     setTheme(payload) {
