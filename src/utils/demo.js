@@ -274,7 +274,8 @@ export const activateDemoMode = () => {
 
 export const getDemoTheme = () => 'dark';
 
-const jsonResponse = (payload) => new Response(JSON.stringify(payload), {
+const jsonResponse = (payload, status = 200) => new Response(JSON.stringify(payload), {
+  status,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -317,14 +318,23 @@ const buildDemoPaymentOption = ({ invoiceId, store, invoiceValue, currency }) =>
   };
 };
 
-const buildPublicInvoice = ({ store_id, currency, price, redirectURL, invoice_id }) => {
+const buildPublicInvoice = ({ store_id, currency, price, redirectURL, invoice_id, email }) => {
   const store = withStore(store_id || demoActiveStoreId);
   if (invoice_id && demoPublicInvoices.has(invoice_id)) {
     const existingInvoice = demoPublicInvoices.get(invoice_id);
-    return {
-      ...existingInvoice,
-      redirectURL: redirectURL || existingInvoice.redirectURL,
+    const updatedInvoice = email
+      ? {
+        ...existingInvoice,
+        payee_email: email,
+        paymentOptions: existingInvoice.paymentOptions?.map((option) => ({ ...option, requiresEmail: false })),
+      }
+      : existingInvoice;
+    const result = {
+      ...updatedInvoice,
+      redirectURL: redirectURL || updatedInvoice.redirectURL,
     };
+    if (email) demoPublicInvoices.set(invoice_id, result);
+    return result;
   }
   const fiat = currency || 'GBP';
   const amount = Number(price || 49.95);
@@ -373,6 +383,10 @@ const buildPublicInvoice = ({ store_id, currency, price, redirectURL, invoice_id
   invoice.paymentOptions = [store, linkedStore]
     .filter(Boolean)
     .map((optionStore) => buildDemoPaymentOption({ invoiceId, store: optionStore, invoiceValue: amount, currency: fiat }));
+  if (email) {
+    invoice.payee_email = email;
+    invoice.paymentOptions = invoice.paymentOptions.map((option) => ({ ...option, requiresEmail: false }));
+  }
   demoPublicInvoices.set(invoiceId, invoice);
   return invoice;
 };
@@ -617,6 +631,9 @@ export const getDemoResponse = async (pathname, body = {}, method = 'GET') => {
       return jsonResponse({ invoice: buildPublicInvoice(body) });
 
     case '/invoice-retrieve':
+      if (body.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(body.email).trim())) {
+        return jsonResponse({ proceed: false, statusText: 'Please enter a valid email address.' }, 400);
+      }
       return jsonResponse({ invoice: buildPublicInvoice(body) });
 
     case '/invoice-status': {

@@ -93,13 +93,16 @@
           <p>This invoice has expired before a payment was received. If you have already sent the payment, it may be delayed by network conditions.</p>
         </div>
 
-        <div v-else-if="requiresEmail" class="email-panel">
-          <h2 class="payment-heading">Email required</h2>
-          <form :action="currentSearch" method="post">
-            <input name="email" type="email" class="form-input" placeholder="mail@example.com" required />
-            <p class="help-text">{{ activeStoreName }} requires a valid email address before you can proceed.</p>
-            <button class="primary-button" type="submit">Continue <span>→</span></button>
+        <div v-else-if="requiresEmail || showEmailForm" class="email-panel">
+          <h2 class="payment-heading">{{ requiresEmail ? 'Email required' : 'Change email' }}</h2>
+          <form @submit.prevent="submitEmail" novalidate>
+            <input v-model="emailAddress" name="email" type="email" class="form-input" placeholder="mail@example.com" autocomplete="email" :disabled="emailSubmitting" required />
+            <p v-if="emailError" class="help-text email-error" role="alert">{{ emailError }}</p>
+            <p v-else-if="!requiresEmail" class="help-text">Update the email address used for this invoice.</p>
+            <p v-else class="help-text">{{ activeStoreName }} requires a valid email address before you can proceed.</p>
+            <button class="primary-button" type="submit" :disabled="emailSubmitting">{{ emailSubmitting ? 'Working…' : (requiresEmail ? 'Continue' : 'Save email') }} <span>→</span></button>
           </form>
+          <button v-if="!requiresEmail" type="button" class="support-link" @click="showEmailForm = false">Keep current email</button>
         </div>
 
         <section v-else class="payment-panel" aria-labelledby="scan-heading">
@@ -115,6 +118,7 @@
             </button>
           </div>
           <a id="payLink" :href="payLink" class="primary-button wallet-button">Open in wallet <span>↗</span></a>
+          <button v-if="invoice.payeeEmail || invoice.payee_email" type="button" class="support-link" @click="startEmailChange">Change email</button>
           <button type="button" class="support-link" @click="openSupport">Need help? <span>↗</span></button>
         </section>
       </section>
@@ -139,12 +143,16 @@
 import { computed, defineProps, onBeforeUnmount, onMounted, reactive, ref } from 'vue'
 import QrcodeVue from 'qrcode.vue'
 import f18Logo from '../../assets/logo.svg'
+import { apiUrl } from '../../utils/api'
 
 const props = defineProps({ invoiceData: { type: Object, default: () => ({}) } })
 const invoice = reactive({ ...(props.invoiceData || {}) })
-const currentSearch = typeof window !== 'undefined' ? window.location.search : ''
 const selectedPaymentOption = ref(0)
 const copiedAddress = ref(false)
+const emailAddress = ref('')
+const emailSubmitting = ref(false)
+const emailError = ref('')
+const showEmailForm = ref(false)
 const state = reactive({
   invoiceStatusInterval: null,
   invoiceStatusIntervalIterations: 0,
@@ -246,6 +254,50 @@ const copyAddress = async () => {
 
 const openSupport = () => {
   if (window.$chatwoot?.toggle) window.$chatwoot.toggle('open')
+}
+
+const startEmailChange = () => {
+  emailAddress.value = invoice.payeeEmail || invoice.payee_email || ''
+  emailError.value = ''
+  showEmailForm.value = true
+}
+
+const submitEmail = async () => {
+  const email = emailAddress.value.trim()
+  if (!email) {
+    emailError.value = 'Enter your email address to continue.'
+    return
+  }
+
+  emailError.value = ''
+  emailSubmitting.value = true
+
+  try {
+    const response = await fetch(apiUrl('/invoice-retrieve'), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        invoice_id: invoice.invoiceId,
+        email,
+        redirectURL: invoice.redirectURL,
+      }),
+    })
+    const data = await response.json().catch(() => ({}))
+
+    if (!response.ok || !data.invoice) {
+      emailError.value = data.statusText || 'We could not save your email address. Please try again.'
+      return
+    }
+
+    Object.assign(invoice, data.invoice)
+    emailAddress.value = ''
+    showEmailForm.value = false
+  } catch (error) {
+    emailError.value = 'We could not save your email address. Please try again.'
+    console.error(error)
+  } finally {
+    emailSubmitting.value = false
+  }
 }
 
 const invoiceStatus = async () => {
@@ -403,6 +455,7 @@ onBeforeUnmount(() => {
 .copy-button { border: 0; background: transparent; color: var(--primary); font-size: 11px; font-weight: 750; cursor: pointer; }
 .primary-button { display: flex; align-items: center; justify-content: center; gap: 10px; box-sizing: border-box; width: 100%; margin-top: 12px; padding: 13px 16px; border: 0; border-radius: 11px; background: var(--primary); color: #fff; font-size: 13px; font-weight: 750; text-decoration: none; cursor: pointer; transition: filter .2s ease, transform .2s ease; }
 .primary-button:hover { filter: brightness(.94); transform: translateY(-1px); }
+.primary-button:disabled { opacity: .72; cursor: wait; transform: none; }
 .wallet-button { margin-top: 10px; }
 .support-link { display: flex; align-items: center; justify-content: center; gap: 6px; width: fit-content; margin: 13px auto 0; padding: 0; border: 0; background: transparent; color: var(--primary); font: inherit; font-size: 11px; font-weight: 750; cursor: pointer; }
 .support-link:hover { text-decoration: underline; }
@@ -412,6 +465,7 @@ onBeforeUnmount(() => {
 .email-panel { margin-top: 8px; }
 .form-input { box-sizing: border-box; width: 100%; margin-top: 17px; padding: 12px 13px; border: 1px solid #dfe3eb; border-radius: 11px; color: #283246; font: inherit; font-size: 12px; }
 .help-text { margin: 8px 0 0; color: #858d9d; font-size: 11px; }
+.email-error { color: #a04444; }
 .success-panel { padding-top: 62px; padding-bottom: 54px; text-align: center; }
 .success-mark { display: grid; place-items: center; width: 68px; height: 68px; margin: 0 auto 20px; border-radius: 22px; background: #e8f7ee; color: #2e9f66; font-size: 36px; font-weight: 500; }
 .success-panel h1 { margin-top: 8px; font-size: 28px; }
