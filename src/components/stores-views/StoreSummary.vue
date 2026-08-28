@@ -8,7 +8,7 @@
   <div class="subsect">
     <h3>Invoice Statistics</h3>
     <p class="help-text">Displays paid v total invoices generated over the last 6 months.</p>
-    <div v-if="fetchingStatistics" class="form working statistics-loading" role="status" aria-live="polite">
+    <div v-if="fetchingStatistics" class="form statistics-loading" role="status" aria-live="polite">
       <i class="fas fa-spinner fa-spin" aria-hidden="true"></i>
       <span>Loading statistics</span>
     </div>
@@ -35,6 +35,7 @@ const invoice_values2 = ref(false)
 const invoice_dates = ref(false)
 const chartDestroy = ref(false)
 const fetchingStatistics = ref(true)
+let statisticsRequestId = 0
 
 // Store state with storeToRefs for reactivity
 const { fingerprint, user, keyiv, keyivId, chart, stores } = storeToRefs(store)
@@ -75,6 +76,8 @@ const fetchInvoiceValues = async (id) => {
   }
 
   fetchingStatistics.value = true
+  const requestId = ++statisticsRequestId
+  store.setWorking(true)
   chartDestroy.value = true
   store.setChart({
     chartData: false,
@@ -170,7 +173,10 @@ const fetchInvoiceValues = async (id) => {
   } catch (error) {
     console.error("Error:", error)
   } finally {
-    fetchingStatistics.value = false
+    if (requestId === statisticsRequestId) {
+      fetchingStatistics.value = false
+      store.setWorking(false)
+    }
   }
 }
 
