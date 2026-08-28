@@ -28,47 +28,15 @@
           <span class="network-pill">{{ activePaymentOption.crypto || 'Crypto' }}</span>
         </div>
 
-        <div class="amount-card">
-          <div>
-            <p class="eyebrow">Amount due</p>
-            <p class="amount-value">{{ cryptoAmount }} <span>{{ activePaymentOption.crypto }}</span></p>
-            <p v-if="Number(activePaymentOption.fee || 0) > 0" class="fee-note">Includes {{ formatCryptoAmount(0, activePaymentOption.fee) }} {{ activePaymentOption.crypto }} network fee</p>
-            <p v-if="fiatAmount" class="fiat-value">≈ {{ fiatAmount }} {{ invoice.fiatShortName }}</p>
-          </div>
-        </div>
-
-        <details v-if="paymentOptions.length > 1" class="payment-methods">
-          <summary>
-            <span>Payment method</span>
-            <span class="payment-method-selection">{{ activePaymentOption.crypto }} · {{ decodeText(activePaymentOption.storeName || activeStoreName) }}</span>
-          </summary>
-          <div class="section-heading">
+        <details class="amount-card">
+          <summary aria-label="Amount due. Show invoice details">
             <div>
-              <h2 id="payment-method-heading">Choose how to pay</h2>
+              <p class="eyebrow">Amount due <span class="info-badge" aria-hidden="true">i</span></p>
+              <p class="amount-value">{{ cryptoAmount }} <span>{{ activePaymentOption.crypto }}</span></p>
+              <p v-if="Number(activePaymentOption.fee || 0) > 0" class="fee-note">Includes {{ formatCryptoAmount(0, activePaymentOption.fee) }} {{ activePaymentOption.crypto }} network fee</p>
+              <p v-if="fiatAmount" class="fiat-value">≈ {{ fiatAmount }} {{ invoice.fiatShortName }}</p>
             </div>
-            <span class="method-count">{{ paymentOptions.length }} options</span>
-          </div>
-          <div class="payment-option-list">
-            <button
-              v-for="(option, index) in paymentOptions"
-              :key="option.id || `${option.storeId}-${option.crypto}-${index}`"
-              type="button"
-              :class="['payment-option', { selected: selectedPaymentOption === index }]"
-              @click="selectPaymentOption(index)"
-            >
-              <span class="option-icon">{{ cryptoSymbolFor(option.crypto) }}</span>
-              <span class="option-copy">
-                <strong>{{ option.crypto || 'Crypto' }}</strong>
-                <small>{{ decodeText(option.storeName || activeStoreName) }}</small>
-              </span>
-              <span class="option-amount">{{ formatCryptoAmount(option.amount, option.fee) }} {{ option.crypto }}</span>
-              <span class="option-check" aria-hidden="true">✓</span>
-            </button>
-          </div>
-        </details>
-
-        <details class="invoice-details">
-          <summary><span>Invoice details</span></summary>
+          </summary>
           <dl class="detail-list">
             <div v-if="invoice.tx2" class="detail-row">
               <dt>Reference</dt>
@@ -88,6 +56,37 @@
             </div>
           </dl>
         </details>
+
+        <section v-if="paymentOptions.length > 1" class="payment-methods" aria-labelledby="payment-method-heading">
+          <div class="payment-methods-heading">
+            <h2 id="payment-method-heading">Pay with</h2>
+            <details class="currency-info">
+              <summary>
+                <span>{{ paymentOptions.length }} currencies</span>
+                <span class="info-badge" aria-hidden="true">i</span>
+              </summary>
+              <div class="currency-info-panel">
+                <p>This invoice can accept payments from multiple store assets linked by the same merchant.</p>
+                <p>The asset names may look different because merchants can name each store independently, but the merchant who issued this invoice controls every linked asset.</p>
+                <p>Select a currency to see its specific amount, wallet address, exchange rate, network fee, and payment instructions. Always check those details before sending.</p>
+              </div>
+            </details>
+          </div>
+          <div class="payment-option-list" role="group" aria-label="Payment method">
+            <button
+              v-for="(option, index) in paymentOptions"
+              :key="option.id || `${option.storeId}-${option.crypto}-${index}`"
+              type="button"
+              :class="['payment-option', { selected: selectedPaymentOption === index }]"
+              :aria-pressed="selectedPaymentOption === index"
+              @click="selectPaymentOption(index)"
+            >
+              <span class="option-icon">{{ cryptoSymbolFor(option.crypto) }}</span>
+              <span class="option-copy"><strong>{{ option.crypto || 'Crypto' }}</strong></span>
+              <span class="option-check" aria-hidden="true">{{ selectedPaymentOption === index ? '✓' : '' }}</span>
+            </button>
+          </div>
+        </section>
 
         <div v-if="!state.verifyInvoiceValidTime" class="response expired-response">
           <h2>What happened?</h2>
@@ -109,14 +108,14 @@
             <QrcodeVue :value="qrCode" :size="state.qrCodeWidth" level="H" foreground="#111827" />
           </div>
           <div class="address-field">
-            <span class="address-label">or copy wallet address</span>
+            <span class="address-label">Copy wallet address</span>
             <span class="address-value">{{ activePaymentOption.address }}</span>
             <button type="button" class="copy-button" @click="copyAddress">
               <span>{{ copiedAddress ? 'Copied' : 'Copy' }}</span>
             </button>
           </div>
           <a id="payLink" :href="payLink" class="primary-button wallet-button">Open in wallet <span>↗</span></a>
-          <button type="button" class="primary-button secondary-button" @click="openSupport">Contact support <span>→</span></button>
+          <button type="button" class="support-link" @click="openSupport">Need help? <span>↗</span></button>
         </section>
       </section>
 
@@ -326,10 +325,12 @@ onBeforeUnmount(() => {
   background: #f5f5fb;
   color: #172033;
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  width:100vw;
 }
 
 .invoice-shell {
-  width: min(100%, 480px);
+  width: 380px;
+  max-width: 100vw;
   overflow: hidden;
   border: 1px solid var(--primary-border);
   border-radius: 24px;
@@ -339,7 +340,7 @@ onBeforeUnmount(() => {
 
 .invoice-header, .invoice-content, .success-panel { padding-left: 28px; padding-right: 28px; }
 .invoice-header { display: flex; justify-content: space-between; align-items: center; padding-top: 25px; padding-bottom: 22px; }
-.brand-lockup, .status-heading, .merchant-row, .section-heading { display: flex; align-items: center; }
+.brand-lockup, .status-heading, .merchant-row { display: flex; align-items: center; }
 .brand-mark { display: block; width: 28px; height: 28px; margin-right: 8px; }
 .brand-name { color: #222b3f; font-size: 16px; font-weight: 750; letter-spacing: -.02em; }
 .status-card { padding: 12px 28px 13px; background: var(--primary-soft); color: var(--primary); }
@@ -353,45 +354,43 @@ onBeforeUnmount(() => {
 .invoice-content { padding-top: 26px; padding-bottom: 18px; }
 .merchant-row { gap: 12px; }
 .merchant-avatar { display: grid; place-items: center; flex: 0 0 42px; width: 42px; height: 42px; border-radius: 13px; background: var(--accent-soft); color: var(--primary); font-size: 17px; font-weight: 800; }
-.merchant-row h1, .section-heading h2, .payment-heading h2, .success-panel h1 { margin: 2px 0 0; color: #1b2436; font-size: 17px; line-height: 1.2; letter-spacing: -.025em; }
+.merchant-row h1, .success-panel h1 { margin: 2px 0 0; color: #1b2436; font-size: 17px; line-height: 1.2; letter-spacing: -.025em; }
 .network-pill { margin-left: auto; padding: 6px 9px; border: 1px solid var(--primary-border); border-radius: 99px; color: var(--primary); font-size: 11px; font-weight: 750; }
 .eyebrow { margin: 0; color: #8991a1; font-size: 10px; font-weight: 800; letter-spacing: .1em; line-height: 1.2; text-transform: uppercase; }
-.amount-card { display: flex; align-items: center; justify-content: space-between; margin: 24px 0 23px; padding: 20px; border-radius: 17px; background: linear-gradient(135deg, var(--primary-soft), var(--accent-soft)); }
+.amount-card { margin: 24px 0 23px; padding: 20px; border-radius: 17px; background: linear-gradient(135deg, var(--primary-soft), var(--accent-soft)); }
+.amount-card > summary { display: block; list-style: none; cursor: pointer; }
+.amount-card > summary::-webkit-details-marker { display: none; }
+.amount-card > summary:focus, .amount-card > summary:focus-visible, .amount-card > summary:active { border: 0; outline: none; box-shadow: none; }
+.amount-card .eyebrow { display: flex; align-items: center; gap: 6px; }
+.amount-card .info-badge { width: 14px; height: 14px; font-size: 9px; }
 .amount-value { margin: 7px 0 0; color: #161d2d; font-size: 30px; font-weight: 800; letter-spacing: -.055em; line-height: 1; }
 .amount-value span { margin-left: 4px; color: var(--primary); font-size: 14px; letter-spacing: 0; }
 .fee-note { margin: 8px 0 0; color: #687184; font-size: 10px; }
 .fiat-value { margin: 8px 0 0; color: #687184; font-size: 12px; }
-.payment-methods { margin: 0 0 18px; border-top: 1px solid #eef0f4; border-bottom: 1px solid #eef0f4; }
-.payment-methods summary { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 13px 0; color: #687184; font-size: 11px; font-weight: 750; cursor: pointer; list-style: none; }
-.payment-methods summary::-webkit-details-marker { display: none; }
-.payment-methods summary::after { content: '+'; flex: 0 0 auto; color: var(--primary); font-size: 15px; font-weight: 500; }
-.payment-methods[open] summary::after { content: '−'; }
-.payment-method-selection { overflow: hidden; margin-left: auto; color: #354055; font-size: 11px; font-weight: 650; text-overflow: ellipsis; white-space: nowrap; }
-.section-heading { justify-content: space-between; margin-bottom: 11px; }
-.method-count { color: #9299a8; font-size: 11px; }
-.payment-option-list { display: grid; gap: 8px; }
-.payment-option { width: 100%; display: flex; align-items: center; gap: 10px; padding: 11px; border: 1px solid #e9ebf1; border-radius: 13px; background: #fff; color: #20283a; text-align: left; cursor: pointer; transition: border-color .2s ease, background .2s ease, box-shadow .2s ease; }
-.payment-option:hover, .payment-option.selected { border-color: var(--primary); background: var(--primary-soft); box-shadow: 0 4px 12px rgba(37, 34, 78, .05); }
-.option-icon { display: grid; place-items: center; flex: 0 0 30px; width: 30px; height: 30px; border-radius: 9px; background: var(--accent-soft); color: var(--primary); font-size: 17px; font-weight: 750; }
-.option-copy { display: grid; min-width: 0; gap: 3px; }
-.option-copy strong { font-size: 13px; }
-.option-copy small { overflow: hidden; color: #858d9d; font-size: 10px; text-overflow: ellipsis; white-space: nowrap; }
-.option-amount { margin-left: auto; color: #687184; font-size: 11px; white-space: nowrap; }
-.option-check { display: grid; place-items: center; width: 18px; height: 18px; border: 1px solid #dfe2e9; border-radius: 50%; color: transparent; font-size: 11px; }
-.payment-option.selected .option-check { border-color: var(--primary); background: var(--primary); color: #fff; }
-.invoice-details { margin: 18px 0 20px; border-top: 1px solid #eef0f4; border-bottom: 1px solid #eef0f4; }
-.invoice-details summary { display: flex; align-items: center; justify-content: space-between; padding: 13px 0; color: #687184; font-size: 11px; font-weight: 750; cursor: pointer; list-style: none; }
-.invoice-details summary::-webkit-details-marker { display: none; }
-.invoice-details summary::after { content: '+'; color: var(--primary); font-size: 15px; font-weight: 500; }
-.invoice-details[open] summary::after { content: '−'; }
-.details-toggle { margin-left: auto; margin-right: 10px; color: #a0a6b2; font-size: 10px; font-weight: 600; }
-.details-toggle span { display: inline-block; transition: transform .2s ease; }
-.invoice-details[open] .details-toggle span { transform: rotate(180deg); }
-.detail-list { display: grid; gap: 10px; margin: 0; padding: 0 0 14px; }
-.detail-row { display: flex; justify-content: space-between; gap: 20px; color: #81899a; font-size: 11px; }
+.payment-methods { margin: 0 0 20px; }
+.payment-methods-heading { position: relative; margin-bottom: 9px; }
+.payment-methods-heading h2 { margin: 0; color: #1b2436; font-size: 14px; letter-spacing: -.025em; }
+.currency-info { margin: 0; }
+.currency-info summary { position: absolute; top: 0; right: 0; display: flex; align-items: center; gap: 5px; color: #9299a8; font-size: 10px; cursor: pointer; list-style: none; }
+.currency-info summary::-webkit-details-marker { display: none; }
+.currency-info summary:hover { color: var(--primary); }
+.info-badge { display: grid; place-items: center; width: 15px; height: 15px; border: 1px solid currentColor; border-radius: 50%; font-size: 10px; font-weight: 800; line-height: 1; }
+.currency-info-panel { margin-top: 10px; padding: 13px 14px; border: 1px solid #e3e6ee; border-radius: 13px; background: #fff; box-shadow: 0 8px 20px rgba(31, 38, 61, .07); color: #687184; font-size: 11px; line-height: 1.5; }
+.currency-info-panel p { margin: 0; }
+.currency-info-panel p + p { margin-top: 9px; }
+.detail-list { display: grid; gap: 10px; margin: 16px 0 0; padding: 14px 0 0; border-top: 1px solid rgba(37, 34, 78, .12); }
+.detail-row { display: flex; justify-content: space-between; gap: 20px; color: #687184; font-size: 11px; }
 .detail-row dd { margin: 0; color: #354055; font-weight: 650; text-align: right; }
+.payment-option-list { display: flex; gap: 8px; }
+.payment-option { flex: 1 1 0; min-width: 0; display: flex; align-items: center; gap: 8px; padding: 9px 10px; border: 1px solid #e9ebf1; border-radius: 12px; background: #fff; color: #20283a; text-align: left; cursor: pointer; transition: border-color .2s ease, background .2s ease, box-shadow .2s ease; }
+.payment-option:hover, .payment-option.selected { border-color: var(--primary); background: var(--primary-soft); box-shadow: 0 4px 12px rgba(37, 34, 78, .05); }
+.option-icon { display: grid; place-items: center; flex: 0 0 28px; width: 28px; height: 28px; border-radius: 9px; background: var(--accent-soft); color: var(--primary); font-size: 16px; font-weight: 750; }
+.option-copy { display: grid; min-width: 0; gap: 3px; }
+.option-copy strong { overflow: hidden; font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
+.option-check { display: grid; place-items: center; flex: 0 0 17px; width: 17px; height: 17px; margin-left: auto; border: 1px solid #dfe2e9; border-radius: 50%; color: transparent; font-size: 10px; }
+.payment-option.selected .option-check { border-color: var(--primary); background: var(--primary); color: #fff; }
 .payment-panel, .email-panel { padding-top: 2px; }
-.payment-heading { margin: 0 0 10px; color: #8992a1; font-size: 10px; font-weight: 800; letter-spacing: .06em; line-height: 1.2; text-transform: uppercase; }
+.payment-heading { margin: 0 0 12px; color: #1b2436; font-size: 15px; font-weight: 800; letter-spacing: -.025em; line-height: 1.2; }
 .response p, .success-panel > p:not(.eyebrow) { margin: 12px 0 18px; color: #747e90; font-size: 12px; line-height: 1.55; }
 .qr-frame { display: grid; place-items: center; margin: 15px auto 17px; padding: 18px; width: fit-content; border: 1px solid #eef0f4; border-radius: 18px; background: #fff; box-shadow: 0 8px 24px rgba(31, 38, 61, .06); }
 .qr-frame :deep(canvas), .qr-frame :deep(svg) { display: block; max-width: 100%; height: auto; }
@@ -402,8 +401,9 @@ onBeforeUnmount(() => {
 .primary-button { display: flex; align-items: center; justify-content: center; gap: 10px; box-sizing: border-box; width: 100%; margin-top: 12px; padding: 13px 16px; border: 0; border-radius: 11px; background: var(--primary); color: #fff; font-size: 13px; font-weight: 750; text-decoration: none; cursor: pointer; transition: filter .2s ease, transform .2s ease; }
 .primary-button:hover { filter: brightness(.94); transform: translateY(-1px); }
 .wallet-button { margin-top: 10px; }
-.secondary-button { margin-top: 8px; border: 1px solid var(--primary-border); background: transparent; color: var(--primary); }
-.secondary-button:hover { background: var(--primary-soft); filter: none; }
+.support-link { display: flex; align-items: center; justify-content: center; gap: 6px; width: fit-content; margin: 13px auto 0; padding: 0; border: 0; background: transparent; color: var(--primary); font: inherit; font-size: 11px; font-weight: 750; cursor: pointer; }
+.support-link:hover { text-decoration: underline; }
+.support-link span { font-size: 12px; }
 .expired-response { margin: 15px 0 0; padding: 16px; border-radius: 13px; background: #fff5f5; }
 .response h2 { margin: 0; color: #923f3f; font-size: 14px; }
 .email-panel { margin-top: 8px; }
@@ -426,13 +426,12 @@ onBeforeUnmount(() => {
   .invoice-content { padding-top: 18px; padding-bottom: 10px; }
   .amount-card { margin-top: 8px; margin-bottom: 10px; padding: 10px 12px; }
   .amount-value { font-size: 20px; }
-  .invoice-details, .payment-methods { margin-top: 12px; margin-bottom: 14px; }
-  .invoice-details:not([open]) summary, .payment-methods:not([open]) summary { padding-top: 7px; padding-bottom: 7px; }
+  .payment-methods { margin-top: 12px; margin-bottom: 14px; }
   .qr-frame { margin-top: 10px; margin-bottom: 12px; padding: 12px; }
   .invoice-footer { padding-top: 10px; padding-bottom: 14px; }
 }
 
-@media (max-width: 600px) {
+@media (max-width: 500px) {
   .invoice-page { padding: 0; }
   .invoice-shell { width: 100%; max-width: none; min-height: 100vh; border: 0; border-radius: 0; }
   .invoice-header, .invoice-content, .success-panel { padding-left: 22px; padding-right: 22px; }
@@ -451,8 +450,7 @@ onBeforeUnmount(() => {
   .invoice-content { padding-top: 14px; }
   .amount-card { margin-top: 6px; margin-bottom: 8px; padding: 8px 10px; }
   .amount-value { font-size: 18px; }
-  .invoice-details, .payment-methods { margin-top: 10px; margin-bottom: 12px; }
-  .invoice-details:not([open]) summary, .payment-methods:not([open]) summary { padding-top: 5px; padding-bottom: 5px; }
+  .payment-methods { margin-top: 10px; margin-bottom: 12px; }
   .qr-frame { margin-top: 8px; margin-bottom: 10px; padding: 10px; }
 }
 
